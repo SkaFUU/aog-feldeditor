@@ -1,68 +1,74 @@
-# AOG Feldeditor
+# AOG Field Editor
 
-Ein Editor im Browser für Felder aus [AgOpenGPS](https://github.com/AgOpenGPS-Official/AgOpenGPS). Er öffnet den Feldordner direkt, zeigt alles auf einem Satellitenbild und schreibt die Dateien im Format von AgOpenGPS zurück. Ein Umweg über KML ist nicht nötig.
+🇩🇪 [Deutsche Version](README.de.md)
 
-Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und keinen Server und schickt keine Felddaten ins Internet. Aus dem Internet lädt er nur die Kartenbilder und die Kartenbibliothek [Leaflet](https://leafletjs.com/).
+A browser-based editor for [AgOpenGPS](https://github.com/AgOpenGPS-Official/AgOpenGPS) fields. It opens the field folder directly, shows everything on a satellite map and writes the files back in AgOpenGPS format, with no detour through KML.
 
-> *English:* A single-file browser editor for AgOpenGPS fields. You can edit boundary points, flags and the field origin, view coverage, tracks, headlands and tramlines, and rename tracks. It reads and writes the AgOpenGPS field files directly. The interface is in German.
+**▶ Use it here: https://skafuu.github.io/aog-feldeditor/**
 
-## Funktionen
+The editor is **a single HTML file**. It needs no installation and no server, and it never sends your field data anywhere. The only things loaded from the internet are the map tiles and the map library [Leaflet](https://leafletjs.com/). The interface is available in **English and German**: it follows your browser language, and you can switch with **DE | EN** at the top.
 
-**Schlaggrenze bearbeiten**
-- Jeder Punkt ist auf dem Satellitenbild sichtbar und lässt sich verschieben, einfügen (Klick auf die Linie) oder löschen (Rechtsklick oder Entf). Strg+Z macht den letzten Schritt rückgängig.
-- Außen- und Innengrenzen werden unterstützt.
-- „Ausdünnen“ entfernt überflüssige Punkte.
-- Beim Speichern wird die Grenze so aufbereitet, wie AgOpenGPS sie selbst speichert: Punktabstand, Umlaufrichtung und Richtung jedes Punkts. Nur dann berechnet AgOpenGPS daraus eine korrekte Wendelinie.
-- Grenzen mit zu wenigen Punkten erkennt der Editor beim Öffnen und repariert sie beim Speichern.
+## Features
 
-**Fahnen**
-- Fahnen setzen, verschieben und löschen, Farbe und Notiz ändern.
+**Edit the field boundary**
+- Every point is shown on the satellite image. You can drag points, insert them (click the line) or delete them (right-click or Del). Ctrl+Z undoes the last step.
+- Outer and inner boundaries are supported.
+- "Reduce" removes unnecessary points.
+- When saving, the boundary is prepared the same way AgOpenGPS stores it: point spacing, winding direction and the heading of every point. Only then does AgOpenGPS build a correct U-turn line from it.
+- Boundaries with too few points are detected when a field is opened and repaired when it is saved.
 
-**Feld-Ursprung (StartFix)**
-- Der Ursprung lässt sich in die Feldmitte oder an eine beliebige Stelle verschieben. Alle Dateien im Feldordner werden dabei mit umgerechnet: Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahrgassen, Pfade, Höhendaten und Hintergrundbild.
-- Ein Kreis zeigt die 500 m, in denen „Drive In“ das Feld findet.
+**Flags**
+- Add, move and delete flags, change their color and note.
 
-**Anzeigen**
-- Alles, was das Feld enthält, lässt sich einzeln ein- und ausblenden:
-  - bearbeitete Fläche, mit ha-Angabe
-  - AB-Linien und Kurven
-  - Vorgewende und Vorgewende-Linien
-  - Fahrgassen
-  - Kontur
-  - aufgezeichneter Pfad
-  - das Hintergrundbild aus AgOpenGPS
-- Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
+**Field origin (StartFix)**
+- Move the origin to the field center or to any other point. All files in the field folder are converted along with it: boundary, headland, tracks, coverage, tramlines, recorded paths, elevation data and background image.
+- A circle shows the 500 m within which "Drive In" finds the field. "Drive In" only lists a field when you are within 500 m of its StartFix, which is where you pressed "New" when the field was created.
 
-**Namen**
-- AB-Linien, Kurven und Vorgewende-Linien umbenennen. Dabei ändert sich in der Datei nur die Namenszeile.
+**Show**
+- Everything the field contains can be shown or hidden individually:
+  - coverage, with area in ha
+  - AB lines and curves
+  - headland and headland lines
+  - tramlines
+  - contour
+  - recorded path
+  - the background image saved by AgOpenGPS
+- Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
-**Felder-Liste**
-- Einmal den Ordner `Dokumente\AgOpenGPS\Fields` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Der Ordner wird gemerkt.
+**Names**
+- Rename AB lines, curves and headland lines. Only the name line in the file changes.
 
-## Benutzung
+**Field list**
+- Choose the folder `Documents\AgOpenGPS\Fields` once. All fields then appear in a searchable list, and one click opens a field. The folder is remembered.
 
-1. `index.html` herunterladen und in **Chrome oder Edge** öffnen (Doppelklick genügt). Oder die Online-Version über GitHub Pages verwenden, falls sie eingerichtet ist.
-2. **„Felder-Ordner wählen…“** klicken und `Dokumente\AgOpenGPS\Fields` auswählen.
-3. Ein Feld anklicken, bearbeiten, **„Änderungen speichern“**.
+## Usage
 
-Wichtig:
-- **Das Feld vorher in AgOpenGPS schließen.** AgOpenGPS speichert beim Schließen und würde deine Änderungen sonst überschreiben.
-- Nach einer Änderung an der Grenze in AgOpenGPS das **Vorgewende neu erstellen**.
-- Vor jedem Speichern legt der Editor die bisherigen Dateien in einem Unterordner `Backup_<Datum-Uhrzeit>` im Feldordner ab. Beim ersten Ausprobieren trotzdem besser mit einer Kopie des Feldes arbeiten.
-- Ist das Feld mit **AgShare** verknüpft und dort „Automatisch laden“ aktiv, lädt AgOpenGPS beim Öffnen die Cloud-Version. Deine lokalen Änderungen werden dann überschrieben. Der Editor weist darauf hin.
+1. Open **https://skafuu.github.io/aog-feldeditor/** in **Chrome or Edge**. Alternatively, download `index.html` and open it from your computer.
+2. Click **"Choose fields folder…"** and select `Documents\AgOpenGPS\Fields`.
+3. Click a field, edit it, then click **"Save changes"**.
 
-Firefox kann keine Ordner öffnen. Dort wählst du die Dateien des Feldes von Hand aus und bekommst die geänderten Dateien als Download.
+Important:
+- **Close the field in AgOpenGPS before saving.** AgOpenGPS saves when it closes a field and would otherwise overwrite your changes.
+- After changing the boundary, **rebuild the headland** in AgOpenGPS.
+- Before every save, the editor copies the previous files into a `Backup_<date-time>` subfolder of the field folder. For your first tries, still work on a copy of the field.
+- If the field is linked to **AgShare** with auto load enabled, AgOpenGPS loads the cloud version when the field is opened and your local changes are replaced. The editor warns you about this.
 
-## Technisches
+Firefox cannot open folders. There you select the field files by hand and get the changed files as downloads.
 
-- Die Umrechnung zwischen Längen-/Breitengrad und den lokalen Metern eines Feldes entspricht `LocalPlane` aus AgOpenGPS.
-- Die Dateiformate (`Field.txt`, `Boundary.txt`, `Flags.txt`, `TrackLines.txt`, `Headland.txt`, `Headlines.txt`, `Sections.txt`, `Contour.txt`, `Tram.txt`, `RecPath.txt`, `Elevation.txt`, `BackPic.txt`) sind am Quellcode von AgOpenGPS (Zweig `develop`, Stand 2026) ausgerichtet und mit echten Feldern getestet.
-- Unbekannte Dateien im Feldordner fasst der Editor nicht an.
+## Technical notes
 
-## Haftung
+- The conversion between latitude/longitude and a field's local metres matches `LocalPlane` in AgOpenGPS.
+- The file formats (`Field.txt`, `Boundary.txt`, `Flags.txt`, `TrackLines.txt`, `Headland.txt`, `Headlines.txt`, `Sections.txt`, `Contour.txt`, `Tram.txt`, `RecPath.txt`, `Elevation.txt`, `BackPic.txt`) follow the AgOpenGPS source code (`develop` branch, 2026) and were tested with real fields.
+- Files in the field folder that the editor does not know are left untouched.
 
-Das ist ein privates Hilfswerkzeug ohne Verbindung zum AgOpenGPS-Projekt. Die Nutzung erfolgt auf eigene Gefahr. Kontrolliere geänderte Felder in AgOpenGPS, bevor du damit arbeitest.
+## Feedback
 
-## Lizenz
+Bugs and ideas are welcome as a [GitHub issue](https://github.com/SkaFUU/aog-feldeditor/issues) or in the [AgOpenGPS forum](https://discourse.agopengps.com). If a field doesn't load or looks wrong after saving, the files of that field help a lot.
+
+## Disclaimer
+
+This is a private helper tool and is not affiliated with the AgOpenGPS project. Use it at your own risk and check changed fields in AgOpenGPS before working with them.
+
+## License
 
 [MIT](LICENSE)

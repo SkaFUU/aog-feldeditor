@@ -46,6 +46,13 @@
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   #nameList { max-height:260px; overflow-y:auto; }
   #nameList .tag { flex:0 0 52px; font-size:12px; color:var(--muted); }
+  .titlebar { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  .titlebar h1 { margin:0; }
+  .lang { display:flex; flex:none; }
+  .lang button { width:auto; margin:0; padding:3px 7px; font-size:12px; border-radius:0; background:#1d2024; color:var(--muted); }
+  .lang button:first-child { border-radius:5px 0 0 5px; }
+  .lang button:last-child { border-radius:0 5px 5px 0; }
+  .lang button.on { background:#3c4148; color:var(--fg); font-weight:600; }
   #hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1000; background:rgba(0,0,0,.8); color:#fff; padding:6px 12px; border-radius:6px; display:none; pointer-events:none; }
   @media (max-width:700px) { #app { flex-direction:column; } #side { width:100%; max-height:45%; } }
 </style>
@@ -53,71 +60,74 @@
 <body>
 <div id="app">
   <div id="side">
-    <h1>AgOpenGPS Feldeditor</h1>
-
-    <h2>Felder</h2>
-    <div id="rootName" class="muted">Noch kein Felder-Ordner gewählt</div>
-    <button id="btnRoot" class="primary">Felder-Ordner wählen…</button>
-    <button id="btnRegrant" style="display:none">Zugriff auf den Felder-Ordner erlauben</button>
-    <input id="fieldFilter" placeholder="Feld suchen…" style="display:none;margin-top:4px">
-    <select id="fieldList" size="10" style="display:none;margin-top:4px"></select>
-    <div class="muted">Einmal Dokumente\AgOpenGPS\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.</div>
-    <div id="fallback" style="display:none">
-      <div class="muted">Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):</div>
-      <input type="file" id="fileIn" multiple accept=".txt">
+    <div class="titlebar">
+      <h1 data-i18n="h1">AgOpenGPS Feldeditor</h1>
+      <div class="lang"><button data-lang="de">DE</button><button data-lang="en">EN</button></div>
     </div>
-    <div id="agshare" class="muted warn" style="display:none;margin-top:6px">
+
+    <h2 data-i18n="hFields">Felder</h2>
+    <div id="rootName" class="muted" data-i18n="rootNone">Noch kein Felder-Ordner gewählt</div>
+    <button id="btnRoot" class="primary" data-i18n="btnRoot">Felder-Ordner wählen…</button>
+    <button id="btnRegrant" style="display:none" data-i18n="btnRegrant">Zugriff auf den Felder-Ordner erlauben</button>
+    <input id="fieldFilter" data-i18n-ph="phFilter" placeholder="Feld suchen…" style="display:none;margin-top:4px">
+    <select id="fieldList" size="10" style="display:none;margin-top:4px"></select>
+    <div class="muted" data-i18n="rootHelp">Einmal Dokumente\AgOpenGPS\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.</div>
+    <div id="fallback" style="display:none">
+      <div class="muted" data-i18n-html="fallback">Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):</div>
+      <input type="file" id="fileIn" multiple accept=".txt,.png">
+    </div>
+    <div id="agshare" class="muted warn" style="display:none;margin-top:6px" data-i18n="agshare">
       Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.
     </div>
 
-    <h2>Schlaggrenze</h2>
+    <h2 data-i18n="hBoundary">Schlaggrenze</h2>
     <select id="selBnd"></select>
     <div class="info" id="info">–</div>
     <div class="row">
-      <button id="btnDel" disabled>Punkt löschen</button>
-      <button id="btnUndo" disabled>Rückgängig</button>
+      <button id="btnDel" disabled data-i18n="btnDel">Punkt löschen</button>
+      <button id="btnUndo" disabled data-i18n="btnUndo">Rückgängig</button>
     </div>
-    <ul class="muted">
+    <ul class="muted" data-i18n-html="editHelp">
       <li><b>Verschieben:</b> Punkt ziehen</li>
       <li><b>Einfügen:</b> auf die rote Linie klicken</li>
       <li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>
     </ul>
-    <label class="muted">Punkte ausdünnen (Toleranz in m)</label>
+    <label class="muted" data-i18n="simpLabel">Punkte ausdünnen (Toleranz in m)</label>
     <div class="row">
       <input id="tol" type="number" value="0.01" min="0.001" step="0.01">
-      <button id="btnSimp" disabled>Ausdünnen</button>
+      <button id="btnSimp" disabled data-i18n="btnSimp">Ausdünnen</button>
     </div>
 
-    <h2>Fahnen</h2>
-    <button id="btnAddFlag" disabled>Fahne setzen (dann in Karte klicken)</button>
+    <h2 data-i18n="hFlags">Fahnen</h2>
+    <button id="btnAddFlag" disabled data-i18n="btnAddFlag">Fahne setzen (dann in Karte klicken)</button>
     <div id="flagEdit" style="display:none" class="info">
       <div id="flagTitle"></div>
       <div class="row" style="margin-top:6px">
-        <select id="flagColor"><option value="0">Rot</option><option value="1">Grün</option><option value="2">Lila</option></select>
-        <button id="btnDelFlag">Löschen</button>
+        <select id="flagColor"><option value="0" data-i18n="red">Rot</option><option value="1" data-i18n="green">Grün</option><option value="2" data-i18n="purple">Lila</option></select>
+        <button id="btnDelFlag" data-i18n="btnDelFlag">Löschen</button>
       </div>
-      <input id="flagNotes" placeholder="Notiz" style="margin-top:4px">
+      <input id="flagNotes" data-i18n-ph="phNote" placeholder="Notiz" style="margin-top:4px">
     </div>
-    <div class="muted">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
+    <div class="muted" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
 
-    <h2>Anzeigen</h2>
+    <h2 data-i18n="hLayers">Anzeigen</h2>
     <div id="layerList" class="muted">–</div>
 
-    <h2>Namen</h2>
+    <h2 data-i18n="hNames">Namen</h2>
     <div id="nameList" class="muted">–</div>
-    <div class="muted">Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.</div>
+    <div class="muted" data-i18n="namesHelp">Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.</div>
 
-    <h2>Feld-Ursprung (StartFix)</h2>
+    <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
     <div class="info" id="originInfo">–</div>
-    <button id="btnOriginCenter" disabled>Ursprung in Feldmitte setzen</button>
-    <button id="btnOriginClick" disabled>Ursprung per Klick setzen</button>
-    <button id="btnOriginReset" disabled>Ursprung zurücksetzen</button>
-    <div class="muted">Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.</div>
+    <button id="btnOriginCenter" disabled data-i18n="btnOriginCenter">Ursprung in Feldmitte setzen</button>
+    <button id="btnOriginClick" disabled data-i18n="btnOriginClick">Ursprung per Klick setzen</button>
+    <button id="btnOriginReset" disabled data-i18n="btnOriginReset">Ursprung zurücksetzen</button>
+    <div class="muted" data-i18n="originHelp">Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.</div>
 
-    <h2>Speichern</h2>
-    <button id="btnSave" class="primary" disabled>Änderungen speichern</button>
+    <h2 data-i18n="hSave">Speichern</h2>
+    <button id="btnSave" class="primary" disabled data-i18n="btnSave">Änderungen speichern</button>
     <div id="status"></div>
-    <ul class="muted">
+    <ul class="muted" data-i18n-html="saveHelp">
       <li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li>
       <li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li>
       <li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>
@@ -127,6 +137,99 @@
 </div>
 
 <script>
+// ---------- Sprache (Deutsch / Englisch) ----------
+const I18N = {
+  de: {
+    title: 'AOG Feldeditor', h1: 'AgOpenGPS Feldeditor',
+    hFields: 'Felder', rootNone: 'Noch kein Felder-Ordner gewählt', rootIs: 'Felder-Ordner: {0}',
+    btnRoot: 'Felder-Ordner wählen…', btnRegrant: 'Zugriff auf den Felder-Ordner erlauben', phFilter: 'Feld suchen…',
+    rootHelp: 'Einmal Dokumente\\AgOpenGPS\\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.',
+    fallback: 'Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):',
+    agshare: 'Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.',
+    hBoundary: 'Schlaggrenze', btnDel: 'Punkt löschen', btnUndo: 'Rückgängig',
+    editHelp: '<li><b>Verschieben:</b> Punkt ziehen</li><li><b>Einfügen:</b> auf die rote Linie klicken</li><li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>',
+    simpLabel: 'Punkte ausdünnen (Toleranz in m)', btnSimp: 'Ausdünnen',
+    hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen (dann in Karte klicken)', red: 'Rot', green: 'Grün', purple: 'Lila',
+    btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.',
+    hLayers: 'Anzeigen', hNames: 'Namen',
+    namesHelp: 'Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.',
+    hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'Ursprung in Feldmitte setzen', btnOriginClick: 'Ursprung per Klick setzen',
+    btnOriginReset: 'Ursprung zurücksetzen',
+    originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
+    hSave: 'Speichern', btnSave: 'Änderungen speichern',
+    saveHelp: '<li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li><li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li><li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>',
+    zoomIn: 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen', flagTip: 'Fahne {0}', flagTitle: '<b>Fahne {0}</b> · {1}',
+    min3: 'Eine Grenze braucht mindestens 3 Punkte.',
+    confirmOrigin: 'Ursprung um {0} m verschieben?\n\nBeim Speichern werden Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahnen, Fahrgassen und aufgezeichnete Pfade mit umgerechnet.',
+    originMoved: 'Ursprung verschoben – noch nicht gespeichert.', originReset: 'Ursprung zurückgesetzt.',
+    errNoStartFix: 'StartFix nicht in Field.txt gefunden', errBadStartFix: 'StartFix ungültig',
+    errBoundary: 'Unerwartetes Format in Boundary.txt, Zeile {0}', errNoField: 'Field.txt fehlt – ist das ein Feldordner?',
+    outer: 'Außengrenze', inner: 'Innengrenze {0}', ptsShort: '{0} Pkt.',
+    loaded: 'Geladen: {0}', unreadable: ' – nicht lesbar: {0}',
+    sparse: 'Achtung: Die Grenze hat zu wenige Punkte – AOG berechnet daraus eine falsche Wendelinie. Einfach „Änderungen speichern“ drücken, dann wird sie für AOG verdichtet.',
+    noFields: 'In „{0}“ wurden keine Felder gefunden – bitte Dokumente\\AgOpenGPS\\Fields wählen.',
+    error: 'Fehler: {0}', discard: 'Ungespeicherte Änderungen verwerfen?', fieldLoaded: 'Feld „{0}“ geladen.',
+    nothingToSave: 'Keine Änderungen zum Speichern.', saved: 'Gespeichert: {0}',
+    downloaded: 'Heruntergeladen: {0} – in den Feldordner kopieren.', saveError: 'Fehler beim Speichern: {0}',
+    L_sections: 'Bearbeitete Fläche', L_tracks: 'Spuren (AB-Linien, Kurven)', L_headland: 'Vorgewende',
+    L_headlines: 'Vorgewende-Linien', L_tram: 'Fahrgassen', L_contour: 'Kontur', L_recpath: 'Aufgezeichneter Pfad',
+    L_backpic: 'Hintergrundbild aus AOG', L_flags: 'Fahnen',
+    noName: '(ohne Name)', tagAB: 'AB', tagCurve: 'Kurve', tagTrack: 'Spur', tagHeadline: 'Vorgew.',
+    noNames: 'Keine benennbaren Spuren in diesem Feld.', noBoundary: 'Keine Schlaggrenze vorhanden',
+    infoPts: 'Punkte: <b>{0}</b> · Fläche: <b>{1} ha</b>', infoPoint: 'Punkt #{0}: {1}',
+    distCenter: 'Abstand zur Feldmitte: <b>{0} m</b>', farthest: 'Weitester Grenzpunkt: <b>{0} m</b>',
+    outside500: 'Teile des Felds liegen außerhalb von 500 m – dort findet „Drive In“ das Feld nicht.',
+    movedBy: 'Verschoben um {0} m (nicht gespeichert)', tolTooBig: 'Toleranz zu groß.', reduced: '{0} → {1} Punkte'
+  },
+  en: {
+    title: 'AOG Field Editor', h1: 'AgOpenGPS Field Editor',
+    hFields: 'Fields', rootNone: 'No fields folder selected yet', rootIs: 'Fields folder: {0}',
+    btnRoot: 'Choose fields folder…', btnRegrant: 'Allow access to the fields folder', phFilter: 'Search field…',
+    rootHelp: 'Choose Documents\\AgOpenGPS\\Fields once – the folder is remembered. Then just click a field.',
+    fallback: 'Your browser cannot open folders. Select <b>all files</b> in the field folder (Ctrl+A):',
+    agshare: 'This field is linked to AgShare. If “auto load” is enabled there, AOG replaces your changes with the cloud version when the field is opened.',
+    hBoundary: 'Field boundary', btnDel: 'Delete point', btnUndo: 'Undo',
+    editHelp: '<li><b>Move:</b> drag a point</li><li><b>Insert:</b> click the red line</li><li><b>Delete:</b> right-click a point, or select it + Del</li>',
+    simpLabel: 'Reduce points (tolerance in m)', btnSimp: 'Reduce',
+    hFlags: 'Flags', btnAddFlag: 'Add flag (then click the map)', red: 'Red', green: 'Green', purple: 'Purple',
+    btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Drag a flag to move it, click it to edit.',
+    hLayers: 'Show', hNames: 'Names',
+    namesHelp: 'Clicking into a name highlights the track in yellow on the map. Flags are named via their note.',
+    hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'Move origin to field center', btnOriginClick: 'Set origin by clicking the map',
+    btnOriginReset: 'Reset origin',
+    originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
+    hSave: 'Save', btnSave: 'Save changes',
+    saveHelp: '<li><b>Close</b> the field in AgOpenGPS first.</li><li>All changed files are backed up to a <i>Backup_…</i> subfolder first.</li><li>After changing the boundary, <b>rebuild the headland</b> in AOG.</li>',
+    zoomIn: 'Zoom in further to edit the boundary points', flagTip: 'Flag {0}', flagTitle: '<b>Flag {0}</b> · {1}',
+    min3: 'A boundary needs at least 3 points.',
+    confirmOrigin: 'Move the origin by {0} m?\n\nWhen saving, boundary, headland, tracks, coverage, flags, tramlines and recorded paths are converted as well.',
+    originMoved: 'Origin moved – not saved yet.', originReset: 'Origin reset.',
+    errNoStartFix: 'StartFix not found in Field.txt', errBadStartFix: 'Invalid StartFix',
+    errBoundary: 'Unexpected format in Boundary.txt, line {0}', errNoField: 'Field.txt is missing – is this a field folder?',
+    outer: 'Outer boundary', inner: 'Inner boundary {0}', ptsShort: '{0} pts',
+    loaded: 'Loaded: {0}', unreadable: ' – unreadable: {0}',
+    sparse: 'Note: the boundary has too few points – AOG would build a wrong U-turn line from it. Just press “Save changes” and it will be densified for AOG.',
+    noFields: 'No fields found in “{0}” – please choose Documents\\AgOpenGPS\\Fields.',
+    error: 'Error: {0}', discard: 'Discard unsaved changes?', fieldLoaded: 'Field “{0}” loaded.',
+    nothingToSave: 'No changes to save.', saved: 'Saved: {0}',
+    downloaded: 'Downloaded: {0} – copy them into the field folder.', saveError: 'Error while saving: {0}',
+    L_sections: 'Coverage', L_tracks: 'Tracks (AB lines, curves)', L_headland: 'Headland',
+    L_headlines: 'Headland lines', L_tram: 'Tramlines', L_contour: 'Contour', L_recpath: 'Recorded path',
+    L_backpic: 'Background image from AOG', L_flags: 'Flags',
+    noName: '(no name)', tagAB: 'AB', tagCurve: 'Curve', tagTrack: 'Track', tagHeadline: 'Headl.',
+    noNames: 'No tracks to rename in this field.', noBoundary: 'No boundary',
+    infoPts: 'Points: <b>{0}</b> · Area: <b>{1} ha</b>', infoPoint: 'Point #{0}: {1}',
+    distCenter: 'Distance to field center: <b>{0} m</b>', farthest: 'Farthest boundary point: <b>{0} m</b>',
+    outside500: 'Parts of the field are more than 500 m away – “Drive In” won’t find the field from there.',
+    movedBy: 'Moved by {0} m (not saved)', tolTooBig: 'Tolerance too large.', reduced: '{0} → {1} points'
+  }
+};
+let lang = 'de';
+try { lang = localStorage.getItem('aogLang') || ''; } catch (e) { }
+if (!I18N[lang]) lang = /^de\b/i.test(navigator.language || '') ? 'de' : 'en';
+const t = (key, ...args) => String(I18N[lang][key] ?? I18N.de[key] ?? key).replace(/\{(\d)\}/g, (_, i) => args[i]);
+const fmtNum = (x, d) => { const s = x.toFixed(d); return lang === 'de' ? s.replace('.', ',') : s; };
+
 // ---------- Projektion (wie AgOpenGPS LocalPlane) ----------
 const D = Math.PI / 180;
 const mLat = la => 111132.92 - 559.82 * Math.cos(2 * la * D) + 1.175 * Math.cos(4 * la * D) - 0.0023 * Math.cos(6 * la * D);
@@ -161,14 +264,14 @@ const originChanged = () => plane && (plane.lat0 !== diskPlane.lat0 || plane.lon
 // ---------- Karte ----------
 const map = L.map('map', { maxZoom: 22, doubleClickZoom: false }).setView([47.6, 14], 7);
 const bases = {
-  'Satellit (Esri)': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  'Esri World Imagery': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     { maxZoom: 22, maxNativeZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' }),
-  'Orthofoto basemap.at (nur AT)': L.tileLayer('https://mapsneu.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg',
+  'basemap.at Orthofoto (AT)': L.tileLayer('https://mapsneu.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg',
     { maxZoom: 22, maxNativeZoom: 19, attribution: 'basemap.at' }),
   'OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     { maxZoom: 22, maxNativeZoom: 19, attribution: '© OpenStreetMap' })
 };
-bases['Satellit (Esri)'].addTo(map);
+bases['Esri World Imagery'].addTo(map);
 L.control.layers(bases).addTo(map);
 
 const otherLayer = L.layerGroup().addTo(map);
@@ -207,7 +310,7 @@ function drawMarkers() {
   if (!b) return;
   const vb = map.getBounds().pad(0.1), vis = [];
   b.pts.forEach((p, i) => { const q = ll(p); if (vb.contains(q)) vis.push([i, q]); });
-  if (vis.length > MAX_MARKERS) { hint.textContent = 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen'; hint.style.display = 'block'; return; }
+  if (vis.length > MAX_MARKERS) { hint.textContent = t('zoomIn'); hint.style.display = 'block'; return; }
   for (const [i, q] of vis) {
     const m = L.marker(q, { icon: i === sel ? iconSel : icon, draggable: true, autoPan: true });
     m.on('dragstart', () => { pushUndo(); sel = i; });
@@ -225,7 +328,7 @@ function drawFlags() {
   flags.forEach((f, i) => {
     const ic = L.divIcon({ className: '', html: `<div class="flag${i === selFlag ? ' sel' : ''}" style="--c:${FLAG_COLORS[f.color] || FLAG_COLORS[0]}"></div>`, iconSize: [18, 24], iconAnchor: [2, 24] });
     const m = L.marker([f.lat, f.lon], { icon: ic, draggable: true, zIndexOffset: 1000 });
-    m.bindTooltip(`Fahne ${i + 1}${f.notes ? ': ' + f.notes : ''}`, { direction: 'top', offset: [6, -24] });
+    m.bindTooltip(t('flagTip', i + 1) + (f.notes ? ': ' + f.notes : ''), { direction: 'top', offset: [6, -24] });
     m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
     m.on('click', () => { selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
     m.addTo(flagLayer);
@@ -286,7 +389,7 @@ function onLineClick(e) {
 function deletePoint(i) {
   const b = bnds[active];
   if (!b || i < 0) return;
-  if (b.pts.length <= 3) { setStatus('Eine Grenze braucht mindestens 3 Punkte.', 'err'); return; }
+  if (b.pts.length <= 3) { setStatus(t('min3'), 'err'); return; }
   pushUndo();
   b.pts.splice(i, 1);
   sel = -1;
@@ -352,18 +455,18 @@ function setOrigin(la, lo) {
 }
 function askOrigin(la, lo) {
   const d = distM(plane.lat0, plane.lon0, la, lo);
-  if (!confirm(`Ursprung um ${d.toFixed(0)} m verschieben?\n\nBeim Speichern werden Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahnen, Fahrgassen und aufgezeichnete Pfade mit umgerechnet.`)) return;
+  if (!confirm(t('confirmOrigin', d.toFixed(0)))) return;
   setOrigin(la, lo);
-  setStatus('Ursprung verschoben – noch nicht gespeichert.', 'ok');
+  setStatus(t('originMoved'), 'ok');
 }
 
 // ---------- Dateien lesen ----------
 function parseField(txt) {
   const l = txt.split(/\r?\n/).map(s => s.trim());
   const k = l.findIndex(s => /^startfix/i.test(s));
-  if (k < 0 || !l[k + 1]) throw new Error('StartFix nicht in Field.txt gefunden');
+  if (k < 0 || !l[k + 1]) throw new Error(t('errNoStartFix'));
   const v = l[k + 1].split(',').map(parseFloat);
-  if (!isFinite(v[0]) || !isFinite(v[1])) throw new Error('StartFix ungültig');
+  if (!isFinite(v[0]) || !isFinite(v[1])) throw new Error(t('errBadStartFix'));
   return v;
 }
 
@@ -376,7 +479,7 @@ function parseBoundary(txt) {
     const flagLines = [];
     while (i < l.length && /^(true|false)$/i.test(l[i])) flagLines.push(l[i++]);
     const n = parseInt(l[i++], 10);
-    if (!isFinite(n)) throw new Error('Unerwartetes Format in Boundary.txt, Zeile ' + i);
+    if (!isFinite(n)) throw new Error(t('errBoundary', i));
     const pts = [], orig = [];
     for (let k = 0; k < n; k++) {
       const line = l[i++]; const v = line.split(',');
@@ -536,15 +639,14 @@ function buildOutputs() {
 
 // ---------- Laden / Speichern ----------
 function load(found) {
-  if (found['Field.txt'] === undefined) throw new Error('Field.txt fehlt – ist das ein Feldordner?');
+  if (found['Field.txt'] === undefined) throw new Error(t('errNoField'));
   files = found;
   const [la, lo] = parseField(files['Field.txt']);
   plane = diskPlane = Plane(la, lo);
   bnds = files['Boundary.txt'] ? parseBoundary(files['Boundary.txt']) : [];
   flags = files['Flags.txt'] ? parseFlags(files['Flags.txt']) : [];
   active = 0; sel = -1; selFlag = -1; undo = []; unsaved = false; flagsDirty = false;
-  const s = document.getElementById('selBnd'); s.innerHTML = '';
-  bnds.forEach((b, i) => s.add(new Option((i === 0 ? 'Außengrenze' : 'Innengrenze ' + i) + ` (${b.pts.length} Pkt.)`, i)));
+  fillBndSelect();
   document.getElementById('agshare').style.display = files['agshare.txt'] !== undefined ? 'block' : 'none';
   ['btnAddFlag', 'btnOriginClick', 'btnOriginReset', 'btnSave'].forEach(id => document.getElementById(id).disabled = false);
   document.getElementById('btnOriginCenter').disabled = !bnds.length;
@@ -554,13 +656,19 @@ function load(found) {
   drawAll();
   const bad = initExtras();
   const list = Object.keys(files).filter(n => n !== 'agshare.txt').join(', ');
-  setStatus('Geladen: ' + list + (bad.length ? ' – nicht lesbar: ' + bad.join(', ') : ''), bad.length ? 'err' : 'ok');
+  setStatus(t('loaded', list) + (bad.length ? t('unreadable', bad.join(', ')) : ''), bad.length ? 'err' : 'ok');
   const sparse = bnds.filter((b, i) => fenceTooSparse(b.pts, i));
   if (sparse.length) {
     sparse.forEach(b => b.dirty = true); unsaved = true; updateInfo();
-    setStatus('Achtung: Die Grenze hat zu wenige Punkte – AOG berechnet daraus eine falsche Wendelinie. ' +
-      'Einfach „Änderungen speichern“ drücken, dann wird sie für AOG verdichtet.', 'err');
+    setStatus(t('sparse'), 'err');
   }
+}
+
+function fillBndSelect() {
+  const s = document.getElementById('selBnd');
+  s.innerHTML = '';
+  bnds.forEach((b, i) => s.add(new Option((i === 0 ? t('outer') : t('inner', i)) + ' (' + t('ptsShort', b.pts.length) + ')', i)));
+  s.value = active;
 }
 
 async function readDir(dir) {
@@ -582,7 +690,8 @@ const stamp = () => { const d = new Date(), p = x => String(x).padStart(2, '0');
 
 // ---------- Felder-Ordner (wird im Browser gemerkt) ----------
 const $ = id => document.getElementById(id);
-let rootHandle = null, fieldNames = [], currentField = '';
+let rootHandle = null, fieldNames = [], currentField = '', rootLabel = '';
+function showRoot(name) { rootLabel = name; $('rootName').textContent = t('rootIs', name); }
 
 function idb(mode, fn) {
   return new Promise((resolve, reject) => {
@@ -601,7 +710,7 @@ const idbSet = (k, v) => idb('readwrite', st => st.put(v, k));
 
 async function useRoot(h) {
   rootHandle = h;
-  $('rootName').textContent = 'Felder-Ordner: ' + h.name;
+  showRoot(h.name);
   $('btnRegrant').style.display = 'none';
   fieldNames = [];
   for await (const [name, e] of h.entries()) {
@@ -609,7 +718,7 @@ async function useRoot(h) {
     try { await e.getFileHandle('Field.txt'); fieldNames.push(name); } catch (err) { /* kein Feld */ }
   }
   fieldNames.sort((a, b) => a.localeCompare(b, 'de'));
-  if (!fieldNames.length) setStatus('In „' + h.name + '“ wurden keine Felder gefunden – bitte Dokumente\\AgOpenGPS\\Fields wählen.', 'err');
+  if (!fieldNames.length) setStatus(t('noFields', h.name), 'err');
   renderFieldList();
 }
 
@@ -627,14 +736,14 @@ $('btnRoot').onclick = async () => {
     const h = await window.showDirectoryPicker({ id: 'aogFields', mode: 'readwrite', startIn: 'documents' });
     await useRoot(h);
     try { await idbSet('root', h); } catch (e) { /* Merken nicht möglich – dann eben jedes Mal wählen */ }
-  } catch (e) { if (e.name !== 'AbortError') setStatus('Fehler: ' + e.message, 'err'); }
+  } catch (e) { if (e.name !== 'AbortError') setStatus(t('error', e.message), 'err'); }
 };
 
 $('btnRegrant').onclick = async () => {
   try {
     const h = await idbGet('root');
     if (h && await h.requestPermission({ mode: 'readwrite' }) === 'granted') await useRoot(h);
-  } catch (e) { setStatus('Fehler: ' + e.message, 'err'); }
+  } catch (e) { setStatus(t('error', e.message), 'err'); }
 };
 
 $('fieldFilter').oninput = renderFieldList;
@@ -642,13 +751,13 @@ $('fieldFilter').oninput = renderFieldList;
 $('fieldList').onchange = async e => {
   const name = e.target.value;
   if (!name || name === currentField) return;
-  if (unsaved && !confirm('Ungespeicherte Änderungen verwerfen?')) { e.target.value = currentField; return; }
+  if (unsaved && !confirm(t('discard'))) { e.target.value = currentField; return; }
   try {
     const d = await rootHandle.getDirectoryHandle(name);
     load(await readDir(d));
     dirHandle = d; currentField = name;
-    setStatus('Feld „' + name + '“ geladen.', 'ok');
-  } catch (err) { setStatus('Fehler: ' + err.message, 'err'); }
+    setStatus(t('fieldLoaded', name), 'ok');
+  } catch (err) { setStatus(t('error', err.message), 'err'); }
 };
 
 // Beim Start den gemerkten Felder-Ordner wieder öffnen (Chrome fragt ggf. einmal nach der Erlaubnis)
@@ -658,7 +767,7 @@ $('fieldList').onchange = async e => {
     const h = await idbGet('root');
     if (!h) return;
     if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') await useRoot(h);
-    else { $('rootName').textContent = 'Felder-Ordner: ' + h.name; $('btnRegrant').style.display = 'block'; }
+    else { showRoot(h.name); $('btnRegrant').style.display = 'block'; }
   } catch (e) { /* nichts gemerkt */ }
 })();
 
@@ -673,18 +782,18 @@ document.getElementById('fileIn').onchange = async e => {
     }
     dirHandle = null; currentField = '';
     load(found);
-  } catch (err) { setStatus('Fehler: ' + err.message, 'err'); }
+  } catch (err) { setStatus(t('error', err.message), 'err'); }
 };
 
 document.getElementById('btnSave').onclick = async () => {
   const outs = buildOutputs(), names = Object.keys(outs);
-  if (!names.length) { setStatus('Keine Änderungen zum Speichern.', ''); return; }
+  if (!names.length) { setStatus(t('nothingToSave'), ''); return; }
   try {
     if (dirHandle) {
       const bdir = await dirHandle.getDirectoryHandle('Backup_' + stamp(), { create: true });
       for (const n of names) if (files[n] !== undefined) await writeText(bdir, realName[n] || n, files[n]);
       for (const n of names) await writeText(dirHandle, realName[n] || n, outs[n]);
-      setStatus('Gespeichert: ' + names.join(', '), 'ok');
+      setStatus(t('saved', names.join(', ')), 'ok');
     } else {
       for (const n of names) {
         const a = document.createElement('a');
@@ -692,7 +801,7 @@ document.getElementById('btnSave').onclick = async () => {
         a.download = n; a.click();
         await new Promise(r => setTimeout(r, 300));
       }
-      setStatus('Heruntergeladen: ' + names.join(', ') + ' – in den Feldordner kopieren.', 'ok');
+      setStatus(t('downloaded', names.join(', ')), 'ok');
     }
     for (const n of names) files[n] = outs[n];
     diskPlane = plane;
@@ -700,7 +809,7 @@ document.getElementById('btnSave').onclick = async () => {
     flagsDirty = false; unsaved = false;
     initExtras();
     updateInfo();
-  } catch (e) { setStatus('Fehler beim Speichern: ' + e.message, 'err'); }
+  } catch (e) { setStatus(t('saveError', e.message), 'err'); }
 };
 
 // ---------- Weitere Felddaten anzeigen (Ebenen) und umbenennen ----------
@@ -709,9 +818,7 @@ map.createPane('backpic').style.zIndex = 300;
 map.createPane('extras').style.zIndex = 350;              // unter der Grenze, die bearbeitet wird
 const cv = L.canvas({ pane: 'extras', padding: 0.5 });
 const EXTRA_DEFS = [
-  ['sections', 'Bearbeitete Fläche'], ['tracks', 'Spuren (AB-Linien, Kurven)'], ['headland', 'Vorgewende'],
-  ['headlines', 'Vorgewende-Linien'], ['tram', 'Fahrgassen'], ['contour', 'Kontur'],
-  ['recpath', 'Aufgezeichneter Pfad'], ['backpic', 'Hintergrundbild aus AOG'], ['flags', 'Fahnen']
+  ['sections'], ['tracks'], ['headland'], ['headlines'], ['tram'], ['contour'], ['recpath'], ['backpic'], ['flags']   // Beschriftung: t('L_' + id)
 ];
 const exLayers = Object.fromEntries(EXTRA_DEFS.map(([id]) => [id, id === 'flags' ? flagLayer : L.layerGroup()]));
 let ex = { tracks: [], headlines: [] }, namesDirty = { tracks: false, headlines: false }, hiTrack = -1, backPicUrl = null;
@@ -887,7 +994,7 @@ function drawLayer(id) {
   if (id === 'headland') ex.headland.forEach(p => L.polygon(p, { renderer: cv, interactive: false, color: '#ff9500', weight: 2, dashArray: '8 6', fill: false }).addTo(g));
   if (id === 'headlines') ex.headlines.filter(h => h.show).forEach(h => {
     line(h.pts, { color: '#ffd400', weight: 2, dashArray: '4 4' });
-    nameLabel(h.pts[h.pts.length >> 1], h.name || '(ohne Name)').addTo(g);
+    nameLabel(h.pts[h.pts.length >> 1], h.name || t('noName')).addTo(g);
   });
   if (id === 'tram' && ex.tram) {
     [ex.tram.outer, ex.tram.inner].forEach(a => { if (a.length > 1) L.polygon(a, { renderer: cv, interactive: false, color: '#ff8c00', weight: 2, fill: false }).addTo(g); });
@@ -903,10 +1010,10 @@ function showLayer(id) { if (layerOn[id]) map.addLayer(exLayers[id]); else map.r
 function renderLayerList() {
   const box = $('layerList');
   box.innerHTML = '';
-  EXTRA_DEFS.forEach(([id, label]) => {
-    const n = exCount(id);
+  EXTRA_DEFS.forEach(([id]) => {
+    const n = exCount(id), label = t('L_' + id);
     if (!n && id !== 'flags') { map.removeLayer(exLayers[id]); return; }
-    const extra = id === 'sections' ? ` (${(ex.sections.area / 10000).toFixed(2).replace('.', ',')} ha)` : n > 1 ? ` (${n})` : '';
+    const extra = id === 'sections' ? ` (${fmtNum(ex.sections.area / 10000, 2)} ha)` : n > 1 ? ` (${n})` : '';
     const lab = document.createElement('label'), cb = document.createElement('input');
     lab.className = 'check';
     cb.type = 'checkbox';
@@ -948,9 +1055,9 @@ function renderNames() {
     row.append(tag, inp);
     box.append(row);
   });
-  add('tracks', ex.tracks, t => t.mode === 2 ? 'AB' : t.mode === 4 ? 'Kurve' : 'Spur');
-  add('headlines', ex.headlines, () => 'Vorgew.');
-  if (!box.children.length) box.textContent = 'Keine benennbaren Spuren in diesem Feld.';
+  add('tracks', ex.tracks, tr => tr.mode === 2 ? t('tagAB') : tr.mode === 4 ? t('tagCurve') : t('tagTrack'));
+  add('headlines', ex.headlines, () => t('tagHeadline'));
+  if (!box.children.length) box.textContent = t('noNames');
 }
 
 // Namenszeilen ersetzen, alles andere bleibt Zeichen für Zeichen gleich
@@ -976,10 +1083,10 @@ function initExtras() {
 // ---------- Anzeige ----------
 function updateInfo() {
   const b = bnds[active], el = document.getElementById('info');
-  if (!b) el.textContent = plane ? 'Keine Schlaggrenze vorhanden' : '–';
+  if (!b) el.textContent = plane ? t('noBoundary') : '–';
   else {
-    let h = `Punkte: <b>${b.pts.length}</b> · Fläche: <b>${(area(b.pts) / 10000).toFixed(3)} ha</b>`;
-    if (sel >= 0 && b.pts[sel]) { const [la, lo] = plane.inv(b.pts[sel].e, b.pts[sel].n); h += `<br>Punkt #${sel}: ${la.toFixed(7)}, ${lo.toFixed(7)}`; }
+    let h = t('infoPts', b.pts.length, fmtNum(area(b.pts) / 10000, 3));
+    if (sel >= 0 && b.pts[sel]) { const [la, lo] = plane.inv(b.pts[sel].e, b.pts[sel].n); h += '<br>' + t('infoPoint', sel, la.toFixed(7) + ', ' + lo.toFixed(7)); }
     el.innerHTML = h;
   }
   document.getElementById('btnDel').disabled = sel < 0;
@@ -988,7 +1095,7 @@ function updateInfo() {
   const fe = document.getElementById('flagEdit'), f = flags[selFlag];
   fe.style.display = f ? 'block' : 'none';
   if (f) {
-    document.getElementById('flagTitle').innerHTML = `<b>Fahne ${selFlag + 1}</b> · ${f.lat.toFixed(7)}, ${f.lon.toFixed(7)}`;
+    document.getElementById('flagTitle').innerHTML = t('flagTitle', selFlag + 1, f.lat.toFixed(7) + ', ' + f.lon.toFixed(7));
     document.getElementById('flagColor').value = f.color;
     if (document.activeElement !== document.getElementById('flagNotes')) document.getElementById('flagNotes').value = f.notes || '';
   }
@@ -1000,11 +1107,11 @@ function updateInfo() {
     let far = 0;
     bnds[0].pts.forEach(p => { const [a, c] = plane.inv(p.e, p.n); far = Math.max(far, distM(plane.lat0, plane.lon0, a, c)); });
     const cen = centroid(bnds[0].pts), [ca, co] = plane.inv(cen.e, cen.n);
-    h += `<br>Abstand zur Feldmitte: <b>${distM(plane.lat0, plane.lon0, ca, co).toFixed(0)} m</b>`;
-    h += `<br>Weitester Grenzpunkt: <b>${far.toFixed(0)} m</b>`;
-    if (far > 500) h += `<br><span class="warn">Teile des Felds liegen außerhalb von 500 m – dort findet „Drive In“ das Feld nicht.</span>`;
+    h += '<br>' + t('distCenter', distM(plane.lat0, plane.lon0, ca, co).toFixed(0));
+    h += '<br>' + t('farthest', far.toFixed(0));
+    if (far > 500) h += '<br><span class="warn">' + t('outside500') + '</span>';
   }
-  if (originChanged()) h += `<br><span class="warn">Verschoben um ${distM(diskPlane.lat0, diskPlane.lon0, plane.lat0, plane.lon0).toFixed(0)} m (nicht gespeichert)</span>`;
+  if (originChanged()) h += '<br><span class="warn">' + t('movedBy', distM(diskPlane.lat0, diskPlane.lon0, plane.lat0, plane.lon0).toFixed(0)) + '</span>';
   oi.innerHTML = h;
 }
 
@@ -1018,10 +1125,10 @@ document.getElementById('btnSimp').onclick = () => {
   const b = bnds[active], tol = parseFloat(document.getElementById('tol').value);
   if (!b || !(tol > 0)) return;
   const res = simplifyRing(b.pts, tol);
-  if (res.length < 3) { setStatus('Toleranz zu groß.', 'err'); return; }
+  if (res.length < 3) { setStatus(t('tolTooBig'), 'err'); return; }
   pushUndo(); const before = b.pts.length;
   b.pts = res; sel = -1; changed(b); drawAll();
-  setStatus(`${before} → ${res.length} Punkte`, 'ok');
+  setStatus(t('reduced', before, res.length), 'ok');
 };
 document.getElementById('btnAddFlag').onclick = () => setMode('flag');
 document.getElementById('btnOriginClick').onclick = () => setMode('origin');
@@ -1030,7 +1137,7 @@ document.getElementById('btnOriginCenter').onclick = () => {
   askOrigin(la, lo);
 };
 document.getElementById('btnOriginReset').onclick = () => {
-  if (originChanged()) { setOrigin(diskPlane.lat0, diskPlane.lon0); setStatus('Ursprung zurückgesetzt.', 'ok'); }
+  if (originChanged()) { setOrigin(diskPlane.lat0, diskPlane.lon0); setStatus(t('originReset'), 'ok'); }
 };
 document.getElementById('flagColor').onchange = e => { flags[selFlag].color = +e.target.value; flagsDirty = unsaved = true; drawFlags(); };
 document.getElementById('flagNotes').oninput = e => { flags[selFlag].notes = e.target.value.replace(/,/g, ' '); flagsDirty = unsaved = true; drawFlags(); };
@@ -1050,6 +1157,21 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Escape') { setMode(''); sel = -1; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); }
 });
 window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue = ''; } });
+
+// ---------- Sprache anwenden (automatisch nach Browser, umschaltbar mit DE | EN) ----------
+function applyLang(l) {
+  if (l) { lang = l; try { localStorage.setItem('aogLang', l); } catch (e) { } }
+  document.documentElement.lang = lang;
+  document.title = t('title');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  if (rootLabel) showRoot(rootLabel);
+  if (plane) { fillBndSelect(); updateInfo(); drawFlags(); drawMarkers(); renderLayerList(); renderNames(); drawLayer('headlines'); }
+}
+document.querySelectorAll('[data-lang]').forEach(b => { b.onclick = () => applyLang(b.dataset.lang); });
+applyLang();
 </script>
 </body>
 </html>
