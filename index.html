@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AOG Feldeditor</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root { --bg:#1d2024; --panel:#272b30; --fg:#e8eaed; --muted:#9aa0a6; --acc:#ff3b30; --ok:#34c759; --warn:#ffd400; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:14px/1.4 system-ui,Segoe UI,sans-serif; }
+  #app { display:flex; height:100%; }
+  #side { width:320px; flex:none; background:var(--panel); padding:14px; overflow-y:auto; }
+  #mapwrap { flex:1; position:relative; display:flex; }
+  #map { flex:1; }
+  #map.pick { cursor:crosshair; }
+  h1 { font-size:17px; margin:0 0 10px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:18px 0 6px; }
+  button { width:100%; padding:9px; margin:4px 0; border:0; border-radius:6px; background:#3c4148; color:var(--fg); font:inherit; cursor:pointer; }
+  button:hover { background:#4a5058; }
+  button.primary { background:var(--acc); color:#fff; font-weight:600; }
+  button.on { background:var(--warn); color:#000; }
+  button:disabled { opacity:.4; cursor:default; }
+  .row { display:flex; gap:6px; align-items:center; }
+  .row > * { flex:1; }
+  select,input { width:100%; padding:7px; border-radius:6px; border:1px solid #444; background:#1d2024; color:var(--fg); font:inherit; }
+  .info { background:#1d2024; border-radius:6px; padding:8px; font-variant-numeric:tabular-nums; margin:6px 0; }
+  .muted { color:var(--muted); font-size:12.5px; }
+  .warn { color:var(--warn); }
+  #status { margin-top:8px; font-size:13px; min-height:1.4em; }
+  #status.ok { color:var(--ok); } #status.err { color:var(--acc); }
+  ul { padding-left:18px; margin:4px 0; } li { margin:2px 0; }
+  .pt { background:#fff; border:2px solid var(--acc); border-radius:50%; }
+  .pt.sel { background:var(--warn); border-color:#000; }
+  .flag { position:relative; width:18px; height:24px; }
+  .flag::before { content:''; position:absolute; left:1px; top:0; width:2px; height:24px; background:#111; }
+  .flag::after { content:''; position:absolute; left:3px; top:0; width:13px; height:10px; background:var(--c); border:1px solid #000; }
+  .flag.sel::after { outline:2px solid var(--warn); }
+  .origin { width:22px; height:22px; border:3px solid #00c8ff; border-radius:50%; background:rgba(0,200,255,.25); position:relative; }
+  .origin::before, .origin::after { content:''; position:absolute; background:#00c8ff; }
+  .origin::before { left:50%; top:-6px; width:2px; height:28px; margin-left:-1px; }
+  .origin::after { top:50%; left:-6px; height:2px; width:28px; margin-top:-1px; }
+  .check { display:flex; gap:8px; align-items:center; margin:4px 0; font-size:13px; cursor:pointer; }
+  .check input { width:auto; }
+  .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  #nameList { max-height:260px; overflow-y:auto; }
+  #nameList .tag { flex:0 0 52px; font-size:12px; color:var(--muted); }
+  #hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1000; background:rgba(0,0,0,.8); color:#fff; padding:6px 12px; border-radius:6px; display:none; pointer-events:none; }
+  @media (max-width:700px) { #app { flex-direction:column; } #side { width:100%; max-height:45%; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="side">
+    <h1>AgOpenGPS Feldeditor</h1>
+
+    <h2>Felder</h2>
+    <div id="rootName" class="muted">Noch kein Felder-Ordner gewählt</div>
+    <button id="btnRoot" class="primary">Felder-Ordner wählen…</button>
+    <button id="btnRegrant" style="display:none">Zugriff auf den Felder-Ordner erlauben</button>
+    <input id="fieldFilter" placeholder="Feld suchen…" style="display:none;margin-top:4px">
+    <select id="fieldList" size="10" style="display:none;margin-top:4px"></select>
+    <div class="muted">Einmal Dokumente\AgOpenGPS\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.</div>
+    <div id="fallback" style="display:none">
+      <div class="muted">Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):</div>
+      <input type="file" id="fileIn" multiple accept=".txt">
+    </div>
+    <div id="agshare" class="muted warn" style="display:none;margin-top:6px">
+      Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.
+    </div>
+
+    <h2>Schlaggrenze</h2>
+    <select id="selBnd"></select>
+    <div class="info" id="info">–</div>
+    <div class="row">
+      <button id="btnDel" disabled>Punkt löschen</button>
+      <button id="btnUndo" disabled>Rückgängig</button>
+    </div>
+    <ul class="muted">
+      <li><b>Verschieben:</b> Punkt ziehen</li>
+      <li><b>Einfügen:</b> auf die rote Linie klicken</li>
+      <li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>
+    </ul>
+    <label class="muted">Punkte ausdünnen (Toleranz in m)</label>
+    <div class="row">
+      <input id="tol" type="number" value="0.01" min="0.001" step="0.01">
+      <button id="btnSimp" disabled>Ausdünnen</button>
+    </div>
+
+    <h2>Fahnen</h2>
+    <button id="btnAddFlag" disabled>Fahne setzen (dann in Karte klicken)</button>
+    <div id="flagEdit" style="display:none" class="info">
+      <div id="flagTitle"></div>
+      <div class="row" style="margin-top:6px">
+        <select id="flagColor"><option value="0">Rot</option><option value="1">Grün</option><option value="2">Lila</option></select>
+        <button id="btnDelFlag">Löschen</button>
+      </div>
+      <input id="flagNotes" placeholder="Notiz" style="margin-top:4px">
+    </div>
+    <div class="muted">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
+
+    <h2>Anzeigen</h2>
+    <div id="layerList" class="muted">–</div>
+
+    <h2>Namen</h2>
+    <div id="nameList" class="muted">–</div>
+    <div class="muted">Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.</div>
+
+    <h2>Feld-Ursprung (StartFix)</h2>
+    <div class="info" id="originInfo">–</div>
+    <button id="btnOriginCenter" disabled>Ursprung in Feldmitte setzen</button>
+    <button id="btnOriginClick" disabled>Ursprung per Klick setzen</button>
+    <button id="btnOriginReset" disabled>Ursprung zurücksetzen</button>
+    <div class="muted">Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.</div>
+
+    <h2>Speichern</h2>
+    <button id="btnSave" class="primary" disabled>Änderungen speichern</button>
+    <div id="status"></div>
+    <ul class="muted">
+      <li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li>
+      <li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li>
+      <li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>
+    </ul>
+  </div>
+  <div id="mapwrap"><div id="map"></div><div id="hint"></div></div>
+</div>
+
+<script>
+// ---------- Projektion (wie AgOpenGPS LocalPlane) ----------
+const D = Math.PI / 180;
+const mLat = la => 111132.92 - 559.82 * Math.cos(2 * la * D) + 1.175 * Math.cos(4 * la * D) - 0.0023 * Math.cos(6 * la * D);
+const mLon = la => 111412.84 * Math.cos(la * D) - 93.5 * Math.cos(3 * la * D) + 0.118 * Math.cos(5 * la * D);
+function Plane(lat0, lon0) {
+  const ml = mLat(lat0);
+  return {
+    lat0, lon0,
+    fwd: (la, lo) => ({ e: (lo - lon0) * mLon(la), n: (la - lat0) * ml }),
+    inv: (e, n) => { const la = lat0 + n / ml; return [la, lon0 + e / mLon(la)]; }
+  };
+}
+function distM(a1, o1, a2, o2) {
+  const s1 = Math.sin((a2 - a1) * D / 2), s2 = Math.sin((o2 - o1) * D / 2);
+  return 2 * 6371000 * Math.asin(Math.sqrt(s1 * s1 + Math.cos(a1 * D) * Math.cos(a2 * D) * s2 * s2));
+}
+const r3 = x => String(Math.round(x * 1000) / 1000);
+const r7 = x => String(Math.round(x * 1e7) / 1e7);
+
+// ---------- Zustand ----------
+const KNOWN = ['Field.txt', 'Boundary.txt', 'Flags.txt', 'Headland.txt', 'TrackLines.txt', 'Sections.txt', 'Contour.txt',
+  'Tram.txt', 'RecPath.txt', 'Headlines.txt', 'Elevation.txt', 'BackPic.txt', 'agshare.txt'];
+let files = {}, realName = {};       // Originaltexte der Dateien auf der Platte
+let plane = null, diskPlane = null;  // aktueller Ursprung / Ursprung der Dateien auf der Platte
+let bnds = [], flags = [], flagsDirty = false;
+let active = 0, sel = -1, selFlag = -1, undo = [], unsaved = false, mode = '';
+let dirHandle = null;
+
+const ll = p => { const [a, b] = plane.inv(p.e, p.n); return L.latLng(a, b); };
+const originChanged = () => plane && (plane.lat0 !== diskPlane.lat0 || plane.lon0 !== diskPlane.lon0);
+
+// ---------- Karte ----------
+const map = L.map('map', { maxZoom: 22, doubleClickZoom: false }).setView([47.6, 14], 7);
+const bases = {
+  'Satellit (Esri)': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { maxZoom: 22, maxNativeZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' }),
+  'Orthofoto basemap.at (nur AT)': L.tileLayer('https://mapsneu.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg',
+    { maxZoom: 22, maxNativeZoom: 19, attribution: 'basemap.at' }),
+  'OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { maxZoom: 22, maxNativeZoom: 19, attribution: '© OpenStreetMap' })
+};
+bases['Satellit (Esri)'].addTo(map);
+L.control.layers(bases).addTo(map);
+
+const otherLayer = L.layerGroup().addTo(map);
+const markerLayer = L.layerGroup().addTo(map);
+const flagLayer = L.layerGroup().addTo(map);
+const originLayer = L.layerGroup().addTo(map);
+let lineLayer = null, hitLayer = null;
+const icon = L.divIcon({ className: 'pt', iconSize: [14, 14] });
+const iconSel = L.divIcon({ className: 'pt sel', iconSize: [18, 18] });
+const FLAG_COLORS = ['#ff3b30', '#34c759', '#af52de'];
+const MAX_MARKERS = 800;
+
+function drawAll() {
+  otherLayer.clearLayers();
+  bnds.forEach((b, i) => {
+    if (i !== active) L.polygon(b.pts.map(ll), { color: '#ffd400', weight: 2, fill: false, dashArray: '6 4', interactive: false }).addTo(otherLayer);
+  });
+  drawActive(); drawMarkers(); drawFlags(); drawOrigin(); updateInfo();
+}
+
+function drawActive() {
+  const b = bnds[active];
+  const r = b ? b.pts.map(ll) : [];
+  if (r.length) r.push(r[0]);
+  if (!lineLayer) {
+    lineLayer = L.polyline(r, { color: '#ff3b30', weight: 3, interactive: false }).addTo(map);
+    hitLayer = L.polyline(r, { color: '#000', opacity: 0, weight: 18 }).addTo(map);
+    hitLayer.on('click', onLineClick);
+  } else { lineLayer.setLatLngs(r); hitLayer.setLatLngs(r); }
+}
+
+function drawMarkers() {
+  markerLayer.clearLayers();
+  const b = bnds[active], hint = document.getElementById('hint');
+  hint.style.display = 'none';
+  if (!b) return;
+  const vb = map.getBounds().pad(0.1), vis = [];
+  b.pts.forEach((p, i) => { const q = ll(p); if (vb.contains(q)) vis.push([i, q]); });
+  if (vis.length > MAX_MARKERS) { hint.textContent = 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen'; hint.style.display = 'block'; return; }
+  for (const [i, q] of vis) {
+    const m = L.marker(q, { icon: i === sel ? iconSel : icon, draggable: true, autoPan: true });
+    m.on('dragstart', () => { pushUndo(); sel = i; });
+    m.on('drag', e => { b.pts[i] = plane.fwd(e.latlng.lat, e.latlng.lng); drawActive(); });
+    m.on('dragend', () => { changed(b); drawMarkers(); });
+    m.on('click', () => { sel = i; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); });
+    m.on('contextmenu', e => { L.DomEvent.preventDefault(e.originalEvent); deletePoint(i); });
+    m.addTo(markerLayer);
+  }
+}
+map.on('moveend', drawMarkers);
+
+function drawFlags() {
+  flagLayer.clearLayers();
+  flags.forEach((f, i) => {
+    const ic = L.divIcon({ className: '', html: `<div class="flag${i === selFlag ? ' sel' : ''}" style="--c:${FLAG_COLORS[f.color] || FLAG_COLORS[0]}"></div>`, iconSize: [18, 24], iconAnchor: [2, 24] });
+    const m = L.marker([f.lat, f.lon], { icon: ic, draggable: true, zIndexOffset: 1000 });
+    m.bindTooltip(`Fahne ${i + 1}${f.notes ? ': ' + f.notes : ''}`, { direction: 'top', offset: [6, -24] });
+    m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
+    m.on('click', () => { selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
+    m.addTo(flagLayer);
+  });
+}
+
+function drawOrigin() {
+  originLayer.clearLayers();
+  if (!plane) return;
+  const c = [plane.lat0, plane.lon0];
+  L.circle(c, { radius: 500, color: '#00c8ff', weight: 2, dashArray: '8 6', fill: false, interactive: false }).addTo(originLayer);
+  L.marker(c, { icon: L.divIcon({ className: '', html: '<div class="origin"></div>', iconSize: [22, 22], iconAnchor: [11, 11] }), interactive: false }).addTo(originLayer);
+}
+
+function changed(b) { b.dirty = true; unsaved = true; updateInfo(); }
+
+// ---------- Modi (Fahne setzen / Ursprung per Klick) ----------
+function setMode(m) {
+  mode = mode === m ? '' : m;
+  document.getElementById('btnAddFlag').classList.toggle('on', mode === 'flag');
+  document.getElementById('btnOriginClick').classList.toggle('on', mode === 'origin');
+  document.getElementById('map').classList.toggle('pick', !!mode);
+}
+function mapClick(latlng) {
+  if (mode === 'flag') {
+    const id = flags.reduce((m, f) => Math.max(m, f.id || 0), 0) + 1;
+    flags.push({ lat: latlng.lat, lon: latlng.lng, heading: 0, color: 0, id, notes: '' });
+    selFlag = flags.length - 1; sel = -1; flagsDirty = unsaved = true;
+    setMode(''); drawFlags(); drawMarkers(); updateInfo();
+  } else if (mode === 'origin') {
+    setMode(''); askOrigin(latlng.lat, latlng.lng);
+  } else {
+    sel = -1; selFlag = -1; drawMarkers(); drawFlags(); updateInfo();
+  }
+}
+map.on('click', e => mapClick(e.latlng));
+
+// ---------- Grenze bearbeiten ----------
+function onLineClick(e) {
+  L.DomEvent.stopPropagation(e);
+  if (mode) { mapClick(e.latlng); return; }
+  const b = bnds[active], q = plane.fwd(e.latlng.lat, e.latlng.lng), n = b.pts.length;
+  let best = 0, bd = Infinity, bp = null;
+  for (let i = 0; i < n; i++) {
+    const a = b.pts[i], c = b.pts[(i + 1) % n];
+    const dx = c.e - a.e, dy = c.n - a.n, l2 = dx * dx + dy * dy;
+    let t = l2 ? ((q.e - a.e) * dx + (q.n - a.n) * dy) / l2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    const pe = a.e + t * dx, pn = a.n + t * dy, d = (q.e - pe) ** 2 + (q.n - pn) ** 2;
+    if (d < bd) { bd = d; best = i; bp = { e: pe, n: pn }; }
+  }
+  pushUndo();
+  b.pts.splice(best + 1, 0, bp);
+  sel = best + 1; selFlag = -1;
+  changed(b); drawActive(); drawMarkers(); drawFlags();
+}
+
+function deletePoint(i) {
+  const b = bnds[active];
+  if (!b || i < 0) return;
+  if (b.pts.length <= 3) { setStatus('Eine Grenze braucht mindestens 3 Punkte.', 'err'); return; }
+  pushUndo();
+  b.pts.splice(i, 1);
+  sel = -1;
+  changed(b); drawActive(); drawMarkers();
+}
+
+function pushUndo() {
+  undo.push({ a: active, pts: bnds[active].pts.map(p => ({ ...p })), dirty: bnds[active].dirty });
+  if (undo.length > 300) undo.shift();
+}
+function doUndo() {
+  const u = undo.pop(); if (!u) return;
+  bnds[u.a].pts = u.pts; bnds[u.a].dirty = u.dirty;
+  active = u.a; sel = -1; unsaved = true;
+  document.getElementById('selBnd').value = active;
+  drawAll();
+}
+
+function segDist(p, a, b) {
+  const dx = b.e - a.e, dy = b.n - a.n, l2 = dx * dx + dy * dy;
+  let t = l2 ? ((p.e - a.e) * dx + (p.n - a.n) * dy) / l2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p.e - (a.e + t * dx), p.n - (a.n + t * dy));
+}
+function dp(pts, tol) {
+  if (pts.length < 3) return pts.slice();
+  const keep = new Uint8Array(pts.length); keep[0] = keep[pts.length - 1] = 1;
+  const st = [[0, pts.length - 1]];
+  while (st.length) {
+    const [s, e] = st.pop(); let md = 0, mi = -1;
+    for (let i = s + 1; i < e; i++) { const d = segDist(pts[i], pts[s], pts[e]); if (d > md) { md = d; mi = i; } }
+    if (md > tol) { keep[mi] = 1; st.push([s, mi], [mi, e]); }
+  }
+  return pts.filter((_, i) => keep[i]);
+}
+function simplifyRing(pts, tol) {
+  let f = 0, fd = 0;
+  pts.forEach((p, i) => { const d = (p.e - pts[0].e) ** 2 + (p.n - pts[0].n) ** 2; if (d > fd) { fd = d; f = i; } });
+  const a = dp(pts.slice(0, f + 1), tol), b = dp(pts.slice(f).concat([pts[0]]), tol);
+  return a.concat(b.slice(1, -1));
+}
+
+function area(pts) {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; s += a.e * b.n - b.e * a.n; }
+  return Math.abs(s) / 2;
+}
+function centroid(pts) {
+  let a = 0, cx = 0, cy = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i], q = pts[(i + 1) % pts.length], k = p.e * q.n - q.e * p.n;
+    a += k; cx += (p.e + q.e) * k; cy += (p.n + q.n) * k;
+  }
+  return a ? { e: cx / (3 * a), n: cy / (3 * a) } : pts[0];
+}
+
+// ---------- Ursprung ----------
+function setOrigin(la, lo) {
+  const np = Plane(la, lo);
+  bnds.forEach(b => { b.pts = b.pts.map(p => { const [a, c] = plane.inv(p.e, p.n); return np.fwd(a, c); }); b.dirty = true; });
+  plane = np; undo = []; sel = -1; unsaved = true;
+  drawAll();
+}
+function askOrigin(la, lo) {
+  const d = distM(plane.lat0, plane.lon0, la, lo);
+  if (!confirm(`Ursprung um ${d.toFixed(0)} m verschieben?\n\nBeim Speichern werden Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahnen, Fahrgassen und aufgezeichnete Pfade mit umgerechnet.`)) return;
+  setOrigin(la, lo);
+  setStatus('Ursprung verschoben – noch nicht gespeichert.', 'ok');
+}
+
+// ---------- Dateien lesen ----------
+function parseField(txt) {
+  const l = txt.split(/\r?\n/).map(s => s.trim());
+  const k = l.findIndex(s => /^startfix/i.test(s));
+  if (k < 0 || !l[k + 1]) throw new Error('StartFix nicht in Field.txt gefunden');
+  const v = l[k + 1].split(',').map(parseFloat);
+  if (!isFinite(v[0]) || !isFinite(v[1])) throw new Error('StartFix ungültig');
+  return v;
+}
+
+function parseBoundary(txt) {
+  const l = txt.split(/\r?\n/).map(s => s.trim());
+  let i = 0; const out = [];
+  if (l[i] && l[i].startsWith('$')) i++;
+  while (i < l.length) {
+    if (l[i] === '') { i++; continue; }
+    const flagLines = [];
+    while (i < l.length && /^(true|false)$/i.test(l[i])) flagLines.push(l[i++]);
+    const n = parseInt(l[i++], 10);
+    if (!isFinite(n)) throw new Error('Unerwartetes Format in Boundary.txt, Zeile ' + i);
+    const pts = [], orig = [];
+    for (let k = 0; k < n; k++) {
+      const line = l[i++]; const v = line.split(',');
+      pts.push({ e: parseFloat(v[0]), n: parseFloat(v[1]) }); orig.push(line);
+    }
+    out.push({ flagLines, pts, orig, dirty: false });
+  }
+  return out;
+}
+
+function parseFlags(txt) {
+  const l = txt.split(/\r?\n/), n = parseInt(l[1], 10) || 0, out = [];
+  for (let i = 0; i < n; i++) {
+    const w = (l[2 + i] || '').split(',');
+    if (w.length < 6) continue;
+    const eight = w.length >= 8;
+    out.push({ lat: +w[0], lon: +w[1], heading: eight ? +w[4] : 0, color: +w[eight ? 5 : 4] || 0, id: +w[eight ? 6 : 5] || i + 1,
+      notes: eight ? w.slice(7).join(' ').trim() : '' });
+  }
+  return out;
+}
+
+// ---------- Dateien schreiben ----------
+// AOG baut die Wendelinie aus jedem Grenzpunkt + dessen Richtung und verdichtet die Grenze beim
+// Laden nicht mehr. Daher hier wie AOG (CalculateFenceArea + FixFenceLine) aufbereiten.
+function fenceSignedArea(pts) {
+  let a = 0;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) a += (pts[j].e + pts[i].e) * (pts[j].n - pts[i].n);
+  return a;
+}
+function fenceSpacing(pts, idx) {
+  const ar = Math.abs(fenceSignedArea(pts) / 2);
+  const sp = ar < 200000 ? 1.1 : ar < 400000 ? 2.2 : 3.3;
+  return idx > 0 ? sp * 0.5 : sp;
+}
+const dist = (a, b) => Math.hypot(a.e - b.e, a.n - b.n);
+function prepareFence(src, idx) {
+  const pts = src.map(p => ({ e: p.e, n: p.n }));
+  const s = fenceSignedArea(pts);
+  if ((idx === 0 && s >= 0) || (idx > 0 && s < 0)) pts.reverse();
+  const sp = fenceSpacing(pts, idx);
+  for (const f of [1.5, 1.6]) {
+    for (let i = 0; i < pts.length; i++) {
+      const j = (i + 1) % pts.length;
+      if (dist(pts[i], pts[j]) > sp * f) {
+        pts.splice(j === 0 ? pts.length : j, 0, { e: (pts[i].e + pts[j].e) / 2, n: (pts[i].n + pts[j].n) / 2 });
+        i--;
+      }
+    }
+  }
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (dist(pts[i], pts[i + 1]) < sp * 0.9) { pts.splice(i + 1, 1); i--; }
+  }
+  const n = pts.length;
+  return pts.map((p, i) => {
+    const a = pts[(i - 1 + n) % n], c = pts[(i + 1) % n];
+    let h = Math.atan2(c.e - a.e, c.n - a.n); if (h < 0) h += 2 * Math.PI;
+    return { e: p.e, n: p.n, h };
+  });
+}
+// Grenze zu dünn für AOG? (z. B. ausgedünnt oder aus älterer Editor-Version gespeichert)
+function fenceTooSparse(pts, idx) {
+  const sp = fenceSpacing(pts, idx);
+  return pts.some((p, i) => dist(p, pts[(i + 1) % pts.length]) > sp * 3);
+}
+
+function serializeBoundary() {
+  const out = ['$Boundary'];
+  bnds.forEach((b, idx) => {
+    if (!b.dirty) { b.newLines = b.orig; out.push(...b.flagLines, String(b.orig.length), ...b.orig); return; }
+    b.newLines = prepareFence(b.pts, idx).map(p => r3(p.e) + ',' + r3(p.n) + ',' + p.h.toFixed(5));
+    out.push(...b.flagLines, String(b.newLines.length), ...b.newLines);
+  });
+  return out.join('\r\n') + '\r\n';
+}
+
+function serializeFlags() {
+  const out = ['$Flags', String(flags.length)];
+  for (const f of flags) {
+    const p = plane.fwd(f.lat, f.lon);
+    out.push([r7(f.lat), r7(f.lon), r3(p.e), r3(p.n), r7(f.heading), f.color, f.id, (f.notes || '').replace(/,/g, ' ')].join(','));
+  }
+  return out.join('\r\n') + '\r\n';
+}
+
+// Lokale Koordinate vom alten (Platten-)Ursprung auf den neuen umrechnen
+function T(e, n) { const [a, c] = diskPlane.inv(e, n); return plane.fwd(a, c); }
+
+const NUM = '(-?\\d+(?:\\.\\d+)?(?:[eE][-+]?\\d+)?)';
+const PT_RE = new RegExp('^(\\s*)' + NUM + '(\\s*,\\s*)' + NUM + '(.*)$');
+function shiftLine(line) {
+  const m = line.match(PT_RE); if (!m) return line;
+  const p = T(+m[2], +m[4]);
+  return m[1] + r3(p.e) + m[3] + r3(p.n) + m[5];
+}
+// Dateien, in denen jede Zeile "easting,northing[,...]" ein Punkt ist
+// skip: Zeilennummern, die nie verschoben werden dürfen (Namen wie „1,5 m“ sehen sonst wie ein Punkt aus)
+function shiftGeneric(txt, skip) { return txt.split(/\r?\n/).map((l, i) => skip && skip.has(i) ? l : shiftLine(l)).join('\r\n'); }
+
+// Sections.txt: bei ungerader Punktzahl ist der erste Eintrag eine Farbe (R,G,B), kein Punkt
+function shiftSections(txt) {
+  const l = txt.split(/\r?\n/); let i = 0;
+  while (i < l.length) {
+    const c = l[i].trim();
+    if (!/^\d+$/.test(c)) { i++; continue; }
+    const n = +c; i++;
+    for (let k = 0; k < n && i < l.length; k++, i++) if (!(k === 0 && n % 2 === 1)) l[i] = shiftLine(l[i]);
+  }
+  return l.join('\r\n');
+}
+
+function replaceStartFix(txt) {
+  const l = txt.split(/\r?\n/);
+  const k = l.findIndex(s => /^startfix/i.test(s.trim()));
+  if (k >= 0) l[k + 1] = plane.lat0 + ',' + plane.lon0;
+  return { l, k };
+}
+
+// Elevation.txt: eigener StartFix-Kopf, Zeilen: Lat,Lon,Höhe,Qualität,Easting,Northing,Heading,Roll
+function shiftElevation(txt) {
+  const { l, k } = replaceStartFix(txt);
+  for (let i = k >= 0 ? k + 2 : 0; i < l.length; i++) {
+    const w = l[i].split(',');
+    if (w.length >= 6 && w.slice(0, 6).every(x => x.trim() !== '' && isFinite(+x))) {
+      const p = plane.fwd(+w[0], +w[1]); w[4] = r3(p.e); w[5] = r3(p.n); l[i] = w.join(',');
+    }
+  }
+  return l.join('\r\n');
+}
+
+// BackPic.txt: $BackPic, True, maxE, minE, maxN, minN
+function shiftBackPic(txt) {
+  const l = txt.split(/\r?\n/);
+  if (!/^true$/i.test((l[1] || '').trim())) return txt;
+  const num = s => parseFloat(String(s).replace(/,/g, ''));
+  const lo = T(num(l[3]), num(l[5])), hi = T(num(l[2]), num(l[4]));
+  l[2] = hi.e.toFixed(3); l[3] = lo.e.toFixed(3); l[4] = hi.n.toFixed(3); l[5] = lo.n.toFixed(3);
+  return l.join('\r\n');
+}
+
+function buildOutputs() {
+  const out = {}, oc = originChanged();
+  if ((oc || bnds.some(b => b.dirty)) && bnds.length) out['Boundary.txt'] = serializeBoundary();
+  if ((oc || flagsDirty) && (flags.length || files['Flags.txt'] !== undefined)) out['Flags.txt'] = serializeFlags();
+  if (namesDirty.tracks) out['TrackLines.txt'] = renameLines(files['TrackLines.txt'], ex.tracks);
+  if (namesDirty.headlines) out['Headlines.txt'] = renameLines(files['Headlines.txt'], ex.headlines);
+  if (oc) {
+    out['Field.txt'] = replaceStartFix(files['Field.txt']).l.join('\r\n');
+    for (const f of ['Headland.txt', 'TrackLines.txt', 'Contour.txt', 'Tram.txt', 'RecPath.txt', 'Headlines.txt'])
+      if (files[f] !== undefined) out[f] = shiftGeneric(out[f] ?? files[f], nameLines(f));
+    if (files['Sections.txt'] !== undefined) out['Sections.txt'] = shiftSections(files['Sections.txt']);
+    if (files['Elevation.txt'] !== undefined) out['Elevation.txt'] = shiftElevation(files['Elevation.txt']);
+    if (files['BackPic.txt'] !== undefined) out['BackPic.txt'] = shiftBackPic(files['BackPic.txt']);
+  }
+  return out;
+}
+
+// ---------- Laden / Speichern ----------
+function load(found) {
+  if (found['Field.txt'] === undefined) throw new Error('Field.txt fehlt – ist das ein Feldordner?');
+  files = found;
+  const [la, lo] = parseField(files['Field.txt']);
+  plane = diskPlane = Plane(la, lo);
+  bnds = files['Boundary.txt'] ? parseBoundary(files['Boundary.txt']) : [];
+  flags = files['Flags.txt'] ? parseFlags(files['Flags.txt']) : [];
+  active = 0; sel = -1; selFlag = -1; undo = []; unsaved = false; flagsDirty = false;
+  const s = document.getElementById('selBnd'); s.innerHTML = '';
+  bnds.forEach((b, i) => s.add(new Option((i === 0 ? 'Außengrenze' : 'Innengrenze ' + i) + ` (${b.pts.length} Pkt.)`, i)));
+  document.getElementById('agshare').style.display = files['agshare.txt'] !== undefined ? 'block' : 'none';
+  ['btnAddFlag', 'btnOriginClick', 'btnOriginReset', 'btnSave'].forEach(id => document.getElementById(id).disabled = false);
+  document.getElementById('btnOriginCenter').disabled = !bnds.length;
+  document.getElementById('btnSimp').disabled = !bnds.length;
+  const pts = bnds.flatMap(b => b.pts.map(ll)).concat(flags.map(f => L.latLng(f.lat, f.lon)), [L.latLng(la, lo)]);
+  map.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 18 });
+  drawAll();
+  const bad = initExtras();
+  const list = Object.keys(files).filter(n => n !== 'agshare.txt').join(', ');
+  setStatus('Geladen: ' + list + (bad.length ? ' – nicht lesbar: ' + bad.join(', ') : ''), bad.length ? 'err' : 'ok');
+  const sparse = bnds.filter((b, i) => fenceTooSparse(b.pts, i));
+  if (sparse.length) {
+    sparse.forEach(b => b.dirty = true); unsaved = true; updateInfo();
+    setStatus('Achtung: Die Grenze hat zu wenige Punkte – AOG berechnet daraus eine falsche Wendelinie. ' +
+      'Einfach „Änderungen speichern“ drücken, dann wird sie für AOG verdichtet.', 'err');
+  }
+}
+
+async function readDir(dir) {
+  const found = {}; realName = {};
+  const lower = Object.fromEntries(KNOWN.map(n => [n.toLowerCase(), n]));
+  setBackPic(null);
+  for await (const [name, h] of dir.entries()) {
+    const k = lower[name.toLowerCase()];
+    if (h.kind === 'file' && k) { found[k] = await (await h.getFile()).text(); realName[k] = name; }
+    if (h.kind === 'file' && name.toLowerCase() === 'backpic.png') setBackPic(await h.getFile());
+  }
+  return found;
+}
+async function writeText(dir, name, txt) {
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable(); await w.write(txt); await w.close();
+}
+const stamp = () => { const d = new Date(), p = x => String(x).padStart(2, '0'); return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; };
+
+// ---------- Felder-Ordner (wird im Browser gemerkt) ----------
+const $ = id => document.getElementById(id);
+let rootHandle = null, fieldNames = [], currentField = '';
+
+function idb(mode, fn) {
+  return new Promise((resolve, reject) => {
+    const rq = indexedDB.open('aog-feldeditor', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+    rq.onerror = () => reject(rq.error);
+    rq.onsuccess = () => {
+      const tx = rq.result.transaction('kv', mode), r = fn(tx.objectStore('kv'));
+      tx.oncomplete = () => resolve(r.result);
+      tx.onerror = () => reject(tx.error);
+    };
+  });
+}
+const idbGet = k => idb('readonly', st => st.get(k));
+const idbSet = (k, v) => idb('readwrite', st => st.put(v, k));
+
+async function useRoot(h) {
+  rootHandle = h;
+  $('rootName').textContent = 'Felder-Ordner: ' + h.name;
+  $('btnRegrant').style.display = 'none';
+  fieldNames = [];
+  for await (const [name, e] of h.entries()) {
+    if (e.kind !== 'directory') continue;
+    try { await e.getFileHandle('Field.txt'); fieldNames.push(name); } catch (err) { /* kein Feld */ }
+  }
+  fieldNames.sort((a, b) => a.localeCompare(b, 'de'));
+  if (!fieldNames.length) setStatus('In „' + h.name + '“ wurden keine Felder gefunden – bitte Dokumente\\AgOpenGPS\\Fields wählen.', 'err');
+  renderFieldList();
+}
+
+function renderFieldList() {
+  const q = $('fieldFilter').value.trim().toLowerCase(), sel = $('fieldList');
+  sel.innerHTML = '';
+  fieldNames.filter(n => n.toLowerCase().includes(q)).forEach(n => sel.add(new Option(n, n)));
+  sel.value = currentField;
+  sel.style.display = $('fieldFilter').style.display = fieldNames.length ? 'block' : 'none';
+}
+
+$('btnRoot').onclick = async () => {
+  if (!window.showDirectoryPicker) { $('fallback').style.display = 'block'; return; }
+  try {
+    const h = await window.showDirectoryPicker({ id: 'aogFields', mode: 'readwrite', startIn: 'documents' });
+    await useRoot(h);
+    try { await idbSet('root', h); } catch (e) { /* Merken nicht möglich – dann eben jedes Mal wählen */ }
+  } catch (e) { if (e.name !== 'AbortError') setStatus('Fehler: ' + e.message, 'err'); }
+};
+
+$('btnRegrant').onclick = async () => {
+  try {
+    const h = await idbGet('root');
+    if (h && await h.requestPermission({ mode: 'readwrite' }) === 'granted') await useRoot(h);
+  } catch (e) { setStatus('Fehler: ' + e.message, 'err'); }
+};
+
+$('fieldFilter').oninput = renderFieldList;
+
+$('fieldList').onchange = async e => {
+  const name = e.target.value;
+  if (!name || name === currentField) return;
+  if (unsaved && !confirm('Ungespeicherte Änderungen verwerfen?')) { e.target.value = currentField; return; }
+  try {
+    const d = await rootHandle.getDirectoryHandle(name);
+    load(await readDir(d));
+    dirHandle = d; currentField = name;
+    setStatus('Feld „' + name + '“ geladen.', 'ok');
+  } catch (err) { setStatus('Fehler: ' + err.message, 'err'); }
+};
+
+// Beim Start den gemerkten Felder-Ordner wieder öffnen (Chrome fragt ggf. einmal nach der Erlaubnis)
+(async function restoreRoot() {
+  if (!window.showDirectoryPicker || !window.indexedDB) return;
+  try {
+    const h = await idbGet('root');
+    if (!h) return;
+    if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') await useRoot(h);
+    else { $('rootName').textContent = 'Felder-Ordner: ' + h.name; $('btnRegrant').style.display = 'block'; }
+  } catch (e) { /* nichts gemerkt */ }
+})();
+
+document.getElementById('fileIn').onchange = async e => {
+  try {
+    const found = {}; realName = {};
+    setBackPic(null);
+    for (const f of e.target.files) {
+      const k = KNOWN.find(n => n.toLowerCase() === f.name.toLowerCase());
+      if (k) { found[k] = await f.text(); realName[k] = f.name; }
+      if (f.name.toLowerCase() === 'backpic.png') setBackPic(f);
+    }
+    dirHandle = null; currentField = '';
+    load(found);
+  } catch (err) { setStatus('Fehler: ' + err.message, 'err'); }
+};
+
+document.getElementById('btnSave').onclick = async () => {
+  const outs = buildOutputs(), names = Object.keys(outs);
+  if (!names.length) { setStatus('Keine Änderungen zum Speichern.', ''); return; }
+  try {
+    if (dirHandle) {
+      const bdir = await dirHandle.getDirectoryHandle('Backup_' + stamp(), { create: true });
+      for (const n of names) if (files[n] !== undefined) await writeText(bdir, realName[n] || n, files[n]);
+      for (const n of names) await writeText(dirHandle, realName[n] || n, outs[n]);
+      setStatus('Gespeichert: ' + names.join(', '), 'ok');
+    } else {
+      for (const n of names) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([outs[n]], { type: 'text/plain' }));
+        a.download = n; a.click();
+        await new Promise(r => setTimeout(r, 300));
+      }
+      setStatus('Heruntergeladen: ' + names.join(', ') + ' – in den Feldordner kopieren.', 'ok');
+    }
+    for (const n of names) files[n] = outs[n];
+    diskPlane = plane;
+    bnds.forEach(b => { if (b.newLines) { b.orig = b.newLines; b.dirty = false; } });
+    flagsDirty = false; unsaved = false;
+    initExtras();
+    updateInfo();
+  } catch (e) { setStatus('Fehler beim Speichern: ' + e.message, 'err'); }
+};
+
+// ---------- Weitere Felddaten anzeigen (Ebenen) und umbenennen ----------
+// Alles wird beim Laden in Längen-/Breitengrad umgerechnet, ist also vom Ursprung unabhängig.
+map.createPane('backpic').style.zIndex = 300;
+map.createPane('extras').style.zIndex = 350;              // unter der Grenze, die bearbeitet wird
+const cv = L.canvas({ pane: 'extras', padding: 0.5 });
+const EXTRA_DEFS = [
+  ['sections', 'Bearbeitete Fläche'], ['tracks', 'Spuren (AB-Linien, Kurven)'], ['headland', 'Vorgewende'],
+  ['headlines', 'Vorgewende-Linien'], ['tram', 'Fahrgassen'], ['contour', 'Kontur'],
+  ['recpath', 'Aufgezeichneter Pfad'], ['backpic', 'Hintergrundbild aus AOG'], ['flags', 'Fahnen']
+];
+const exLayers = Object.fromEntries(EXTRA_DEFS.map(([id]) => [id, id === 'flags' ? flagLayer : L.layerGroup()]));
+let ex = { tracks: [], headlines: [] }, namesDirty = { tracks: false, headlines: false }, hiTrack = -1, backPicUrl = null;
+const layerOn = { sections: true, tracks: true, headland: true, headlines: true, tram: true, contour: false, recpath: true, backpic: false, flags: true };
+try { Object.assign(layerOn, JSON.parse(localStorage.getItem('aogLayers') || '{}')); } catch (e) { }
+
+function setBackPic(file) {
+  if (backPicUrl) URL.revokeObjectURL(backPicUrl);
+  backPicUrl = file ? URL.createObjectURL(file) : null;
+}
+
+const txtLines = t => t.split(/\r?\n/);
+const nums = s => String(s).split(',').map(x => parseFloat(x));
+const wgs = (e, n) => diskPlane.inv(e, n);
+
+// ab Zeile i: wiederholt "Anzahl" + so viele Punktzeilen "e,n,..."
+function parseBlocks(l, i) {
+  const out = [];
+  while (i < l.length) {
+    const c = parseInt(l[i], 10);
+    if (!(c > 0) || String(l[i]).includes(',')) { i++; continue; }
+    const pts = [];
+    for (let k = 1; k <= c && i + k < l.length; k++) { const v = nums(l[i + k]); if (isFinite(v[0]) && isFinite(v[1])) pts.push(v); }
+    out.push(pts);
+    i += c + 1;
+  }
+  return out;
+}
+
+// Sections.txt: Dreiecksstreifen; ungerade Anzahl = erster Eintrag ist die Farbe (R,G,B)
+function parseSections(txt) {
+  let area = 0;
+  const patches = parseBlocks(txtLines(txt), 0).map(b => {
+    let color = [27, 151, 160], pts = b;
+    if (b.length % 2 === 1) { color = b[0]; pts = b.slice(1); }
+    for (let j = 0; j + 2 < pts.length; j++) {
+      const [a, c, d] = [pts[j], pts[j + 1], pts[j + 2]];
+      area += Math.abs((c[0] - a[0]) * (d[1] - a[1]) - (d[0] - a[0]) * (c[1] - a[1])) / 2;
+    }
+    const left = pts.filter((_, k) => k % 2 === 0), right = pts.filter((_, k) => k % 2 === 1).reverse();
+    return { color, ring: left.concat(right).map(v => wgs(v[0], v[1])) };
+  }).filter(p => p.ring.length > 2);
+  return { patches, area };
+}
+
+// TrackLines.txt: Name, Richtung, A, B, Nudge, Art, sichtbar, Anzahl, Kurvenpunkte
+function parseTrackLines(txt) {
+  const l = txtLines(txt), twol = (l[0] || '').trim() === '$TwolTracks', out = [];
+  let i = 1;
+  while (i < l.length) {
+    const line = i, name = (l[i++] || '').trim();
+    if (!name) continue;
+    if (i + 7 > l.length) break;
+    const heading = parseFloat(l[i++]), a = nums(l[i++]), b = nums(l[i++]);
+    i++;
+    const mode = parseInt(l[i++], 10);
+    i++;
+    const cnt = parseInt(l[i++], 10);
+    if (!(cnt >= 0) || !isFinite(heading) || !isFinite(a[0]) || !isFinite(b[0])) throw new Error('Format');
+    const pts = [];
+    for (let k = 0; k < cnt && i < l.length; k++) { const v = nums(l[i++]); if (isFinite(v[0]) && isFinite(v[1])) pts.push(wgs(v[0], v[1])); }
+    if (twol) i += 2;
+    out.push({ line, name, heading, mode, a, b, pts });
+  }
+  return out;
+}
+
+// Headlines.txt: Name, Abstand, Art, A-Punkt, Anzahl, Punkte "e , n , h"
+function parseHeadlines(txt) {
+  const l = txtLines(txt), out = [];
+  let i = 1;
+  while (i < l.length) {
+    const line = i, name = l[i++];
+    if (i + 4 > l.length) break;
+    i += 3;
+    const cnt = parseInt(l[i++], 10);
+    if (!(cnt >= 0)) throw new Error('Format');
+    const pts = [];
+    for (let k = 0; k < cnt && i < l.length; k++) { const v = nums(l[i++]); if (isFinite(v[0]) && isFinite(v[1])) pts.push(wgs(v[0], v[1])); }
+    out.push({ line, name, pts, show: pts.length > 3 });   // AOG lädt nur Linien mit mehr als 3 Punkten
+  }
+  return out;
+}
+
+function parseTramFile(txt) {
+  const l = txtLines(txt).map(s => s.trim());
+  let i = l[0] && l[0].startsWith('$') ? 1 : 0;
+  const block = () => {
+    const n = parseInt(l[i++], 10) || 0, a = [];
+    for (let k = 0; k < n && i < l.length; k++) { const v = nums(l[i++]); if (isFinite(v[0]) && isFinite(v[1])) a.push(wgs(v[0], v[1])); }
+    return a;
+  };
+  const outer = block(), inner = block(), lines = [], nl = parseInt(l[i++], 10) || 0;
+  for (let k = 0; k < nl && i < l.length; k++) { const a = block(); if (a.length > 1) lines.push(a); }
+  return { outer, inner, lines };
+}
+
+// BackPic.txt: $BackPic, True, maxE, minE, maxN, minN (Zahlen ggf. mit Tausenderkomma)
+function parseBackPic(txt) {
+  const l = txtLines(txt);
+  if (!/^true$/i.test((l[1] || '').trim())) return null;
+  const v = l.slice(2, 6).map(s => parseFloat(String(s).replace(/,/g, '')));
+  if (v.length < 4 || !v.every(isFinite)) return null;
+  return [wgs(v[1], v[3]), wgs(v[0], v[2])];
+}
+
+function parseExtras() {
+  const bad = [];
+  const tryP = (f, fn, def) => { if (files[f] === undefined) return def; try { return fn(files[f]); } catch (e) { bad.push(f); return def; } };
+  const toWgs = b => b.map(v => wgs(v[0], v[1]));
+  ex = {
+    sections: tryP('Sections.txt', parseSections, null),
+    tracks: tryP('TrackLines.txt', parseTrackLines, []),
+    headland: tryP('Headland.txt', t => parseBlocks(txtLines(t), 1).filter(b => b.length > 2).map(toWgs), []),
+    headlines: tryP('Headlines.txt', parseHeadlines, []),
+    tram: tryP('Tram.txt', parseTramFile, null),
+    contour: tryP('Contour.txt', t => parseBlocks(txtLines(t), 1).filter(b => b.length > 1).map(toWgs), []),
+    recpath: tryP('RecPath.txt', t => (parseBlocks(txtLines(t), 1)[0] || []).map(v => wgs(v[0], v[1])), []),
+    backpic: tryP('BackPic.txt', parseBackPic, null)
+  };
+  namesDirty = { tracks: false, headlines: false };
+  hiTrack = -1;
+  return bad;
+}
+
+function exCount(id) {
+  switch (id) {
+    case 'sections': return ex.sections ? ex.sections.patches.length : 0;
+    case 'tracks': return ex.tracks.length;
+    case 'headland': return ex.headland.length;
+    case 'headlines': return ex.headlines.filter(h => h.show).length;
+    case 'tram': return ex.tram ? ex.tram.lines.length + (ex.tram.outer.length > 1) + (ex.tram.inner.length > 1) : 0;
+    case 'contour': return ex.contour.length;
+    case 'recpath': return ex.recpath.length > 1 ? 1 : 0;
+    case 'backpic': return ex.backpic && backPicUrl ? 1 : 0;
+    case 'flags': return flags.length;
+  }
+  return 0;
+}
+
+const nameLabel = (pos, text) => L.marker(pos, { interactive: false,
+  icon: L.divIcon({ className: '', html: `<span class="tlabel">${text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])}</span>`, iconSize: [0, 0] }) });
+
+function drawLayer(id) {
+  const g = exLayers[id];
+  if (id === 'flags') return;
+  g.clearLayers();
+  const line = (pts, style) => L.polyline(pts, { renderer: cv, interactive: false, ...style }).addTo(g);
+  if (id === 'sections' && ex.sections) {
+    const byColor = {};
+    ex.sections.patches.forEach(p => {
+      const k = p.color.slice(0, 3).map(c => Math.max(0, Math.min(255, Math.round(c)))).join(',');
+      (byColor[k] = byColor[k] || []).push([p.ring]);
+    });
+    Object.entries(byColor).forEach(([k, polys]) =>
+      L.polygon(polys, { renderer: cv, stroke: false, fillColor: `rgb(${k})`, fillOpacity: .55, interactive: false }).addTo(g));
+  }
+  if (id === 'tracks') ex.tracks.forEach((t, i) => {
+    const hi = i === hiTrack, style = { color: hi ? '#ffd400' : '#ff4fd8', weight: hi ? 5 : 2.5 };
+    let pts = t.pts, mid;
+    if (t.mode === 2) {                              // AB-Linie: über A und B hinaus verlängern
+      const h = t.heading, s = Math.sin(h), c = Math.cos(h), E = 1500;
+      pts = [wgs(t.a[0] - s * E, t.a[1] - c * E), wgs(t.b[0] + s * E, t.b[1] + c * E)];
+      const A = wgs(t.a[0], t.a[1]), B = wgs(t.b[0], t.b[1]);
+      mid = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+    } else if (t.mode === 64) {                      // Kreis (Pivot): Mittelpunkt
+      mid = wgs(t.a[0], t.a[1]);
+      L.circleMarker(mid, { renderer: cv, interactive: false, radius: 7, ...style }).addTo(g);
+    } else mid = pts[pts.length >> 1];
+    if (pts.length > 1) line(pts, style);
+    if (mid) nameLabel(mid, t.name).addTo(g);
+  });
+  if (id === 'headland') ex.headland.forEach(p => L.polygon(p, { renderer: cv, interactive: false, color: '#ff9500', weight: 2, dashArray: '8 6', fill: false }).addTo(g));
+  if (id === 'headlines') ex.headlines.filter(h => h.show).forEach(h => {
+    line(h.pts, { color: '#ffd400', weight: 2, dashArray: '4 4' });
+    nameLabel(h.pts[h.pts.length >> 1], h.name || '(ohne Name)').addTo(g);
+  });
+  if (id === 'tram' && ex.tram) {
+    [ex.tram.outer, ex.tram.inner].forEach(a => { if (a.length > 1) L.polygon(a, { renderer: cv, interactive: false, color: '#ff8c00', weight: 2, fill: false }).addTo(g); });
+    ex.tram.lines.forEach(a => line(a, { color: '#ff8c00', weight: 3 }));
+  }
+  if (id === 'contour') ex.contour.forEach(a => line(a, { color: '#7fff00', weight: 1.5 }));
+  if (id === 'recpath' && ex.recpath.length > 1) line(ex.recpath, { color: '#00e5ff', weight: 2 });
+  if (id === 'backpic' && ex.backpic && backPicUrl) L.imageOverlay(backPicUrl, ex.backpic, { pane: 'backpic', opacity: .9 }).addTo(g);
+}
+
+function showLayer(id) { if (layerOn[id]) map.addLayer(exLayers[id]); else map.removeLayer(exLayers[id]); }
+
+function renderLayerList() {
+  const box = $('layerList');
+  box.innerHTML = '';
+  EXTRA_DEFS.forEach(([id, label]) => {
+    const n = exCount(id);
+    if (!n && id !== 'flags') { map.removeLayer(exLayers[id]); return; }
+    const extra = id === 'sections' ? ` (${(ex.sections.area / 10000).toFixed(2).replace('.', ',')} ha)` : n > 1 ? ` (${n})` : '';
+    const lab = document.createElement('label'), cb = document.createElement('input');
+    lab.className = 'check';
+    cb.type = 'checkbox';
+    cb.checked = !!layerOn[id];
+    cb.onchange = () => {
+      layerOn[id] = cb.checked;
+      try { localStorage.setItem('aogLayers', JSON.stringify(layerOn)); } catch (e) { }
+      showLayer(id);
+    };
+    lab.append(cb, ' ' + label + extra);
+    box.append(lab);
+    showLayer(id);
+  });
+}
+
+function renderNames() {
+  const box = $('nameList');
+  box.innerHTML = '';
+  const add = (kind, list, tagOf) => list.forEach((t, i) => {
+    if (kind === 'headlines' && !t.show) return;
+    const row = document.createElement('div'), tag = document.createElement('span'), inp = document.createElement('input');
+    row.className = 'row';
+    row.style.margin = '3px 0';
+    tag.className = 'tag';
+    tag.textContent = tagOf(t);
+    inp.value = t.name;
+    inp.oninput = () => {
+      const v = inp.value.trim();
+      inp.style.borderColor = v ? '' : 'var(--acc)';     // leerer Name würde AOG aus dem Tritt bringen
+      if (!v) return;
+      t.name = v;
+      namesDirty[kind] = true; unsaved = true;
+      drawLayer(kind);
+    };
+    if (kind === 'tracks') {
+      inp.onfocus = () => { hiTrack = i; drawLayer('tracks'); };
+      inp.onblur = () => { hiTrack = -1; drawLayer('tracks'); };
+    }
+    row.append(tag, inp);
+    box.append(row);
+  });
+  add('tracks', ex.tracks, t => t.mode === 2 ? 'AB' : t.mode === 4 ? 'Kurve' : 'Spur');
+  add('headlines', ex.headlines, () => 'Vorgew.');
+  if (!box.children.length) box.textContent = 'Keine benennbaren Spuren in diesem Feld.';
+}
+
+// Namenszeilen ersetzen, alles andere bleibt Zeichen für Zeichen gleich
+function renameLines(txt, list) {
+  const l = txtLines(txt);
+  list.forEach(t => { if (t.name.trim()) l[t.line] = t.name.trim(); });
+  return l.join('\r\n');
+}
+function nameLines(f) {
+  if (f === 'TrackLines.txt') return new Set(ex.tracks.map(t => t.line));
+  if (f === 'Headlines.txt') return new Set(ex.headlines.map(h => h.line));
+  return null;
+}
+
+function initExtras() {
+  const bad = parseExtras();
+  EXTRA_DEFS.forEach(([id]) => drawLayer(id));
+  renderLayerList();
+  renderNames();
+  return bad;
+}
+
+// ---------- Anzeige ----------
+function updateInfo() {
+  const b = bnds[active], el = document.getElementById('info');
+  if (!b) el.textContent = plane ? 'Keine Schlaggrenze vorhanden' : '–';
+  else {
+    let h = `Punkte: <b>${b.pts.length}</b> · Fläche: <b>${(area(b.pts) / 10000).toFixed(3)} ha</b>`;
+    if (sel >= 0 && b.pts[sel]) { const [la, lo] = plane.inv(b.pts[sel].e, b.pts[sel].n); h += `<br>Punkt #${sel}: ${la.toFixed(7)}, ${lo.toFixed(7)}`; }
+    el.innerHTML = h;
+  }
+  document.getElementById('btnDel').disabled = sel < 0;
+  document.getElementById('btnUndo').disabled = !undo.length;
+
+  const fe = document.getElementById('flagEdit'), f = flags[selFlag];
+  fe.style.display = f ? 'block' : 'none';
+  if (f) {
+    document.getElementById('flagTitle').innerHTML = `<b>Fahne ${selFlag + 1}</b> · ${f.lat.toFixed(7)}, ${f.lon.toFixed(7)}`;
+    document.getElementById('flagColor').value = f.color;
+    if (document.activeElement !== document.getElementById('flagNotes')) document.getElementById('flagNotes').value = f.notes || '';
+  }
+
+  const oi = document.getElementById('originInfo');
+  if (!plane) { oi.textContent = '–'; return; }
+  let h = `${plane.lat0.toFixed(7)}, ${plane.lon0.toFixed(7)}`;
+  if (bnds[0]) {
+    let far = 0;
+    bnds[0].pts.forEach(p => { const [a, c] = plane.inv(p.e, p.n); far = Math.max(far, distM(plane.lat0, plane.lon0, a, c)); });
+    const cen = centroid(bnds[0].pts), [ca, co] = plane.inv(cen.e, cen.n);
+    h += `<br>Abstand zur Feldmitte: <b>${distM(plane.lat0, plane.lon0, ca, co).toFixed(0)} m</b>`;
+    h += `<br>Weitester Grenzpunkt: <b>${far.toFixed(0)} m</b>`;
+    if (far > 500) h += `<br><span class="warn">Teile des Felds liegen außerhalb von 500 m – dort findet „Drive In“ das Feld nicht.</span>`;
+  }
+  if (originChanged()) h += `<br><span class="warn">Verschoben um ${distM(diskPlane.lat0, diskPlane.lon0, plane.lat0, plane.lon0).toFixed(0)} m (nicht gespeichert)</span>`;
+  oi.innerHTML = h;
+}
+
+function setStatus(msg, cls) { const s = document.getElementById('status'); s.textContent = msg; s.className = cls || ''; }
+
+// ---------- Bedienelemente ----------
+document.getElementById('selBnd').onchange = e => { active = +e.target.value; sel = -1; drawAll(); };
+document.getElementById('btnDel').onclick = () => deletePoint(sel);
+document.getElementById('btnUndo').onclick = doUndo;
+document.getElementById('btnSimp').onclick = () => {
+  const b = bnds[active], tol = parseFloat(document.getElementById('tol').value);
+  if (!b || !(tol > 0)) return;
+  const res = simplifyRing(b.pts, tol);
+  if (res.length < 3) { setStatus('Toleranz zu groß.', 'err'); return; }
+  pushUndo(); const before = b.pts.length;
+  b.pts = res; sel = -1; changed(b); drawAll();
+  setStatus(`${before} → ${res.length} Punkte`, 'ok');
+};
+document.getElementById('btnAddFlag').onclick = () => setMode('flag');
+document.getElementById('btnOriginClick').onclick = () => setMode('origin');
+document.getElementById('btnOriginCenter').onclick = () => {
+  const c = centroid(bnds[0].pts), [la, lo] = plane.inv(c.e, c.n);
+  askOrigin(la, lo);
+};
+document.getElementById('btnOriginReset').onclick = () => {
+  if (originChanged()) { setOrigin(diskPlane.lat0, diskPlane.lon0); setStatus('Ursprung zurückgesetzt.', 'ok'); }
+};
+document.getElementById('flagColor').onchange = e => { flags[selFlag].color = +e.target.value; flagsDirty = unsaved = true; drawFlags(); };
+document.getElementById('flagNotes').oninput = e => { flags[selFlag].notes = e.target.value.replace(/,/g, ' '); flagsDirty = unsaved = true; drawFlags(); };
+document.getElementById('btnDelFlag').onclick = () => {
+  if (selFlag < 0) return;
+  flags.splice(selFlag, 1); selFlag = -1; flagsDirty = unsaved = true; drawFlags(); updateInfo();
+};
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault();
+    if (selFlag >= 0) document.getElementById('btnDelFlag').click();
+    else if (sel >= 0) deletePoint(sel);
+  }
+  else if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doUndo(); }
+  else if (e.key === 'Escape') { setMode(''); sel = -1; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); }
+});
+window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue = ''; } });
+</script>
+</body>
+</html>
