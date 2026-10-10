@@ -1308,7 +1308,7 @@ $('toolOk').onclick = finishTool;
 $('toolCancel').onclick = closeTool;
 $('toolRange').oninput = e => { if (tool && tool.onRange) tool.onRange(+e.target.value); };
 map.on('dblclick', () => { if (tool && tool.onDbl) tool.onDbl(); });
-map.on('moveend', () => { if (tool && tool.picks && tool.result) redrawTool(); });
+map.on('moveend', () => { if (tool && tool.showPts) redrawTool(); });   // sichtbare Punkte nachzeichnen
 
 const dot = (p, color) => L.circleMarker(p, { radius: 5, color: '#000', weight: 1, fillColor: color, fillOpacity: 1, interactive: false });
 // Ein Doppelklick erzeugt vorher zwei Einzelklicks an derselben Stelle – die werden zusammengefasst
@@ -1488,7 +1488,7 @@ function startSmooth(idx) {
   };
   const setRange = () => Object.assign($('toolRange'), tool.sec ? { min: 10, max: 60, step: 1, value: tool.round } : { min: 0, max: 50, step: 1, value: tool.value });
   startTool({
-    value: 10, round: 40, result: null, picks: [], sec: null,
+    value: 10, round: 40, result: null, picks: [], sec: null, showPts: true,
     range: { min: 0, max: 50, step: 1, value: 10 },
     msg: () => tool.picks.length === 1 ? t('smoothPick2') : tool.sec ? t('smoothSectionMsg', tool.round) : t('smoothPickMsg', tool.value),
     onClick: p => {
@@ -1670,7 +1670,7 @@ function startDrawAB() {
   if (!tracksEditable()) return;
   const snap = bnds.some(b => b.pts.length > 2);
   startTool({
-    pts: [], bi: -1, idx: [],
+    pts: [], bi: -1, idx: [], showPts: true,
     msg: () => tool.pts.length < 2 ? t(tool.pts.length ? 'abDrawMsgB' : 'abDrawMsgA') : t(snap ? 'abDrawChoose' : 'abDrawChooseFree'),
     onClick: p => {
       if (tool.pts.length >= 2) return;
@@ -1688,6 +1688,12 @@ function startDrawAB() {
       redrawTool();
     },
     draw: g => {
+      // Grenzpunkte, auf denen ein Klick einrastet (nach dem ersten Klick nur noch die derselben Grenze)
+      if (snap && tool.pts.length < 2) {
+        const vb = map.getBounds().pad(0.2), vis = [];
+        bnds.forEach((b, bi) => { if (!tool.pts.length || bi === tool.bi) b.pts.forEach(v => { const q = ll(v); if (vb.contains(q)) vis.push(q); }); });
+        if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
+      }
       tool.pts.forEach(p => L.circleMarker(ll(p), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
       if (tool.pts.length < 2) return;
       L.polyline(tool.pts.map(ll), { color: '#ff4fd8', weight: 2, dashArray: '6 5', interactive: false }).addTo(g);
