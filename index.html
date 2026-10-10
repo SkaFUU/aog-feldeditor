@@ -121,10 +121,6 @@
 
     <h2 data-i18n="hFlags">Fahnen</h2>
     <button id="btnAddFlag" disabled data-i18n="btnAddFlag">Fahne setzen (dann in Karte klicken)</button>
-    <div class="row">
-      <input id="flagCoord" data-i18n-ph="phFlagCoord" placeholder="48.12345, 16.54321">
-      <button id="btnFlagCoord" disabled data-i18n="btnFlagCoord" style="flex:0 0 auto">Fahne an Koordinate</button>
-    </div>
     <div id="flagEdit" style="display:none" class="info">
       <div id="flagTitle"></div>
       <div class="row" style="margin-top:6px">
@@ -235,8 +231,6 @@ const I18N = {
     fieldExists: 'Ein Feld „{0}“ gibt es schon – bitte einen anderen Namen wählen.',
     newFieldStarted: 'Neues Feld „{0}“: jetzt die Außengrenze auf die Karte klicken. Angelegt wird es mit „Änderungen speichern“, der Ursprung kommt dann in die Feldmitte.',
     fieldCreated: 'Feld „{0}“ angelegt.',
-    phFlagCoord: 'Breite, Länge – z. B. 48.12345, 16.54321', btnFlagCoord: 'Fahne an Koordinate',
-    badCoord: 'Bitte Breite und Länge eingeben, z. B. 48.12345, 16.54321',
     clearTitle: 'Alles löschen', confirmClear: '„{0}“ komplett löschen? Das wird erst beim Speichern übernommen, die alte Datei kommt in die Sicherung.',
     cleared: '„{0}“ gelöscht – wird beim Speichern übernommen.',
     curveMsgA: 'Startpunkt der Kurve klicken.', curveMsgB: 'Endpunkt der Kurve klicken.',
@@ -303,8 +297,6 @@ const I18N = {
     fieldExists: 'A field “{0}” already exists – please choose another name.',
     newFieldStarted: 'New field “{0}”: now click the outer boundary on the map. The field is created with “Save changes”, and the origin is then moved to the field center.',
     fieldCreated: 'Field “{0}” created.',
-    phFlagCoord: 'Latitude, longitude – e.g. 48.12345, 16.54321', btnFlagCoord: 'Flag at coordinate',
-    badCoord: 'Please enter latitude and longitude, e.g. 48.12345, 16.54321',
     clearTitle: 'Delete all', confirmClear: 'Delete all “{0}”? This is applied when you save, and the old file goes into the backup.',
     cleared: '“{0}” deleted – applied when you save.',
     curveMsgA: 'Click the start point of the curve.', curveMsgB: 'Click the end point of the curve.',
@@ -397,16 +389,16 @@ function drawMarkers() {
   markerLayer.clearLayers();
   const b = bnds[active], hint = document.getElementById('hint');
   hint.style.display = 'none';
-  if (!b) return;
+  if (!b || tool) return;                                 // während eines Werkzeugs nicht bearbeitbar
   const vb = map.getBounds().pad(0.1), vis = [];
   b.pts.forEach((p, i) => { const q = ll(p); if (vb.contains(q)) vis.push([i, q]); });
   if (vis.length > MAX_MARKERS) { hint.textContent = t('zoomIn'); hint.style.display = 'block'; return; }
   for (const [i, q] of vis) {
     const m = L.marker(q, { icon: i === sel ? iconSel : icon, draggable: true, autoPan: true });
-    m.on('dragstart', () => { pushUndo(); sel = i; showGhost(q); });
+    m.on('dragstart', () => { pushUndo(); sel = i; const old = b.pts.map(ll); old.push(old[0]); showGhost(q, old); });
     m.on('drag', e => { b.pts[i] = plane.fwd(e.latlng.lat, e.latlng.lng); drawActive(); });
     m.on('dragend', () => { changed(b); drawMarkers(); });
-    m.on('click', () => { sel = i; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); });
+    m.on('click', () => { clearGhost(); sel = i; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); });
     m.on('contextmenu', e => { L.DomEvent.preventDefault(e.originalEvent); deletePoint(i); });
     m.addTo(markerLayer);
   }
@@ -421,7 +413,7 @@ function drawFlags() {
     m.bindTooltip(t('flagTip', i + 1) + (f.notes ? ': ' + f.notes : ''), { direction: 'top', offset: [6, -24] });
     m.on('dragstart', () => showGhost(L.latLng(f.lat, f.lon)));
     m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
-    m.on('click', () => { selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
+    m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
     m.addTo(flagLayer);
   });
 }
@@ -462,6 +454,7 @@ map.on('click', e => mapClick(e.latlng));
 // ---------- Grenze bearbeiten ----------
 function onLineClick(e) {
   L.DomEvent.stopPropagation(e);
+  clearGhost();
   if (mode || tool) { mapClick(e.latlng); return; }
   const b = bnds[active], q = plane.fwd(e.latlng.lat, e.latlng.lng), n = b.pts.length;
   let best = 0, bd = Infinity, bp = null;
@@ -480,6 +473,7 @@ function onLineClick(e) {
 }
 
 function deletePoint(i) {
+  clearGhost();
   const b = bnds[active];
   if (!b || i < 0) return;
   if (b.pts.length <= 3) { setStatus(t('min3'), 'err'); return; }
@@ -1213,6 +1207,7 @@ function startTool(def) {
   closeTool();
   if (mode) setMode(mode);                       // laufenden Modus (Fahne/Ursprung) beenden
   tool = def;
+  drawMarkers();
   map.getContainer().classList.toggle('pick', !!def.onClick);
   $('toolbox').style.display = 'flex';
   const r = $('toolRange');
@@ -1223,6 +1218,7 @@ function startTool(def) {
 function closeTool() {
   if (!tool) return;
   tool = null;
+  drawMarkers();
   toolLayer.clearLayers();
   $('toolbox').style.display = 'none';
   map.getContainer().classList.toggle('pick', !!mode);
@@ -1472,9 +1468,15 @@ $('btnNewCurve').onclick = startNewCurve;
 const ghostLayer = L.layerGroup().addTo(map);
 let newFieldName = null, clearedFiles = {};
 
-// Schattenpunkt: zeigt beim Verschieben, wo der Punkt vorher war
-function showGhost(p) {
+// Schatten: zeigt beim Verschieben, wo der Punkt (und die Grenze) vorher war – bis zur nächsten Aktion.
+// Karte verschieben oder zoomen zählt nicht, damit man sich die Änderung in Ruhe ansehen kann.
+const clearGhost = () => ghostLayer.clearLayers();
+map.on('click', clearGhost);
+document.addEventListener('keydown', clearGhost, true);
+document.addEventListener('click', e => { if (e.target.closest('#side, #toolbox')) clearGhost(); }, true);
+function showGhost(p, ring) {
   ghostLayer.clearLayers();
+  if (ring) L.polyline(ring, { color: '#fff', weight: 1.5, opacity: .85, dashArray: '6 6', interactive: false }).addTo(ghostLayer);
   L.circleMarker(p, { radius: 7, color: '#fff', weight: 2, dashArray: '3 3', fill: false, interactive: false }).addTo(ghostLayer);
 }
 
@@ -1527,25 +1529,6 @@ function clearLayer(id, label) {
   unsaved = true;
   renderLayerList(); renderNames();
   setStatus(t('cleared', label), 'ok');
-}
-
-// --- Fahne an Koordinate (wie „Flagge mit Länge/Breitengrad“) ---
-function parseCoord(s) {
-  s = String(s).trim();
-  let parts = s.split(/\s*;\s*|,\s+|\s+/).filter(Boolean);
-  if (parts.length !== 2 && (s.match(/,/g) || []).length === 1) parts = s.split(',');
-  if (parts.length !== 2) return null;
-  const [la, lo] = parts.map(x => parseFloat(x.replace(',', '.')));
-  return isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180 ? [la, lo] : null;
-}
-function flagAtCoord() {
-  const c = parseCoord($('flagCoord').value);
-  if (!c) { setStatus(t('badCoord'), 'err'); return; }
-  const id = flags.reduce((m, f) => Math.max(m, f.id || 0), 0) + 1;
-  flags.push({ lat: c[0], lon: c[1], heading: 0, color: 0, id, notes: '' });
-  selFlag = flags.length - 1; sel = -1; flagsDirty = unsaved = true;
-  drawFlags(); drawMarkers(); updateInfo();
-  map.panTo(c);
 }
 
 // --- AB-Linie / Kurve wie „AB zeichnen“ in AgOpenGPS (FormABDraw) ---
@@ -1622,7 +1605,7 @@ function startDrawAB() {
       redrawTool();
     },
     draw: g => {
-      tool.pts.forEach(p => dot(ll(p), '#ff4fd8').addTo(g));
+      tool.pts.forEach(p => L.circleMarker(ll(p), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
       if (tool.pts.length < 2) return;
       L.polyline(tool.pts.map(ll), { color: '#ff4fd8', weight: 2, dashArray: '6 5', interactive: false }).addTo(g);
       if (snap) L.polyline(alongBoundary(tool).map(ll), { color: '#ffd400', weight: 4, opacity: .8, interactive: false }).addTo(g);
@@ -1669,8 +1652,6 @@ function makeBoundaryTracks() {
 })();
 
 $('btnNewField').onclick = newField;
-$('btnFlagCoord').onclick = flagAtCoord;
-$('flagCoord').onkeydown = e => { if (e.key === 'Enter') flagAtCoord(); };
 $('btnBndCurve').onclick = makeBoundaryTracks;
 
 // ---------- Anzeige ----------
@@ -1684,7 +1665,7 @@ function updateInfo() {
   }
   document.getElementById('btnDel').disabled = sel < 0;
   document.getElementById('btnUndo').disabled = !undo.length;
-  ['btnNewOuter', 'btnNewAB', 'btnNewCurve', 'btnFlagCoord'].forEach(id => { document.getElementById(id).disabled = !plane; });
+  ['btnNewOuter', 'btnNewAB', 'btnNewCurve'].forEach(id => { document.getElementById(id).disabled = !plane; });
   document.getElementById('btnBndCurve').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
   document.getElementById('btnDelBnd').disabled = !bnds[active];
