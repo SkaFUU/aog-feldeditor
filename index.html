@@ -1454,7 +1454,7 @@ function adaptiveSample(fine, maxStep = 1, maxDeg = 2) {
     if (d < 1e-6) continue;
     const dir = Math.atan2(p.e - last.e, p.n - last.n);
     const turned = Math.abs(Math.atan2(Math.sin(dir - dirPrev), Math.cos(dir - dirPrev)));
-    if (d >= maxStep || turned >= lim) { out.push(p); dirPrev = dir; }
+    if (d >= maxStep || (turned >= lim && d >= 0.05)) { out.push(p); dirPrev = dir; }   // mind. 5 cm Abstand
   }
   if (out.length > 1 && dist(out[out.length - 1], end) < maxStep * 0.25) out.pop();   // kein winziges Reststück vor dem Ende
   out.push(end);
