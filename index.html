@@ -45,7 +45,9 @@
   .check input { width:auto; }
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   #nameList { max-height:260px; overflow-y:auto; }
-  #nameList .tag { flex:0 0 52px; font-size:12px; color:var(--muted); }
+  #nameList .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
+  .bndrow input { flex:1; min-width:0; padding:4px 6px; }
+  .bndrow.off input { opacity:.45; text-decoration:line-through; }
   .titlebar { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px; }
   .titlebar h1 { margin:0; }
   .lang { display:flex; flex:none; }
@@ -190,7 +192,7 @@ const I18N = {
     hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen (dann in Karte klicken)', red: 'Rot', green: 'Grün', purple: 'Lila',
     btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.',
     hLayers: 'Anzeigen', hNames: 'Spuren',
-    namesHelp: 'Ins Namensfeld klicken markiert die Spur gelb auf der Karte. 〰 glättet eine Kurve, ✕ löscht. Fahnen benennst du über ihre Notiz.',
+    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve, 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
     hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'Ursprung in Feldmitte setzen', btnOriginClick: 'Ursprung per Klick setzen',
     btnOriginReset: 'Ursprung zurücksetzen',
     originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
@@ -259,7 +261,7 @@ const I18N = {
     hFlags: 'Flags', btnAddFlag: 'Add flag (then click the map)', red: 'Red', green: 'Green', purple: 'Purple',
     btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Drag a flag to move it, click it to edit.',
     hLayers: 'Show', hNames: 'Tracks',
-    namesHelp: 'Clicking into a name highlights the track in yellow on the map. 〰 smooths a curve, ✕ deletes. Flags are named via their note.',
+    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve, 👁 shows/hides, ✕ deletes. Flags are named via their note.',
     hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'Move origin to field center', btnOriginClick: 'Set origin by clicking the map',
     btnOriginReset: 'Reset origin',
     originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
@@ -1118,7 +1120,7 @@ function drawLayer(id) {
     });
   }
   if (id === 'tracks') ex.tracks.forEach((t, i) => {
-    if (t.deleted) return;
+    if (t.deleted || t.hidden) return;
     const hi = i === hiTrack, style = { color: hi ? '#ffd400' : '#ff4fd8', weight: hi ? 5 : 2.5 };
     let pts = t.pts, mid;
     if (t.mode === 2) {                              // AB-Linie: über A und B hinaus verlängern
@@ -1134,7 +1136,7 @@ function drawLayer(id) {
     if (mid) nameLabel(mid, t.name).addTo(g);
   });
   if (id === 'headland') ex.headland.forEach(p => L.polygon(p, { renderer: cv, interactive: false, color: '#ff9500', weight: 2, dashArray: '8 6', fill: false }).addTo(g));
-  if (id === 'headlines') ex.headlines.filter(h => h.show && !h.deleted).forEach(h => {
+  if (id === 'headlines') ex.headlines.filter(h => h.show && !h.deleted && !h.hidden).forEach(h => {
     line(h.pts, { color: '#ffd400', weight: 2, dashArray: '4 4' });
     nameLabel(h.pts[h.pts.length >> 1], h.name || t('noName')).addTo(g);
   });
@@ -1177,22 +1179,30 @@ function renderLayerList() {
   });
 }
 
+// Spuren und Vorgewende-Linien als Liste wie die Grenzen: Zeile anklicken = gelb markieren (nochmal = aufheben),
+// Name direkt umbenennen, 〰 = Kurve glätten, 👁 = ein-/ausblenden (nur Anzeige), ✕ = löschen
+function markTrackRows() {
+  document.querySelectorAll('#nameList .bndrow[data-kind="tracks"]').forEach(r => r.classList.toggle('on', +r.dataset.i === hiTrack));
+}
 function renderNames() {
   const box = $('nameList');
   box.innerHTML = '';
+  box.className = '';
   const mini = (txt, title, fn) => {
     const b = document.createElement('button');
-    b.className = 'mini'; b.textContent = txt; b.title = title; b.onclick = fn;
+    b.className = 'mini'; b.textContent = txt; b.title = title;
+    b.onclick = ev => { ev.stopPropagation(); fn(); };
     return b;
   };
   const add = (kind, list, tagOf) => list.forEach((tr, i) => {
     if (tr.deleted || (kind === 'headlines' && !tr.show)) return;
     const row = document.createElement('div'), tag = document.createElement('span'), inp = document.createElement('input');
-    row.className = 'row';
-    row.style.margin = '3px 0';
+    row.className = 'bndrow' + (kind === 'tracks' && hiTrack === i ? ' on' : '') + (tr.hidden ? ' off' : '');
+    row.dataset.kind = kind; row.dataset.i = i;
     tag.className = 'tag';
     tag.textContent = tagOf(tr);
     inp.value = tr.name;
+    inp.onclick = ev => ev.stopPropagation();
     inp.oninput = () => {
       const v = inp.value.trim();
       inp.style.borderColor = v ? '' : 'var(--acc)';     // leerer Name würde AOG aus dem Tritt bringen
@@ -1202,22 +1212,25 @@ function renderNames() {
       drawLayer(kind);
     };
     if (kind === 'tracks') {
-      inp.onfocus = () => { hiTrack = i; drawLayer('tracks'); };
-      inp.onblur = () => { if (!tool) { hiTrack = -1; drawLayer('tracks'); } };
+      const select = on => { hiTrack = on ? i : -1; drawLayer('tracks'); markTrackRows(); };
+      inp.onfocus = () => select(true);
+      row.onclick = () => select(hiTrack !== i);
     }
     row.append(tag, inp);
     if (kind === 'tracks' && tr.mode === 4 && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
-    row.append(mini('✕', t('delTitle'), () => {
-      if (!confirm(t('confirmDelTrack', tr.name || t('noName')))) return;
-      tr.deleted = true; listDirty[kind] = true; unsaved = true;
-      if (hiTrack === i) hiTrack = -1;
-      drawLayer(kind); renderLayerList(); renderNames();
-    }));
+    row.append(
+      mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
+      mini('✕', t('delTitle'), () => {
+        if (!confirm(t('confirmDelTrack', tr.name || t('noName')))) return;
+        tr.deleted = true; listDirty[kind] = true; unsaved = true;
+        if (hiTrack === i) hiTrack = -1;
+        drawLayer(kind); renderLayerList(); renderNames();
+      }));
     box.append(row);
   });
   add('tracks', ex.tracks, tr => tr.mode === 2 ? t('tagAB') : tr.mode === 4 ? t('tagCurve') : t('tagTrack'));
   add('headlines', ex.headlines, () => t('tagHeadline'));
-  if (!box.children.length) box.textContent = t('noNames');
+  if (!box.children.length) { box.className = 'muted'; box.textContent = t('noNames'); }
 }
 
 function nameLines(f) {
@@ -1258,7 +1271,7 @@ function closeTool() {
   toolLayer.clearLayers();
   $('toolbox').style.display = 'none';
   map.getContainer().classList.toggle('pick', !!mode);
-  if (hiTrack >= 0) { hiTrack = -1; drawLayer('tracks'); }
+  if (hiTrack >= 0) { hiTrack = -1; drawLayer('tracks'); markTrackRows(); }
 }
 function updateToolbox() {
   if (!tool) return;
