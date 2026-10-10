@@ -241,7 +241,8 @@ const I18N = {
     cleared: '„{0}“ gelöscht – wird beim Speichern übernommen.',
     smoothPickMsg: 'Glätten: {0} m – ganze Kurve. Zwei Punkte auf der Kurve anklicken, um nur dazwischen zu glätten.',
     smoothPick2: 'Zweiten Punkt auf der Kurve anklicken.',
-    smoothSectionMsg: 'Glätten: {0} m – nur der orange Abschnitt. Ein neuer Klick setzt neu an.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
+    smoothSectionMsg: 'Rundung: {0} % – der orange Abschnitt wird durch einen glatten Bogen ersetzt. Ein neuer Klick setzt neu an.',
+    noActive: 'Keine Grenze ausgewählt – zum Bearbeiten den Namen anklicken.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
     confirmDelTrack: '„{0}“ löschen?', trackCreated: '„{0}“ angelegt.', trackChanged: '„{0}“ geändert.',
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
@@ -309,7 +310,8 @@ const I18N = {
     cleared: '“{0}” deleted – applied when you save.',
     smoothPickMsg: 'Smoothing: {0} m – whole curve. Click two points on the curve to smooth only between them.',
     smoothPick2: 'Click the second point on the curve.',
-    smoothSectionMsg: 'Smoothing: {0} m – only the orange section. A new click starts over.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
+    smoothSectionMsg: 'Rounding: {0} % – the orange section is replaced by a smooth arc. A new click starts over.',
+    noActive: 'No boundary selected – click a name to edit it.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
     confirmDelTrack: 'Delete “{0}”?', trackCreated: '“{0}” created.', trackChanged: '“{0}” changed.',
     twolNo: 'This track file uses an old format – new or changed tracks are not possible here.'
   }
@@ -783,7 +785,7 @@ function renderBndList() {
     nm.className = 'nm';
     nm.textContent = (i === 0 ? t('outer') : t('inner', i)) + ' (' + t('ptsShort', b.pts.length) + ')';
     row.append(nm);
-    row.onclick = () => { if (active !== i) { active = i; sel = -1; drawAll(); } };
+    row.onclick = () => { active = active === i ? -1 : i; sel = -1; drawAll(); };   // erneuter Klick: nicht mehr bearbeiten
     if (i > 0) {
       const lab = document.createElement('label'), cb = document.createElement('input');
       cb.type = 'checkbox';
@@ -1406,43 +1408,54 @@ function smoothLine(P, w) {
   });
 }
 
+function bez(c, u) {
+  const v = 1 - u, k0 = v * v * v, k1 = 3 * v * v * u, k2 = 3 * v * u * u, k3 = u * u * u;
+  return { e: k0 * c[0].e + k1 * c[1].e + k2 * c[2].e + k3 * c[3].e, n: k0 * c[0].n + k1 * c[1].n + k2 * c[2].n + k3 * c[3].n };
+}
 function startSmooth(idx) {
   if (!tracksEditable()) return;
-  const tr = ex.tracks[idx], base = resample(tr.pts.map(([la, lo]) => plane.fwd(la, lo)), 1);
-  // Ohne Auswahl wird die ganze Kurve geglättet; mit zwei Klicks nur der Abschnitt dazwischen.
-  // An den Abschnittsenden wird weich übergeblendet, damit kein Knick entsteht.
+  const tr = ex.tracks[idx], base = resample(tr.pts.map(([la, lo]) => plane.fwd(la, lo)), 1), n = base.length;
+  // Richtung der Kurve an Punkt i, über ~5 m gemessen (vor dem Abschnitt hinein, nach dem Abschnitt hinaus)
+  const dirAt = (i, before) => {
+    let a = before ? base[Math.max(0, i - 5)] : base[i], b = before ? base[i] : base[Math.min(n - 1, i + 5)];
+    if (dist(a, b) < 0.5) { a = base[Math.max(0, i - 5)]; b = base[Math.min(n - 1, i + 5)]; }
+    const L = dist(a, b) || 1;
+    return { e: (b.e - a.e) / L, n: (b.n - a.n) / L };
+  };
+  // Ganze Kurve: Glättung über w Meter. Abschnitt: wird durch einen glatten Bogen ersetzt, der an beiden Enden
+  // genau in Richtung der Kurve übergeht und nie über die beiden Punkte hinaus ausholt (neue Punkte im 1-m-Abstand).
   const recompute = () => {
-    const sm = smoothLine(base, tool.value);
-    if (!tool.sec) tool.result = sm;
+    if (!tool.sec) tool.result = smoothLine(base, tool.value);
     else {
-      const [a, b] = tool.sec, L = Math.max(1, Math.min(tool.value, (b - a) / 3));
-      tool.result = base.map((p, i) => {
-        let m = 0;
-        if (i >= a && i <= b) { const u = Math.min(i - a, b - i) / L; m = u >= 1 ? 1 : u * u * (3 - 2 * u); }
-        return { e: p.e + (sm[i].e - p.e) * m, n: p.n + (sm[i].n - p.n) * m };
-      });
+      const [a, b] = tool.sec, A = base[a], B = base[b], k = tool.round / 100 * dist(A, B);
+      const dA = dirAt(a, true), dB = dirAt(b, false);
+      const c = [A, { e: A.e + dA.e * k, n: A.n + dA.n * k }, { e: B.e - dB.e * k, n: B.n - dB.n * k }, B], fine = [];
+      for (let j = 0; j <= 400; j++) fine.push(bez(c, j / 400));
+      tool.result = base.slice(0, a).concat(resample(fine, 1), base.slice(b + 1));
     }
     redrawTool();
   };
+  const setRange = () => Object.assign($('toolRange'), tool.sec ? { min: 10, max: 60, step: 1, value: tool.round } : { min: 0, max: 50, step: 1, value: tool.value });
   startTool({
-    value: 10, result: null, picks: [], sec: null,
+    value: 10, round: 40, result: null, picks: [], sec: null,
     range: { min: 0, max: 50, step: 1, value: 10 },
-    msg: () => t(tool.picks.length === 1 ? 'smoothPick2' : tool.sec ? 'smoothSectionMsg' : 'smoothPickMsg', tool.value),
+    msg: () => tool.picks.length === 1 ? t('smoothPick2') : tool.sec ? t('smoothSectionMsg', tool.round) : t('smoothPickMsg', tool.value),
     onClick: p => {
       const q = plane.fwd(p.lat, p.lng);
       let bi = 0, bd = Infinity;
       base.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } });
       tool.picks = tool.picks.length === 1 ? [tool.picks[0], bi] : [bi];          // dritter Klick setzt neu an
-      tool.sec = tool.picks.length === 2 && tool.picks[0] !== tool.picks[1] ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
+      tool.sec = tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > 2 ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
+      setRange();
       recompute();
     },
-    onRange: v => { tool.value = v; recompute(); },
+    onRange: v => { if (tool.sec) tool.round = v; else tool.value = v; recompute(); },
     draw: g => {
       if (tool.sec) L.polyline(base.slice(tool.sec[0], tool.sec[1] + 1).map(ll), { color: '#ff8c00', weight: 9, opacity: .45, interactive: false }).addTo(g);
       if (tool.result) L.polyline(tool.result.map(ll), { color: '#ffd400', weight: 3, interactive: false }).addTo(g);
       tool.picks.forEach(i => L.circleMarker(ll(base[i]), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff8c00', fillOpacity: 1, interactive: false }).addTo(g));
     },
-    okEnabled: () => tool.value > 0 && tool.picks.length !== 1,
+    okEnabled: () => tool.picks.length !== 1 && (!!tool.sec || tool.value > 0),
     ok() {
       tr.pts = this.result.map(p => plane.inv(p.e, p.n));
       tr.modified = true; listDirty.tracks = true; unsaved = true;
@@ -1674,7 +1687,7 @@ $('btnBndCurve').onclick = makeBoundaryTracks;
 // ---------- Anzeige ----------
 function updateInfo() {
   const b = bnds[active], el = document.getElementById('info');
-  if (!b) el.textContent = plane ? t('noBoundary') : '–';
+  if (!b) el.textContent = !plane ? '–' : bnds.length ? t('noActive') : t('noBoundary');
   else {
     let h = t('infoPts', b.pts.length, fmtNum(area(b.pts) / 10000, 3));
     if (sel >= 0 && b.pts[sel]) { const [la, lo] = plane.inv(b.pts[sel].e, b.pts[sel].n); h += '<br>' + t('infoPoint', sel, la.toFixed(7) + ', ' + lo.toFixed(7)); }
