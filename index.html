@@ -66,8 +66,14 @@
   #toolActions { display:flex; gap:8px; }
   #toolActions:empty { display:none; }
   .row > button.mini { flex:0 0 32px; padding:6px 0; margin:0; }
-  .handle { background:var(--warn); border:2px solid #000; border-radius:50%; }
-  .endpt { background:#fff; border:2px solid var(--warn); border-radius:3px; }
+  .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }
+  .bndrow:hover { background:#30353b; }
+  .bndrow.on { background:#3c4148; box-shadow:inset 3px 0 0 var(--acc); }
+  .bndrow.off .nm { opacity:.45; text-decoration:line-through; }
+  .bndrow .nm { flex:1; }
+  .bndrow label { display:flex; gap:3px; align-items:center; font-size:12px; color:var(--muted); }
+  .bndrow label input { width:auto; }
+  .bndrow .mini { width:auto; margin:0; padding:2px 7px; font-size:12px; }
   #hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1000; background:rgba(0,0,0,.8); color:#fff; padding:6px 12px; border-radius:6px; display:none; pointer-events:none; }
   @media (max-width:700px) { #app { flex-direction:column; } #side { width:100%; max-height:45%; } }
 </style>
@@ -97,7 +103,7 @@
     </div>
 
     <h2 data-i18n="hBoundary">Schlaggrenze</h2>
-    <select id="selBnd"></select>
+    <div id="bndList" class="muted">–</div>
     <div class="info" id="info">–</div>
     <div class="row">
       <button id="btnDel" disabled data-i18n="btnDel">Punkt löschen</button>
@@ -117,7 +123,6 @@
       <button id="btnNewOuter" disabled data-i18n="btnNewOuter">Neue Außengrenze</button>
       <button id="btnNewInner" disabled data-i18n="btnNewInner">Neue Innengrenze</button>
     </div>
-    <button id="btnDelBnd" disabled data-i18n="btnDelBnd">Diese Grenze löschen</button>
 
     <h2 data-i18n="hFlags">Fahnen</h2>
     <button id="btnAddFlag" disabled data-i18n="btnAddFlag">Fahne setzen (dann in Karte klicken)</button>
@@ -138,9 +143,8 @@
     <div id="nameList" class="muted">–</div>
     <div class="row">
       <button id="btnNewAB" disabled data-i18n="btnNewAB">AB / Kurve an Grenze</button>
-      <button id="btnNewCurve" disabled data-i18n="btnNewCurve">Freie Kurve</button>
+      <button id="btnBndCurve" disabled data-i18n="btnBndCurve">Grenze als Spur</button>
     </div>
-    <button id="btnBndCurve" disabled data-i18n="btnBndCurve">Grenze als Spur</button>
     <div class="muted" data-i18n="namesHelp">Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.</div>
 
     <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
@@ -214,7 +218,9 @@ const I18N = {
     distCenter: 'Abstand zur Feldmitte: <b>{0} m</b>', farthest: 'Weitester Grenzpunkt: <b>{0} m</b>',
     outside500: 'Teile des Felds liegen außerhalb von 500 m – dort findet „Drive In“ das Feld nicht.',
     movedBy: 'Verschoben um {0} m (nicht gespeichert)', tolTooBig: 'Toleranz zu groß.', reduced: '{0} → {1} Punkte',
-    btnNewOuter: 'Neue Außengrenze', btnNewInner: 'Neue Innengrenze', btnDelBnd: 'Diese Grenze löschen',
+    btnNewOuter: 'Neue Außengrenze', btnNewInner: 'Neue Innengrenze',
+    editTitle: 'Zum Bearbeiten auswählen', visTitle: 'Ein-/ausblenden', driveThru: 'befahrbar',
+    driveThruTitle: 'Befahrbare Innengrenze (Durchfahrt, z. B. Graben oder Weg): AOG legt dort keine Wendelinie an.',
     drawBndMsg: 'Punkte auf die Karte klicken ({0}). Doppelklick oder „Fertig“ schließt die Grenze, Strg+Z nimmt den letzten Punkt zurück.',
     needOuter: 'Zuerst eine Außengrenze anlegen.', confirmReplaceOuter: 'Die bestehende Außengrenze durch die neue ersetzen?',
     bndCreated: 'Grenze angelegt – nach dem Speichern in AOG das Vorgewende neu erstellen.',
@@ -222,7 +228,7 @@ const I18N = {
     outerHasInner: 'Zuerst die Innengrenzen löschen, oder eine neue Außengrenze zeichnen.',
     bndDeleted: 'Grenze gelöscht – nach dem Speichern in AOG das Vorgewende neu erstellen.',
     done: 'Fertig', cancel: 'Abbrechen', apply: 'Übernehmen',
-    btnNewAB: 'AB / Kurve an Grenze', btnNewCurve: 'Freie Kurve', btnBndCurve: 'Grenze als Spur',
+    btnNewAB: 'AB / Kurve an Grenze', btnBndCurve: 'Grenze als Spur',
     abDrawMsgA: 'Ersten Punkt anklicken – er rastet auf der Grenze ein.', abDrawMsgB: 'Zweiten Punkt anklicken.',
     abDrawChoose: 'AB-Linie oder Kurve entlang der Grenze (gelb) anlegen?', abDrawChooseFree: 'AB-Linie anlegen?',
     mkAB: 'AB-Linie', mkCurve: 'Kurve entlang Grenze', bndCurvesCreated: '{0} Grenz-Spur(en) angelegt.',
@@ -233,9 +239,9 @@ const I18N = {
     fieldCreated: 'Feld „{0}“ angelegt.',
     clearTitle: 'Alles löschen', confirmClear: '„{0}“ komplett löschen? Das wird erst beim Speichern übernommen, die alte Datei kommt in die Sicherung.',
     cleared: '„{0}“ gelöscht – wird beim Speichern übernommen.',
-    curveMsgA: 'Startpunkt der Kurve klicken.', curveMsgB: 'Endpunkt der Kurve klicken.',
-    curveMsgEdit: 'Gelbe Anfasser ziehen, um die Kurve zu biegen. Auch die Enden lassen sich verschieben.',
-    smoothMsg: 'Glätten: {0} m', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
+    smoothPickMsg: 'Glätten: {0} m – ganze Kurve. Zwei Punkte auf der Kurve anklicken, um nur dazwischen zu glätten.',
+    smoothPick2: 'Zweiten Punkt auf der Kurve anklicken.',
+    smoothSectionMsg: 'Glätten: {0} m – nur der orange Abschnitt. Ein neuer Klick setzt neu an.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
     confirmDelTrack: '„{0}“ löschen?', trackCreated: '„{0}“ angelegt.', trackChanged: '„{0}“ geändert.',
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
@@ -280,7 +286,9 @@ const I18N = {
     distCenter: 'Distance to field center: <b>{0} m</b>', farthest: 'Farthest boundary point: <b>{0} m</b>',
     outside500: 'Parts of the field are more than 500 m away – “Drive In” won’t find the field from there.',
     movedBy: 'Moved by {0} m (not saved)', tolTooBig: 'Tolerance too large.', reduced: '{0} → {1} points',
-    btnNewOuter: 'New outer boundary', btnNewInner: 'New inner boundary', btnDelBnd: 'Delete this boundary',
+    btnNewOuter: 'New outer boundary', btnNewInner: 'New inner boundary',
+    editTitle: 'Select for editing', visTitle: 'Show/hide', driveThru: 'drive-through',
+    driveThruTitle: 'Drive-through inner boundary (e.g. a ditch or path): AOG builds no U-turn line there.',
     drawBndMsg: 'Click points on the map ({0}). Double-click or “Done” closes the boundary, Ctrl+Z removes the last point.',
     needOuter: 'Create an outer boundary first.', confirmReplaceOuter: 'Replace the existing outer boundary with the new one?',
     bndCreated: 'Boundary created – after saving, rebuild the headland in AOG.',
@@ -288,7 +296,7 @@ const I18N = {
     outerHasInner: 'Delete the inner boundaries first, or draw a new outer boundary.',
     bndDeleted: 'Boundary deleted – after saving, rebuild the headland in AOG.',
     done: 'Done', cancel: 'Cancel', apply: 'Apply',
-    btnNewAB: 'AB / curve on boundary', btnNewCurve: 'Free curve', btnBndCurve: 'Boundary as track',
+    btnNewAB: 'AB / curve on boundary', btnBndCurve: 'Boundary as track',
     abDrawMsgA: 'Click the first point – it snaps to the boundary.', abDrawMsgB: 'Click the second point.',
     abDrawChoose: 'Create an AB line or a curve along the boundary (yellow)?', abDrawChooseFree: 'Create an AB line?',
     mkAB: 'AB line', mkCurve: 'Curve along boundary', bndCurvesCreated: '{0} boundary track(s) created.',
@@ -299,9 +307,9 @@ const I18N = {
     fieldCreated: 'Field “{0}” created.',
     clearTitle: 'Delete all', confirmClear: 'Delete all “{0}”? This is applied when you save, and the old file goes into the backup.',
     cleared: '“{0}” deleted – applied when you save.',
-    curveMsgA: 'Click the start point of the curve.', curveMsgB: 'Click the end point of the curve.',
-    curveMsgEdit: 'Drag the yellow handles to bend the curve. The ends can be moved too.',
-    smoothMsg: 'Smoothing: {0} m', smoothTitle: 'Smooth curve', delTitle: 'Delete',
+    smoothPickMsg: 'Smoothing: {0} m – whole curve. Click two points on the curve to smooth only between them.',
+    smoothPick2: 'Click the second point on the curve.',
+    smoothSectionMsg: 'Smoothing: {0} m – only the orange section. A new click starts over.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
     confirmDelTrack: 'Delete “{0}”?', trackCreated: '“{0}” created.', trackChanged: '“{0}” changed.',
     twolNo: 'This track file uses an old format – new or changed tracks are not possible here.'
   }
@@ -369,14 +377,17 @@ const MAX_MARKERS = 800;
 function drawAll() {
   otherLayer.clearLayers();
   bnds.forEach((b, i) => {
-    if (i !== active) L.polygon(b.pts.map(ll), { color: '#ffd400', weight: 2, fill: false, dashArray: '6 4', interactive: false }).addTo(otherLayer);
+    if (i === active || b.hidden) return;
+    const drive = i > 0 && /^true$/i.test(b.flagLines[0] || '');      // befahrbare Innengrenze blau
+    L.polygon(b.pts.map(ll), { color: drive ? '#00c8ff' : '#ffd400', weight: 2, fill: false, dashArray: '6 4', interactive: false }).addTo(otherLayer);
   });
+  renderBndList();
   drawActive(); drawMarkers(); drawFlags(); drawOrigin(); updateInfo();
 }
 
 function drawActive() {
   const b = bnds[active];
-  const r = b ? b.pts.map(ll) : [];
+  const r = b && !b.hidden ? b.pts.map(ll) : [];
   if (r.length) r.push(r[0]);
   if (!lineLayer) {
     lineLayer = L.polyline(r, { color: '#ff3b30', weight: 3, interactive: false }).addTo(map);
@@ -389,7 +400,7 @@ function drawMarkers() {
   markerLayer.clearLayers();
   const b = bnds[active], hint = document.getElementById('hint');
   hint.style.display = 'none';
-  if (!b || tool) return;                                 // während eines Werkzeugs nicht bearbeitbar
+  if (!b || tool || b.hidden) return;                                 // während eines Werkzeugs nicht bearbeitbar
   const vb = map.getBounds().pad(0.1), vis = [];
   b.pts.forEach((p, i) => { const q = ll(p); if (vb.contains(q)) vis.push([i, q]); });
   if (vis.length > MAX_MARKERS) { hint.textContent = t('zoomIn'); hint.style.display = 'block'; return; }
@@ -442,7 +453,8 @@ function mapClick(latlng) {
     const id = flags.reduce((m, f) => Math.max(m, f.id || 0), 0) + 1;
     flags.push({ lat: latlng.lat, lon: latlng.lng, heading: 0, color: 0, id, notes: '' });
     selFlag = flags.length - 1; sel = -1; flagsDirty = unsaved = true;
-    setMode(''); drawFlags(); drawMarkers(); updateInfo();
+    if (!layerOn.flags) { layerOn.flags = true; try { localStorage.setItem('aogLayers', JSON.stringify(layerOn)); } catch (e) { } }
+    setMode(''); drawFlags(); drawMarkers(); updateInfo(); renderLayerList();
   } else if (mode === 'origin') {
     setMode(''); askOrigin(latlng.lat, latlng.lng);
   } else {
@@ -491,7 +503,6 @@ function doUndo() {
   const u = undo.pop(); if (!u) return;
   bnds[u.a].pts = u.pts; bnds[u.a].dirty = u.dirty;
   active = u.a; sel = -1; unsaved = true;
-  document.getElementById('selBnd').value = active;
   drawAll();
 }
 
@@ -740,7 +751,7 @@ function load(found, keepView) {
   bnds = files['Boundary.txt'] ? parseBoundary(files['Boundary.txt']) : [];
   flags = files['Flags.txt'] ? parseFlags(files['Flags.txt']) : [];
   active = 0; sel = -1; selFlag = -1; undo = []; unsaved = false; flagsDirty = false;
-  fillBndSelect();
+  renderBndList();
   document.getElementById('agshare').style.display = files['agshare.txt'] !== undefined ? 'block' : 'none';
   ['btnAddFlag', 'btnOriginClick', 'btnOriginReset', 'btnSave'].forEach(id => document.getElementById(id).disabled = false);
   document.getElementById('btnOriginCenter').disabled = !bnds.length;
@@ -758,11 +769,36 @@ function load(found, keepView) {
   }
 }
 
-function fillBndSelect() {
-  const s = document.getElementById('selBnd');
-  s.innerHTML = '';
-  bnds.forEach((b, i) => s.add(new Option((i === 0 ? t('outer') : t('inner', i)) + ' (' + t('ptsShort', b.pts.length) + ')', i)));
-  s.value = active;
+// Grenzen als Liste: Name anklicken = bearbeiten, 👁 = ein-/ausblenden, ✕ = löschen, bei Innengrenzen „befahrbar“
+function renderBndList() {
+  const box = document.getElementById('bndList');
+  box.innerHTML = '';
+  if (!bnds.length) { box.className = 'muted'; box.textContent = plane ? t('noBoundary') : '–'; return; }
+  box.className = '';
+  const mini = (txt, title, fn) => { const b = document.createElement('button'); b.className = 'mini'; b.textContent = txt; b.title = title; b.onclick = fn; return b; };
+  bnds.forEach((b, i) => {
+    const row = document.createElement('div'), nm = document.createElement('span');
+    row.className = 'bndrow' + (i === active ? ' on' : '') + (b.hidden ? ' off' : '');
+    row.title = t('editTitle');
+    nm.className = 'nm';
+    nm.textContent = (i === 0 ? t('outer') : t('inner', i)) + ' (' + t('ptsShort', b.pts.length) + ')';
+    row.append(nm);
+    row.onclick = () => { if (active !== i) { active = i; sel = -1; drawAll(); } };
+    if (i > 0) {
+      const lab = document.createElement('label'), cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = /^true$/i.test(b.flagLines[0] || '');
+      lab.title = t('driveThruTitle');
+      lab.onclick = ev => ev.stopPropagation();
+      cb.onchange = () => { b.flagLines = [cb.checked ? 'True' : 'False']; bndListDirty = true; unsaved = true; drawAll(); };
+      lab.append(cb, t('driveThru'));
+      row.append(lab);
+    }
+    row.append(
+      mini(b.hidden ? '◌' : '👁', t('visTitle'), ev => { ev.stopPropagation(); b.hidden = !b.hidden; drawAll(); }),
+      mini('✕', t('delTitle'), ev => { ev.stopPropagation(); active = i; deleteBoundary(); }));
+    box.append(row);
+  });
 }
 
 async function readDir(dir) {
@@ -1199,8 +1235,6 @@ function initExtras() {
 // ---------- Werkzeuge: Grenze zeichnen, AB-Linie, Kurve, Glätten ----------
 // Ein Werkzeug ist ein Objekt mit msg/draw/onClick/onDbl/onUndo/onRange/ok – unten auf der Karte erscheint dazu eine Leiste.
 const toolLayer = L.layerGroup().addTo(map);
-const iconHandle = L.divIcon({ className: 'handle', iconSize: [16, 16] });
-const iconEnd = L.divIcon({ className: 'endpt', iconSize: [14, 14] });
 let tool = null, bndListDirty = false;
 
 function startTool(def) {
@@ -1293,7 +1327,7 @@ function startDrawBoundary(inner) {
       else if (bnds[0]) { if (!confirm(t('confirmReplaceOuter'))) return; bnds[0] = nb; active = 0; }
       else { bnds.unshift(nb); active = 0; }
       bndListDirty = true; unsaved = true; undo = []; sel = -1;
-      fillBndSelect(); drawAll();
+      renderBndList(); drawAll();
       setStatus(t('bndCreated'), 'ok');
     }
   });
@@ -1308,7 +1342,7 @@ function deleteBoundary() {
   bnds.splice(active, 1);
   active = 0; sel = -1; undo = [];
   bndListDirty = true; unsaved = true;
-  fillBndSelect(); drawAll();
+  renderBndList(); drawAll();
   setStatus(t('bndDeleted'), 'ok');
 }
 
@@ -1330,10 +1364,6 @@ function addTrack(tr) {
   setStatus(t('trackCreated', tr.name), 'ok');
 }
 
-function bezier(c, u) {
-  const v = 1 - u, k0 = v * v * v, k1 = 3 * v * v * u, k2 = 3 * v * u * u, k3 = u * u * u;
-  return { e: k0 * c[0].e + k1 * c[1].e + k2 * c[2].e + k3 * c[3].e, n: k0 * c[0].n + k1 * c[1].n + k2 * c[2].n + k3 * c[3].n };
-}
 // Linie in gleichmäßige Abstände (m) zerlegen; Anfang und Ende bleiben erhalten
 function resample(P, step) {
   if (P.length < 2) return P.slice();
@@ -1352,44 +1382,6 @@ function resample(P, step) {
   const end = P[P.length - 1];
   if (dist(out[out.length - 1], end) > step * 0.3) out.push(end); else out[out.length - 1] = end;
   return out;
-}
-
-function startNewCurve() {
-  if (!tracksEditable()) return;
-  startTool({
-    pts: [], ctrl: null,
-    msg: () => tool.ctrl ? t('curveMsgEdit') : tool.pts.length ? t('curveMsgB') : t('curveMsgA'),
-    onClick: p => { tool.pts.push(p); if (tool.pts.length === 2) beginCurveEdit(); else redrawTool(); },
-    draw: g => {
-      if (!tool.ctrl) { tool.pts.forEach(p => dot(p, '#ff4fd8').addTo(g)); return; }
-      const c = tool.ctrl, line = [];
-      for (let k = 0; k <= 200; k++) line.push(ll(bezier(c, k / 200)));
-      L.polyline(line, { color: '#ff4fd8', weight: 3, interactive: false }).addTo(g);
-      [[0, 1], [3, 2]].forEach(([a, b]) => L.polyline([ll(c[a]), ll(c[b])], { color: '#ffd400', weight: 1.5, dashArray: '4 4', interactive: false }).addTo(g));
-    },
-    okEnabled: () => !!tool.ctrl,
-    ok() {
-      const fine = [];
-      for (let k = 0; k <= 4000; k++) fine.push(bezier(this.ctrl, k / 4000));
-      const P = resample(fine, 1);                 // AOG-Kurven haben etwa 1 m Punktabstand
-      if (P.length < 3) { setStatus(t('abTooShort'), 'err'); return; }
-      const A = P[0], B = P[P.length - 1];
-      addTrack({ name: 'Cu ' + degName(Math.atan2(B.e - A.e, B.n - A.n)), mode: 4, pts: P.map(p => plane.inv(p.e, p.n)) });
-    }
-  });
-}
-// Nach dem zweiten Klick: gerade Linie mit zwei Anfassern, die man wie in PowerPoint zieht
-function beginCurveEdit() {
-  const [A, B] = tool.pts.map(p => plane.fwd(p.lat, p.lng));
-  tool.ctrl = [A, { e: A.e + (B.e - A.e) / 3, n: A.n + (B.n - A.n) / 3 }, { e: A.e + 2 * (B.e - A.e) / 3, n: A.n + 2 * (B.n - A.n) / 3 }, B];
-  tool.onClick = null;
-  map.getContainer().classList.remove('pick');
-  tool.ctrl.forEach((p, i) => {
-    const m = L.marker(ll(p), { draggable: true, icon: i === 0 || i === 3 ? iconEnd : iconHandle, zIndexOffset: 2000 });
-    m.on('drag', e => { tool.ctrl[i] = plane.fwd(e.latlng.lat, e.latlng.lng); redrawTool(); });
-    m.addTo(toolLayer);
-  });
-  redrawTool();
 }
 
 // Glättung über w Meter (Punkte im 1-m-Abstand): an jeder Stelle eine gewichtete Parabel durch die Nachbarpunkte.
@@ -1417,13 +1409,40 @@ function smoothLine(P, w) {
 function startSmooth(idx) {
   if (!tracksEditable()) return;
   const tr = ex.tracks[idx], base = resample(tr.pts.map(([la, lo]) => plane.fwd(la, lo)), 1);
+  // Ohne Auswahl wird die ganze Kurve geglättet; mit zwei Klicks nur der Abschnitt dazwischen.
+  // An den Abschnittsenden wird weich übergeblendet, damit kein Knick entsteht.
+  const recompute = () => {
+    const sm = smoothLine(base, tool.value);
+    if (!tool.sec) tool.result = sm;
+    else {
+      const [a, b] = tool.sec, L = Math.max(1, Math.min(tool.value, (b - a) / 3));
+      tool.result = base.map((p, i) => {
+        let m = 0;
+        if (i >= a && i <= b) { const u = Math.min(i - a, b - i) / L; m = u >= 1 ? 1 : u * u * (3 - 2 * u); }
+        return { e: p.e + (sm[i].e - p.e) * m, n: p.n + (sm[i].n - p.n) * m };
+      });
+    }
+    redrawTool();
+  };
   startTool({
-    value: 10, result: null,
+    value: 10, result: null, picks: [], sec: null,
     range: { min: 0, max: 50, step: 1, value: 10 },
-    msg: () => t('smoothMsg', tool.value),
-    onRange: v => { tool.value = v; tool.result = smoothLine(base, v); redrawTool(); },
-    draw: g => { if (tool.result) L.polyline(tool.result.map(ll), { color: '#ffd400', weight: 3, interactive: false }).addTo(g); },
-    okEnabled: () => tool.value > 0,
+    msg: () => t(tool.picks.length === 1 ? 'smoothPick2' : tool.sec ? 'smoothSectionMsg' : 'smoothPickMsg', tool.value),
+    onClick: p => {
+      const q = plane.fwd(p.lat, p.lng);
+      let bi = 0, bd = Infinity;
+      base.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } });
+      tool.picks = tool.picks.length === 1 ? [tool.picks[0], bi] : [bi];          // dritter Klick setzt neu an
+      tool.sec = tool.picks.length === 2 && tool.picks[0] !== tool.picks[1] ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
+      recompute();
+    },
+    onRange: v => { tool.value = v; recompute(); },
+    draw: g => {
+      if (tool.sec) L.polyline(base.slice(tool.sec[0], tool.sec[1] + 1).map(ll), { color: '#ff8c00', weight: 9, opacity: .45, interactive: false }).addTo(g);
+      if (tool.result) L.polyline(tool.result.map(ll), { color: '#ffd400', weight: 3, interactive: false }).addTo(g);
+      tool.picks.forEach(i => L.circleMarker(ll(base[i]), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff8c00', fillOpacity: 1, interactive: false }).addTo(g));
+    },
+    okEnabled: () => tool.value > 0 && tool.picks.length !== 1,
     ok() {
       tr.pts = this.result.map(p => plane.inv(p.e, p.n));
       tr.modified = true; listDirty.tracks = true; unsaved = true;
@@ -1460,9 +1479,7 @@ function buildListFile(kind) {
 
 $('btnNewOuter').onclick = () => startDrawBoundary(false);
 $('btnNewInner').onclick = () => startDrawBoundary(true);
-$('btnDelBnd').onclick = deleteBoundary;
 $('btnNewAB').onclick = startDrawAB;
-$('btnNewCurve').onclick = startNewCurve;
 
 // ---------- Stufe 1: neues Feld, AB/Kurve wie AgOpenGPS, Ebenen löschen, Schattenpunkt, Fahne an Koordinate ----------
 const ghostLayer = L.layerGroup().addTo(map);
@@ -1665,10 +1682,9 @@ function updateInfo() {
   }
   document.getElementById('btnDel').disabled = sel < 0;
   document.getElementById('btnUndo').disabled = !undo.length;
-  ['btnNewOuter', 'btnNewAB', 'btnNewCurve'].forEach(id => { document.getElementById(id).disabled = !plane; });
+  ['btnNewOuter', 'btnNewAB'].forEach(id => { document.getElementById(id).disabled = !plane; });
   document.getElementById('btnBndCurve').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
-  document.getElementById('btnDelBnd').disabled = !bnds[active];
   document.getElementById('btnSimp').disabled = !bnds[active];
   document.getElementById('btnOriginCenter').disabled = !bnds[0];
 
@@ -1698,7 +1714,6 @@ function updateInfo() {
 function setStatus(msg, cls) { const s = document.getElementById('status'); s.textContent = msg; s.className = cls || ''; }
 
 // ---------- Bedienelemente ----------
-document.getElementById('selBnd').onchange = e => { active = +e.target.value; sel = -1; drawAll(); };
 document.getElementById('btnDel').onclick = () => deletePoint(sel);
 document.getElementById('btnUndo').onclick = doUndo;
 document.getElementById('btnSimp').onclick = () => {
@@ -1748,7 +1763,7 @@ function applyLang(l) {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
   if (rootLabel) showRoot(rootLabel);
-  if (plane) { fillBndSelect(); updateInfo(); drawFlags(); drawMarkers(); renderLayerList(); renderNames(); drawLayer('headlines'); }
+  if (plane) { renderBndList(); updateInfo(); drawFlags(); drawMarkers(); renderLayerList(); renderNames(); drawLayer('headlines'); }
 }
 document.querySelectorAll('[data-lang]').forEach(b => { b.onclick = () => applyLang(b.dataset.lang); });
 applyLang();
