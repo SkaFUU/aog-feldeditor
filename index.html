@@ -1217,7 +1217,7 @@ function renderNames() {
       row.onclick = () => select(hiTrack !== i);
     }
     row.append(tag, inp);
-    if (kind === 'tracks' && tr.mode === 4 && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
+    if (kind === 'tracks' && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
     row.append(
       mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
       mini('✕', t('delTitle'), () => {
@@ -1403,7 +1403,7 @@ function resample(P, step) {
 // Glättung über w Meter (Punkte im 1-m-Abstand): an jeder Stelle eine gewichtete Parabel durch die Nachbarpunkte.
 // Anders als ein einfacher Mittelwert schneidet das Bögen nicht innen ab – nur das Wackeln verschwindet.
 // Die Enden werden gerade verlängert, damit die Kurve dort nicht wegläuft.
-function smoothLine(P, w) {
+function smoothLine(P, w, closed = false) {
   const s = w / 2, n = P.length;
   if (s < 0.5 || n < 5) return P.slice();
   const K = Math.ceil(3 * s), g = [];
@@ -1413,7 +1413,7 @@ function smoothLine(P, w) {
   const wts = g.map((v, j) => { const k = j - K; return v * (S4 - S2 * k * k) / (S0 * S4 - S2 * S2); });
   const m = Math.min(5, n - 1);
   const d0 = { e: (P[m].e - P[0].e) / m, n: (P[m].n - P[0].n) / m }, d1 = { e: (P[n - 1].e - P[n - 1 - m].e) / m, n: (P[n - 1].n - P[n - 1 - m].n) / m };
-  const at = i => i < 0 ? { e: P[0].e + d0.e * i, n: P[0].n + d0.n * i }
+  const at = i => closed ? P[((i % n) + n) % n] : i < 0 ? { e: P[0].e + d0.e * i, n: P[0].n + d0.n * i }
     : i >= n ? { e: P[n - 1].e + d1.e * (i - n + 1), n: P[n - 1].n + d1.n * (i - n + 1) } : P[i];
   return P.map((_, i) => {
     let se = 0, sn = 0, sw = 0;
@@ -1428,18 +1428,23 @@ function bez(c, u) {
 }
 // Zusätzliche Punkte, wo die Linie stark dreht (Catmull-Rom durch die vorhandenen Punkte), bis höchstens maxDeg
 // Richtungsänderung zwischen zwei Punkten liegen – enge Bögen bleiben so auch stark gezoomt rund.
-function densifySmooth(P, maxDeg = 2) {
+function densifySmooth(P, maxDeg = 2, closed = false) {
   const n = P.length;
   if (n < 3) return P.slice();
+  const at = i => closed ? P[((i % n) + n) % n] : P[Math.max(0, Math.min(n - 1, i))];
   const hd = (a, b) => Math.atan2(b.e - a.e, b.n - a.n);
-  const turn = i => i <= 0 || i >= n - 1 ? 0 : Math.abs(Math.atan2(Math.sin(hd(P[i], P[i + 1]) - hd(P[i - 1], P[i])), Math.cos(hd(P[i], P[i + 1]) - hd(P[i - 1], P[i]))));
+  const turn = i => {
+    if (!closed && (i <= 0 || i >= n - 1)) return 0;
+    const d = hd(at(i), at(i + 1)) - hd(at(i - 1), at(i));
+    return Math.abs(Math.atan2(Math.sin(d), Math.cos(d)));
+  };
   const cr = (a, b, c, d, u) => 0.5 * (2 * b + (c - a) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (3 * b - a - 3 * c + d) * u * u * u);
-  const out = [P[0]];
-  for (let i = 0; i < n - 1; i++) {
+  const out = [P[0]], segs = closed ? n : n - 1;
+  for (let i = 0; i < segs; i++) {
     const k = Math.min(30, Math.ceil(Math.max(turn(i), turn(i + 1)) * 180 / Math.PI / maxDeg));
-    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(n - 1, i + 2)];
+    const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
     for (let j = 1; j < k; j++) out.push({ e: cr(p0.e, p1.e, p2.e, p3.e, j / k), n: cr(p0.n, p1.n, p2.n, p3.n, j / k) });
-    out.push(p2);
+    if (!(closed && i === n - 1)) out.push(p2);        // geschlossen: der erste Punkt steht schon am Anfang
   }
   return out;
 }
@@ -1463,7 +1468,10 @@ function adaptiveSample(fine, maxStep = 1, maxDeg = 2) {
 
 function startSmooth(idx) {
   if (!tracksEditable()) return;
-  const tr = ex.tracks[idx], orig = tr.pts.map(([la, lo]) => plane.fwd(la, lo)), base = resample(orig, 1), n = base.length;
+  const tr = ex.tracks[idx], orig = tr.pts.map(([la, lo]) => plane.fwd(la, lo)), closed = tr.mode === 32;
+  // Grenz-Spur = geschlossener Ring: auch das Stück vom letzten zum ersten Punkt gehört dazu
+  let base = closed ? resample(orig.concat([orig[0]]), 1).slice(0, -1) : resample(orig, 1);
+  const n = base.length;
   const nearest = (P, q) => { let bi = 0, bd = Infinity; P.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } }); return bi; };
   // Richtung der Kurve an Punkt i, über ~5 m gemessen (vor dem Abschnitt hinein, nach dem Abschnitt hinaus)
   const dirAt = (i, before) => {
@@ -1476,7 +1484,7 @@ function startSmooth(idx) {
   // genau in Richtung der Kurve übergeht und nie über die beiden Punkte hinaus ausholt.
   // In beiden Fällen kommen in engen Bögen zusätzliche Punkte dazu.
   const recompute = () => {
-    if (!tool.sec) tool.result = densifySmooth(smoothLine(base, tool.value));
+    if (!tool.sec) tool.result = densifySmooth(smoothLine(base, tool.value, closed), 2, closed);
     else {
       const [a, b] = tool.sec, A = base[a], B = base[b], k = tool.round / 100 * dist(A, B);
       const dA = dirAt(a, true), dB = dirAt(b, false);
@@ -1495,6 +1503,12 @@ function startSmooth(idx) {
       // Klick rastet auf dem nächsten Punkt der Kurve ein
       const v = orig[nearest(orig, plane.fwd(p.lat, p.lng))], bi = nearest(base, v);
       tool.picks = tool.picks.length === 1 ? [tool.picks[0], bi] : [bi];          // dritter Klick setzt neu an
+      // Ring: den kürzeren Weg nehmen – liegt er über dem Anfangspunkt, wird der Ring so gedreht, dass er am Stück liegt
+      if (closed && tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > n / 2) {
+        const k = Math.floor((tool.picks[0] + tool.picks[1]) / 2);
+        base = base.slice(k).concat(base.slice(0, k));
+        tool.picks = tool.picks.map(i => (i - k + n) % n);
+      }
       tool.sec = tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > 1 ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
       setRange();
       recompute();
