@@ -1308,6 +1308,7 @@ $('toolOk').onclick = finishTool;
 $('toolCancel').onclick = closeTool;
 $('toolRange').oninput = e => { if (tool && tool.onRange) tool.onRange(+e.target.value); };
 map.on('dblclick', () => { if (tool && tool.onDbl) tool.onDbl(); });
+map.on('moveend', () => { if (tool && tool.picks && tool.result) redrawTool(); });
 
 const dot = (p, color) => L.circleMarker(p, { radius: 5, color: '#000', weight: 1, fillColor: color, fillOpacity: 1, interactive: false });
 // Ein Doppelklick erzeugt vorher zwei Einzelklicks an derselben Stelle – die werden zusammengefasst
@@ -1425,9 +1426,45 @@ function bez(c, u) {
   const v = 1 - u, k0 = v * v * v, k1 = 3 * v * v * u, k2 = 3 * v * u * u, k3 = u * u * u;
   return { e: k0 * c[0].e + k1 * c[1].e + k2 * c[2].e + k3 * c[3].e, n: k0 * c[0].n + k1 * c[1].n + k2 * c[2].n + k3 * c[3].n };
 }
+// Zusätzliche Punkte, wo die Linie stark dreht (Catmull-Rom durch die vorhandenen Punkte), bis höchstens maxDeg
+// Richtungsänderung zwischen zwei Punkten liegen – enge Bögen bleiben so auch stark gezoomt rund.
+function densifySmooth(P, maxDeg = 2) {
+  const n = P.length;
+  if (n < 3) return P.slice();
+  const hd = (a, b) => Math.atan2(b.e - a.e, b.n - a.n);
+  const turn = i => i <= 0 || i >= n - 1 ? 0 : Math.abs(Math.atan2(Math.sin(hd(P[i], P[i + 1]) - hd(P[i - 1], P[i])), Math.cos(hd(P[i], P[i + 1]) - hd(P[i - 1], P[i]))));
+  const cr = (a, b, c, d, u) => 0.5 * (2 * b + (c - a) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (3 * b - a - 3 * c + d) * u * u * u);
+  const out = [P[0]];
+  for (let i = 0; i < n - 1; i++) {
+    const k = Math.min(30, Math.ceil(Math.max(turn(i), turn(i + 1)) * 180 / Math.PI / maxDeg));
+    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(n - 1, i + 2)];
+    for (let j = 1; j < k; j++) out.push({ e: cr(p0.e, p1.e, p2.e, p3.e, j / k), n: cr(p0.n, p1.n, p2.n, p3.n, j / k) });
+    out.push(p2);
+  }
+  return out;
+}
+
+// Punkte aus einer sehr fein abgetasteten Form auswählen: höchstens 1 m Abstand und höchstens 2° Richtungsänderung
+// zwischen zwei Punkten. Anfang und Ende bleiben exakt, damit die Übergänge zur restlichen Kurve stimmen.
+function adaptiveSample(fine, maxStep = 1, maxDeg = 2) {
+  const out = [fine[0]], lim = maxDeg * D, end = fine[fine.length - 1];
+  let dirPrev = Math.atan2(fine[1].e - fine[0].e, fine[1].n - fine[0].n);   // Richtung am Anfang des Bogens
+  for (let i = 1; i < fine.length - 1; i++) {
+    const last = out[out.length - 1], p = fine[i], d = dist(last, p);
+    if (d < 1e-6) continue;
+    const dir = Math.atan2(p.e - last.e, p.n - last.n);
+    const turned = Math.abs(Math.atan2(Math.sin(dir - dirPrev), Math.cos(dir - dirPrev)));
+    if (d >= maxStep || turned >= lim) { out.push(p); dirPrev = dir; }
+  }
+  if (out.length > 1 && dist(out[out.length - 1], end) < maxStep * 0.25) out.pop();   // kein winziges Reststück vor dem Ende
+  out.push(end);
+  return out;
+}
+
 function startSmooth(idx) {
   if (!tracksEditable()) return;
-  const tr = ex.tracks[idx], base = resample(tr.pts.map(([la, lo]) => plane.fwd(la, lo)), 1), n = base.length;
+  const tr = ex.tracks[idx], orig = tr.pts.map(([la, lo]) => plane.fwd(la, lo)), base = resample(orig, 1), n = base.length;
+  const nearest = (P, q) => { let bi = 0, bd = Infinity; P.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } }); return bi; };
   // Richtung der Kurve an Punkt i, über ~5 m gemessen (vor dem Abschnitt hinein, nach dem Abschnitt hinaus)
   const dirAt = (i, before) => {
     let a = before ? base[Math.max(0, i - 5)] : base[i], b = before ? base[i] : base[Math.min(n - 1, i + 5)];
@@ -1436,15 +1473,16 @@ function startSmooth(idx) {
     return { e: (b.e - a.e) / L, n: (b.n - a.n) / L };
   };
   // Ganze Kurve: Glättung über w Meter. Abschnitt: wird durch einen glatten Bogen ersetzt, der an beiden Enden
-  // genau in Richtung der Kurve übergeht und nie über die beiden Punkte hinaus ausholt (neue Punkte im 1-m-Abstand).
+  // genau in Richtung der Kurve übergeht und nie über die beiden Punkte hinaus ausholt.
+  // In beiden Fällen kommen in engen Bögen zusätzliche Punkte dazu.
   const recompute = () => {
-    if (!tool.sec) tool.result = smoothLine(base, tool.value);
+    if (!tool.sec) tool.result = densifySmooth(smoothLine(base, tool.value));
     else {
       const [a, b] = tool.sec, A = base[a], B = base[b], k = tool.round / 100 * dist(A, B);
       const dA = dirAt(a, true), dB = dirAt(b, false);
       const c = [A, { e: A.e + dA.e * k, n: A.n + dA.n * k }, { e: B.e - dB.e * k, n: B.n - dB.n * k }, B], fine = [];
-      for (let j = 0; j <= 400; j++) fine.push(bez(c, j / 400));
-      tool.result = base.slice(0, a).concat(resample(fine, 1), base.slice(b + 1));
+      for (let j = 0; j <= 4000; j++) fine.push(bez(c, j / 4000));
+      tool.result = base.slice(0, a).concat(adaptiveSample(fine), base.slice(b + 1));
     }
     redrawTool();
   };
@@ -1454,11 +1492,10 @@ function startSmooth(idx) {
     range: { min: 0, max: 50, step: 1, value: 10 },
     msg: () => tool.picks.length === 1 ? t('smoothPick2') : tool.sec ? t('smoothSectionMsg', tool.round) : t('smoothPickMsg', tool.value),
     onClick: p => {
-      const q = plane.fwd(p.lat, p.lng);
-      let bi = 0, bd = Infinity;
-      base.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } });
+      // Klick rastet auf dem nächsten Punkt der Kurve ein
+      const v = orig[nearest(orig, plane.fwd(p.lat, p.lng))], bi = nearest(base, v);
       tool.picks = tool.picks.length === 1 ? [tool.picks[0], bi] : [bi];          // dritter Klick setzt neu an
-      tool.sec = tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > 2 ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
+      tool.sec = tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > 1 ? [Math.min(...tool.picks), Math.max(...tool.picks)] : null;
       setRange();
       recompute();
     },
@@ -1466,6 +1503,9 @@ function startSmooth(idx) {
     draw: g => {
       if (tool.sec) L.polyline(base.slice(tool.sec[0], tool.sec[1] + 1).map(ll), { color: '#ff8c00', weight: 9, opacity: .45, interactive: false }).addTo(g);
       if (tool.result) L.polyline(tool.result.map(ll), { color: '#ffd400', weight: 3, interactive: false }).addTo(g);
+      // Punkte der Kurve (im sichtbaren Ausschnitt), damit man sie gezielt anklicken kann
+      const vb = map.getBounds().pad(0.2), vis = orig.map(ll).filter(q => vb.contains(q));
+      if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
       tool.picks.forEach(i => L.circleMarker(ll(base[i]), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff8c00', fillOpacity: 1, interactive: false }).addTo(g));
     },
     okEnabled: () => tool.picks.length !== 1 && (!!tool.sec || tool.value > 0),
@@ -1477,7 +1517,7 @@ function startSmooth(idx) {
     }
   });
   tool.onRange(10);
-  hiTrack = idx; drawLayer('tracks');
+  hiTrack = idx; drawLayer('tracks'); markTrackRows();
 }
 
 // --- Spurdateien schreiben: unveränderte Spuren bleiben Zeichen für Zeichen gleich ---
