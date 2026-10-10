@@ -233,7 +233,7 @@ const I18N = {
     btnNewAB: 'AB / Kurve an Grenze', btnBndCurve: 'Grenze als Spur',
     abDrawMsgA: 'Ersten Punkt anklicken – er rastet auf der Grenze ein.', abDrawMsgB: 'Zweiten Punkt anklicken.',
     abDrawChoose: 'AB-Linie oder Kurve entlang der Grenze (gelb) anlegen?', abDrawChooseFree: 'AB-Linie anlegen?',
-    mkAB: 'AB-Linie', mkCurve: 'Kurve entlang Grenze', bndCurvesCreated: '{0} Grenz-Spur(en) angelegt.',
+    mkAB: 'AB-Linie', mkCurve: 'Kurve entlang Grenze', pickBndMsg: 'Die Grenze anklicken, die als Spur angelegt werden soll.',
     abTooShort: 'Die Punkte liegen zu nah beieinander.',
     btnNewField: 'Neues Feld…', newFieldName: 'Name des neuen Feldes:', needRoot: 'Zuerst oben den Felder-Ordner wählen.',
     fieldExists: 'Ein Feld „{0}“ gibt es schon – bitte einen anderen Namen wählen.',
@@ -302,7 +302,7 @@ const I18N = {
     btnNewAB: 'AB / curve on boundary', btnBndCurve: 'Boundary as track',
     abDrawMsgA: 'Click the first point – it snaps to the boundary.', abDrawMsgB: 'Click the second point.',
     abDrawChoose: 'Create an AB line or a curve along the boundary (yellow)?', abDrawChooseFree: 'Create an AB line?',
-    mkAB: 'AB line', mkCurve: 'Curve along boundary', bndCurvesCreated: '{0} boundary track(s) created.',
+    mkAB: 'AB line', mkCurve: 'Curve along boundary', pickBndMsg: 'Click the boundary that should become a track.',
     abTooShort: 'The points are too close together.',
     btnNewField: 'New field…', newFieldName: 'Name of the new field:', needRoot: 'Choose the fields folder above first.',
     fieldExists: 'A field “{0}” already exists – please choose another name.',
@@ -1703,20 +1703,34 @@ function startDrawAB() {
       [{ label: 'mkAB', run() { makeABFromTool(this); } }].concat(snap ? [{ label: 'mkCurve', run() { makeCurveFromTool(this); } }] : [])
   });
 }
-// „Grenze als Spur“ (wie „Boundary Curve“ in AOG): jede Grenze wird zu einer Spur entlang der Grenze
+// „Grenze als Spur“ (wie „Boundary Curve“ in AOG): die gewählte Grenze wird zu einer Spur entlang der Grenze
+function boundaryTrack(q) {
+  const F = prepareFence(bnds[q].pts, q);       // dicht und richtig herum, wie AOG die Grenze speichert
+  if (F.length < 4) { setStatus(t('abTooShort'), 'err'); return; }
+  addTrack({ name: q ? 'Inner Boundary Curve ' + q : 'Boundary Curve', mode: 32, heading: 0, pts: F.map(p => plane.inv(p.e, p.n)) });
+}
+// Nur eine Grenze: sofort anlegen. Mehrere: die gewünschte Grenze auf der Karte anklicken.
 function makeBoundaryTracks() {
   if (!tracksEditable() || !bnds.length) return;
-  let n = 0;
-  bnds.forEach((b, q) => {
-    const F = prepareFence(b.pts, q);          // dicht und richtig herum, wie AOG die Grenze speichert
-    if (F.length < 4) return;
-    ex.tracks.push({ name: q ? 'Inner Boundary Curve ' + q : 'Boundary Curve', mode: 32, heading: 0,
-      pts: F.map(p => plane.inv(p.e, p.n)), isNew: true, nudge: '0', visible: 'True' });
-    n++;
+  if (bnds.length === 1) { boundaryTrack(0); return; }
+  const usable = (b, i) => !b.hidden && b.pts.length > 2;
+  startTool({
+    showPts: true,
+    msg: () => t('pickBndMsg'),
+    onClick: p => {
+      const q = plane.fwd(p.lat, p.lng);
+      let best = null;
+      bnds.forEach((b, bi) => { if (usable(b, bi)) b.pts.forEach(v => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (!best || d < best.d) best = { d, bi }; }); });
+      if (!best) return;
+      closeTool();
+      boundaryTrack(best.bi);
+    },
+    draw: g => {
+      const vb = map.getBounds().pad(0.2), vis = [];
+      bnds.forEach((b, bi) => { if (usable(b, bi)) b.pts.forEach(v => { const q = ll(v); if (vb.contains(q)) vis.push(q); }); });
+      if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
+    }
   });
-  listDirty.tracks = true; unsaved = true; layerOn.tracks = true;
-  drawLayer('tracks'); renderLayerList(); renderNames();
-  setStatus(t('bndCurvesCreated', n), 'ok');
 }
 
 // --- Seitenleiste: Bereiche auf- und zuklappen (wird gemerkt) ---
