@@ -10,12 +10,23 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 
 ## Funktionen
 
+**Neues Feld**
+- Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
+
 **Schlaggrenze bearbeiten**
 - Jeder Punkt ist auf dem Satellitenbild sichtbar und lässt sich verschieben, einfügen (Klick auf die Linie) oder löschen (Rechtsklick oder Entf). Strg+Z macht den letzten Schritt rückgängig.
-- Außen- und Innengrenzen werden unterstützt.
+- Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion.
+- Neue Außen- oder Innengrenze zeichnen: Punkte auf die Karte klicken.
+- Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), 👁 blendet ein oder aus, ✕ löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
 - „Ausdünnen“ entfernt überflüssige Punkte.
 - Beim Speichern wird die Grenze so aufbereitet, wie AgOpenGPS sie selbst speichert: Punktabstand, Umlaufrichtung und Richtung jedes Punkts. Nur dann berechnet AgOpenGPS daraus eine korrekte Wendelinie.
 - Grenzen mit zu wenigen Punkten erkennt der Editor beim Öffnen und repariert sie beim Speichern.
+
+**Spuren**
+- **AB / Kurve an Grenze**, wie „AB zeichnen“ in AgOpenGPS: zwei Punkte anklicken, die auf der Grenze einrasten, dann eine AB-Linie oder eine Kurve entlang der Grenze dazwischen anlegen.
+- **Grenze als Spur** („Boundary Curve“): macht aus einer Grenze eine Spur. Bei mehreren Grenzen klickst du die gewünschte an.
+- **Glätten** einer Kurve oder Grenz-Spur: ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen.
+- AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 
 **Fahnen**
 - Fahnen setzen, verschieben und löschen, Farbe und Notiz ändern.
@@ -25,8 +36,8 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 - Ein Kreis zeigt die 500 m, in denen „Drive In“ das Feld findet. „Drive In“ zeigt ein Feld nur an, wenn du höchstens 500 m vom StartFix entfernt bist, also von der Stelle, an der beim Anlegen „Neu“ gedrückt wurde.
 
 **Anzeigen**
-- Alles, was das Feld enthält, lässt sich einzeln ein- und ausblenden:
-  - bearbeitete Fläche, mit ha-Angabe
+- Alles, was das Feld enthält, lässt sich einzeln ein- und ausblenden und mit 🗑 komplett löschen (wie „Bearbeitete Fläche löschen“ in AgOpenGPS):
+  - bearbeitete Fläche, mit ha-Angabe; doppelt bearbeitete Stellen werden dunkler
   - AB-Linien und Kurven
   - Vorgewende und Vorgewende-Linien
   - Fahrgassen
@@ -35,11 +46,9 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
   - das Hintergrundbild aus AgOpenGPS
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
-**Namen**
-- AB-Linien, Kurven und Vorgewende-Linien umbenennen. Dabei ändert sich in der Datei nur die Namenszeile.
-
 **Felder-Liste**
 - Einmal den Ordner `Dokumente\AgOpenGPS\Fields` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Der Ordner wird gemerkt.
+- Die Bereiche der Seitenleiste lassen sich auf- und zuklappen.
 
 ## Benutzung
 

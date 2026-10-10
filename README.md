@@ -10,12 +10,23 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 
 ## Features
 
+**New field**
+- Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.
+
 **Edit the field boundary**
 - Every point is shown on the satellite image. You can drag points, insert them (click the line) or delete them (right-click or Del). Ctrl+Z undoes the last step.
-- Outer and inner boundaries are supported.
+- While you drag a point, a dashed ghost of the old point and the old boundary stays visible until your next action.
+- Draw a new outer or inner boundary by clicking points on the map.
+- All boundaries are listed: click a name to edit it (click again to stop editing), 👁 shows or hides it, ✕ deletes it. Inner boundaries can be marked as **drive-through** (e.g. a ditch or path), and AgOpenGPS builds no U-turn line there.
 - "Reduce" removes unnecessary points.
 - When saving, the boundary is prepared the same way AgOpenGPS stores it: point spacing, winding direction and the heading of every point. Only then does AgOpenGPS build a correct U-turn line from it.
 - Boundaries with too few points are detected when a field is opened and repaired when it is saved.
+
+**Tracks**
+- **AB line / curve on the boundary**, like "Draw AB" in AgOpenGPS: click two points that snap to the boundary, then create an AB line or a curve that follows the boundary between them.
+- **Boundary as track** ("Boundary Curve"): turns a boundary into a track. If there is more than one boundary, you click the one you want.
+- **Smooth** a curve or boundary track: either the whole track, or only between two points. In that case the section is replaced by a smooth arc that joins the track without a kink, with extra points in tight bends.
+- Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 
 **Flags**
 - Add, move and delete flags, change their color and note.
@@ -25,8 +36,8 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 - A circle shows the 500 m within which "Drive In" finds the field. "Drive In" only lists a field when you are within 500 m of its StartFix, which is where you pressed "New" when the field was created.
 
 **Show**
-- Everything the field contains can be shown or hidden individually:
-  - coverage, with area in ha
+- Everything the field contains can be shown or hidden individually, and deleted completely with 🗑 (like "Delete applied area" in AgOpenGPS):
+  - coverage, with area in ha; areas covered twice are drawn darker
   - AB lines and curves
   - headland and headland lines
   - tramlines
@@ -35,11 +46,9 @@ The editor is **a single HTML file**. It needs no installation and no server, an
   - the background image saved by AgOpenGPS
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
-**Names**
-- Rename AB lines, curves and headland lines. Only the name line in the file changes.
-
 **Field list**
 - Choose the folder `Documents\AgOpenGPS\Fields` once. All fields then appear in a searchable list, and one click opens a field. The folder is remembered.
+- The sidebar sections can be collapsed.
 
 ## Usage
 
