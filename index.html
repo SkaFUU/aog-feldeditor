@@ -169,6 +169,7 @@
     <div id="toolbox" style="display:none">
       <span id="toolMsg"></span>
       <input type="range" id="toolRange" style="display:none">
+      <label id="toolBndWrap" class="check" style="display:none;margin:0"><input type="checkbox" id="toolBnd"> <span id="toolBndTxt"></span></label>
       <span id="toolActions"></span>
       <button id="toolOk" class="primary"></button>
       <button id="toolCancel" data-i18n="cancel">Abbrechen</button>
@@ -192,7 +193,7 @@ const I18N = {
     hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen (dann in Karte klicken)', red: 'Rot', green: 'Grün', purple: 'Lila',
     btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.',
     hLayers: 'Anzeigen', hNames: 'Spuren',
-    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve, ⊡ übernimmt eine Grenz-Spur als Schlaggrenze, 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
+    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve (auf Wunsch mit der Grenze), 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
     hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'Ursprung in Feldmitte setzen', btnOriginClick: 'Ursprung per Klick setzen',
     btnOriginReset: 'Ursprung zurücksetzen',
     originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
@@ -245,9 +246,8 @@ const I18N = {
     smoothPick2: 'Zweiten Punkt auf der Kurve anklicken.',
     smoothSectionMsg: 'Rundung: {0} % – der orange Abschnitt wird durch einen glatten Bogen ersetzt. Ein neuer Klick setzt neu an.',
     noActive: 'Keine Grenze ausgewählt – zum Bearbeiten den Namen anklicken.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
-    useAsBndTitle: 'Als Grenze übernehmen – ersetzt die zugehörige Schlaggrenze durch diese Spur',
-    confirmUseAsBnd: '{0} durch die Spur „{1}“ ersetzen? Strg+Z macht das rückgängig.',
-    bndFromTrack: '{0} durch „{1}“ ersetzt – nach dem Speichern in AOG das Vorgewende neu erstellen.',
+    moveBndToo: 'Grenze mitziehen', moveBndNo: 'Grenze mitziehen (hier liegt die Kurve auf keiner Grenze)',
+    bndMoved: '„{0}“ geglättet und {1} mitgezogen – nach dem Speichern in AOG das Vorgewende neu erstellen. Strg+Z macht die Grenze rückgängig.',
     confirmDelTrack: '„{0}“ löschen?', trackCreated: '„{0}“ angelegt.', trackChanged: '„{0}“ geändert.',
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
@@ -264,7 +264,7 @@ const I18N = {
     hFlags: 'Flags', btnAddFlag: 'Add flag (then click the map)', red: 'Red', green: 'Green', purple: 'Purple',
     btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Drag a flag to move it, click it to edit.',
     hLayers: 'Show', hNames: 'Tracks',
-    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve, ⊡ uses a boundary track as the field boundary, 👁 shows/hides, ✕ deletes. Flags are named via their note.',
+    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve (optionally with the boundary), 👁 shows/hides, ✕ deletes. Flags are named via their note.',
     hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'Move origin to field center', btnOriginClick: 'Set origin by clicking the map',
     btnOriginReset: 'Reset origin',
     originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
@@ -317,9 +317,8 @@ const I18N = {
     smoothPick2: 'Click the second point on the curve.',
     smoothSectionMsg: 'Rounding: {0} % – the orange section is replaced by a smooth arc. A new click starts over.',
     noActive: 'No boundary selected – click a name to edit it.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
-    useAsBndTitle: 'Use as boundary – replaces the matching field boundary with this track',
-    confirmUseAsBnd: 'Replace the {0} with the track “{1}”? Ctrl+Z undoes this.',
-    bndFromTrack: '{0} replaced by “{1}” – after saving, rebuild the headland in AOG.',
+    moveBndToo: 'Move boundary too', moveBndNo: 'Move boundary too (the curve is not on a boundary here)',
+    bndMoved: '“{0}” smoothed and {1} moved along – after saving, rebuild the headland in AOG. Ctrl+Z undoes the boundary change.',
     confirmDelTrack: 'Delete “{0}”?', trackCreated: '“{0}” created.', trackChanged: '“{0}” changed.',
     twolNo: 'This track file uses an old format – new or changed tracks are not possible here.'
   }
@@ -1224,7 +1223,6 @@ function renderNames() {
     }
     row.append(tag, inp);
     if (kind === 'tracks' && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
-    if (kind === 'tracks' && tr.mode === 32 && tr.pts.length > 3) row.append(mini('⊡', t('useAsBndTitle'), () => useTrackAsBoundary(i)));
     row.append(
       mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
       mini('✕', t('delTitle'), () => {
@@ -1287,6 +1285,12 @@ function updateToolbox() {
   ok.style.display = tool.ok && !tool.hideOk ? '' : 'none';
   ok.textContent = t(tool.okLabel || 'apply');
   ok.disabled = !!tool.okEnabled && !tool.okEnabled();
+  $('toolBndWrap').style.display = tool.bndOption ? 'flex' : 'none';
+  if (tool.bndOption) {
+    $('toolBnd').disabled = !tool.bndPlan;
+    $('toolBnd').checked = moveBndPref && !!tool.bndPlan;
+    $('toolBndTxt').textContent = t(tool.bndPlan ? 'moveBndToo' : 'moveBndNo');
+  }
   const box = $('toolActions');
   box.innerHTML = '';
   (tool.actions ? tool.actions() : []).forEach(a => {
@@ -1312,6 +1316,7 @@ function finishTool() {
   tl.ok();
 }
 $('toolOk').onclick = finishTool;
+$('toolBnd').onchange = e => { moveBndPref = e.target.checked; };
 $('toolCancel').onclick = closeTool;
 $('toolRange').oninput = e => { if (tool && tool.onRange) tool.onRange(+e.target.value); };
 map.on('dblclick', () => { if (tool && tool.onDbl) tool.onDbl(); });
@@ -1491,19 +1496,25 @@ function startSmooth(idx) {
   // genau in Richtung der Kurve übergeht und nie über die beiden Punkte hinaus ausholt.
   // In beiden Fällen kommen in engen Bögen zusätzliche Punkte dazu.
   const recompute = () => {
-    if (!tool.sec) tool.result = densifySmooth(smoothLine(base, tool.value, closed), 2, closed);
-    else {
+    if (!tool.sec) {
+      tool.result = densifySmooth(smoothLine(base, tool.value, closed), 2, closed);
+      tool.bndPlan = planBoundaryBend(closed ? base.concat([base[0]]) : base, tool.result);
+      tool.bndNew = tool.result;
+    } else {
       const [a, b] = tool.sec, A = base[a], B = base[b], k = tool.round / 100 * dist(A, B);
       const dA = dirAt(a, true), dB = dirAt(b, false);
       const c = [A, { e: A.e + dA.e * k, n: A.n + dA.n * k }, { e: B.e - dB.e * k, n: B.n - dB.n * k }, B], fine = [];
       for (let j = 0; j <= 4000; j++) fine.push(bez(c, j / 4000));
-      tool.result = base.slice(0, a).concat(adaptiveSample(fine), base.slice(b + 1));
+      const arc = adaptiveSample(fine);
+      tool.result = base.slice(0, a).concat(arc, base.slice(b + 1));
+      tool.bndPlan = planBoundaryBend(base.slice(a, b + 1), arc);
+      tool.bndNew = arc;
     }
     redrawTool();
   };
   const setRange = () => Object.assign($('toolRange'), tool.sec ? { min: 10, max: 60, step: 1, value: tool.round } : { min: 0, max: 50, step: 1, value: tool.value });
   startTool({
-    value: 10, round: 40, result: null, picks: [], sec: null, showPts: true,
+    value: 10, round: 40, result: null, picks: [], sec: null, showPts: true, bndOption: true, bndPlan: null,
     range: { min: 0, max: 50, step: 1, value: 10 },
     msg: () => tool.picks.length === 1 ? t('smoothPick2') : tool.sec ? t('smoothSectionMsg', tool.round) : t('smoothPickMsg', tool.value),
     onClick: p => {
@@ -1534,7 +1545,8 @@ function startSmooth(idx) {
       tr.pts = this.result.map(p => plane.inv(p.e, p.n));
       tr.modified = true; listDirty.tracks = true; unsaved = true;
       drawLayer('tracks');
-      setStatus(t('trackChanged', tr.name), 'ok');
+      if (moveBndPref && this.bndPlan) setStatus(t('bndMoved', tr.name, applyBoundaryBend(this.bndPlan, this.bndNew)), 'ok');
+      else setStatus(t('trackChanged', tr.name), 'ok');
     }
   });
   tool.onRange(10);
@@ -1724,40 +1736,55 @@ function startDrawAB() {
       [{ label: 'mkAB', run() { makeABFromTool(this); } }].concat(snap ? [{ label: 'mkCurve', run() { makeCurveFromTool(this); } }] : [])
   });
 }
-// „Grenze als Spur“ (wie „Boundary Curve“ in AOG): die gewählte Grenze wird zu einer Spur entlang der Grenze
-// „Als Grenze übernehmen“: eine (z. B. geglättete) Grenz-Spur ersetzt die zugehörige Schlaggrenze, damit Grenze,
-// Spur und Vorgewende wieder genau zusammenpassen. Welche Grenze gemeint ist, wird über die Lage bestimmt.
-function closestBoundary(P) {
-  let best = -1, bd = Infinity;
-  const step = Math.max(1, Math.floor(P.length / 60));
-  bnds.forEach((b, i) => {
-    if (b.pts.length < 3) return;
-    let sum = 0, cnt = 0;
-    for (let k = 0; k < P.length; k += step) {
-      let m = Infinity;
-      b.pts.forEach(v => { const d = (v.e - P[k].e) ** 2 + (v.n - P[k].n) ** 2; if (d < m) m = d; });
-      sum += Math.sqrt(m); cnt++;
+// „Grenze mitziehen“: Grenzpunkte, die genau auf dem alten Kurvenstück liegen (≤ 30 cm), werden durch das
+// geglättete Stück ersetzt. Das trifft bei „Kurve entlang Grenze“ und „Grenze als Spur“ zu; der Rest der Grenze bleibt.
+let moveBndPref = false;
+function planBoundaryBend(Sorig, Snew) {
+  const tol = 0.3, near = v => { for (let i = 0; i + 1 < Sorig.length; i++) if (segDist(v, Sorig[i], Sorig[i + 1]) < tol) return true; return false; };
+  let best = null;
+  bnds.forEach((b, bi) => {
+    const F = b.pts, n = F.length;
+    if (n < 3 || b.hidden) return;
+    const on = F.map(near);
+    if (on.every(Boolean)) { if (!best || n > best.len) best = { bi, i0: 0, len: n }; return; }
+    // längster zusammenhängender Lauf auf dem Ring
+    const start = on.findIndex(x => !x);
+    let run = 0, i0 = -1;
+    for (let k = 1; k <= n; k++) {
+      const i = (start + k) % n;
+      if (on[i]) { if (!run) i0 = i; run++; if (!best || run > best.len) best = { bi, i0, len: run }; } else run = 0;
     }
-    if (sum / cnt < bd) { bd = sum / cnt; best = i; }
   });
-  return best;
+  if (!best || best.len < 2) return null;
+  // nur anbieten, wenn die Kurve ein nennenswertes Stück auf der Grenze liegt (nicht bloß zufällig berührt)
+  const F = bnds[best.bi].pts;
+  let runLen = 0, curveLen = 0;
+  for (let q = 0; q + 1 < best.len; q++) runLen += dist(F[(best.i0 + q) % F.length], F[(best.i0 + q + 1) % F.length]);
+  for (let q = 1; q < Sorig.length; q++) curveLen += dist(Sorig[q - 1], Sorig[q]);
+  return runLen >= Math.min(5, 0.5 * curveLen) ? best : null;
 }
-function useTrackAsBoundary(i) {
-  const tr = ex.tracks[i], P = tr.pts.map(([la, lo]) => plane.fwd(la, lo));
-  if (P.length < 4) return;
-  let q = closestBoundary(P);
-  if (q < 0) q = 0;                                        // keine Grenze vorhanden: als Außengrenze anlegen
-  const label = q === 0 ? t('outer') : t('inner', q);
-  if (bnds[q] && !confirm(t('confirmUseAsBnd', label, tr.name))) return;
-  if (!bnds[q]) bnds[q] = { flagLines: ['False'], pts: [], orig: [], dirty: true };
-  active = q;
-  pushUndo();                                              // Strg+Z holt die alte Grenze zurück
-  bnds[q].pts = P.map(p => ({ e: p.e, n: p.n }));
-  bnds[q].dirty = true; bndListDirty = true; unsaved = true; sel = -1;
+function applyBoundaryBend(plan, Snew) {
+  const F = bnds[plan.bi].pts, n = F.length;
+  let pts;
+  if (plan.len === n) pts = Snew.map(p => ({ e: p.e, n: p.n }));                 // ganze Grenze (Grenz-Spur ganz geglättet)
+  else {
+    const P0 = F[plan.i0], P1 = F[(plan.i0 + plan.len - 1) % n];
+    const near = q => { let bi = 0, bd = Infinity; Snew.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } }); return bi; };
+    const j0 = near(P0), j1 = near(P1);
+    const seg = j0 <= j1 ? Snew.slice(j0, j1 + 1) : Snew.slice(j1, j0 + 1).reverse();
+    const rest = [];
+    for (let k = 1; k <= n - plan.len; k++) rest.push(F[(plan.i0 + plan.len - 1 + k) % n]);
+    pts = seg.map(p => ({ e: p.e, n: p.n })).concat(rest);
+  }
+  active = plan.bi;
+  pushUndo();                                                    // Strg+Z holt die alte Grenze zurück
+  bnds[plan.bi].pts = pts;
+  bnds[plan.bi].dirty = true; bndListDirty = true; unsaved = true; sel = -1;
   drawAll();
-  setStatus(t('bndFromTrack', label, tr.name), 'ok');
+  return plan.bi === 0 ? t('outer') : t('inner', plan.bi);
 }
 
+// „Grenze als Spur“ (wie „Boundary Curve“ in AOG): die gewählte Grenze wird zu einer Spur entlang der Grenze
 function boundaryTrack(q) {
   const F = prepareFence(bnds[q].pts, q);       // dicht und richtig herum, wie AOG die Grenze speichert
   if (F.length < 4) { setStatus(t('abTooShort'), 'err'); return; }
