@@ -10,6 +10,8 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 
 ## Features
 
+The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags, Origin, View and Measure**, with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be hidden. **Save** and **Undo** are always at the top left.
+
 **New field**
 - Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.
 
@@ -25,7 +27,7 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 **Tracks**
 - **AB line / curve on the boundary**, like "Draw AB" in AgOpenGPS: click two points that snap to the boundary, then create an AB line or a curve that follows the boundary between them.
 - **Boundary as track** ("Boundary Curve"): turns a boundary into a track. If there is more than one boundary, you click the one you want.
-- **Smooth** a curve or boundary track: either the whole track, or only between two points. In that case the section is replaced by a smooth arc that joins the track without a kink, with extra points in tight bends. If the track lies on a boundary, clicks snap to the boundary points, and **"Move boundary too"** moves the matching boundary points along, so boundary, track and headland stay consistent.
+- **Smooth** a curve or boundary track (click it in the list on the right, then "Smooth"): either the whole track, or only between two points. In that case the section is replaced by a smooth arc that joins the track without a kink, with extra points in tight bends. If the track lies on a boundary, clicks snap to the boundary points, and **"Move boundary too"** moves the matching boundary points along, so boundary, track and headland stay consistent.
 - Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 
 **Flags**
@@ -46,15 +48,17 @@ The editor is **a single HTML file**. It needs no installation and no server, an
   - the background image saved by AgOpenGPS
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
+**Measure**
+- Distance (with the length of each segment) or area with perimeter: click points on the map. Works without an open field too.
+
 **Field list**
 - Choose the folder `Documents\AgOpenGPS\Fields` once. All fields then appear in a searchable list, and one click opens a field. The folder is remembered.
-- The sidebar sections can be collapsed.
 
 ## Usage
 
 1. Open **https://skafuu.github.io/aog-feldeditor/** in **Chrome or Edge**. Alternatively, download `index.html` and open it from your computer.
-2. Click **"Choose fields folder…"** and select `Documents\AgOpenGPS\Fields`.
-3. Click a field, edit it, then click **"Save changes"**.
+2. In the **Field** tab, click **"Choose fields folder"** and select `Documents\AgOpenGPS\Fields`.
+3. Click a field on the left, edit it, then click **"Save"** at the top.
 
 Important:
 - **Close the field in AgOpenGPS before saving.** AgOpenGPS saves when it closes a field and would otherwise overwrite your changes.

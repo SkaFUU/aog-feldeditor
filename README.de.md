@@ -10,6 +10,8 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 
 ## Funktionen
 
+Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen, Ursprung, Ansicht und Messen**, darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich ausblenden. **Speichern** und **Rückgängig** sind immer oben links.
+
 **Neues Feld**
 - Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
 
@@ -25,7 +27,7 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 **Spuren**
 - **AB / Kurve an Grenze**, wie „AB zeichnen“ in AgOpenGPS: zwei Punkte anklicken, die auf der Grenze einrasten, dann eine AB-Linie oder eine Kurve entlang der Grenze dazwischen anlegen.
 - **Grenze als Spur** („Boundary Curve“): macht aus einer Grenze eine Spur. Bei mehreren Grenzen klickst du die gewünschte an.
-- **Glätten** einer Kurve oder Grenz-Spur: ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen. Liegt die Spur auf einer Grenze, rasten die Klicks auf den Grenzpunkten ein, und **„Grenze mitziehen“** passt die Grenzpunkte gleich mit an, damit Grenze, Spur und Vorgewende zusammenpassen.
+- **Glätten** einer Kurve oder Grenz-Spur (rechts in der Liste anklicken, dann „Glätten“): ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen. Liegt die Spur auf einer Grenze, rasten die Klicks auf den Grenzpunkten ein, und **„Grenze mitziehen“** passt die Grenzpunkte gleich mit an, damit Grenze, Spur und Vorgewende zusammenpassen.
 - AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 
 **Fahnen**
@@ -46,15 +48,17 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
   - das Hintergrundbild aus AgOpenGPS
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
+**Messen**
+- Strecke (mit Länge jeder Teilstrecke) oder Fläche mit Umfang: Punkte auf die Karte klicken. Geht auch ohne geöffnetes Feld.
+
 **Felder-Liste**
 - Einmal den Ordner `Dokumente\AgOpenGPS\Fields` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Der Ordner wird gemerkt.
-- Die Bereiche der Seitenleiste lassen sich auf- und zuklappen.
 
 ## Benutzung
 
 1. **https://skafuu.github.io/aog-feldeditor/** in **Chrome oder Edge** öffnen. Alternativ `index.html` herunterladen und vom eigenen Rechner öffnen.
-2. **„Felder-Ordner wählen…“** klicken und `Dokumente\AgOpenGPS\Fields` auswählen.
-3. Ein Feld anklicken, bearbeiten, **„Änderungen speichern“**.
+2. Im Register **Feld** auf **„Felder-Ordner wählen“** klicken und `Dokumente\AgOpenGPS\Fields` auswählen.
+3. Links ein Feld anklicken, bearbeiten, oben **„Speichern“**.
 
 Wichtig:
 - **Das Feld vorher in AgOpenGPS schließen.** AgOpenGPS speichert beim Schließen und würde deine Änderungen sonst überschreiben.

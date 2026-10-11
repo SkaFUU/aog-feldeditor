@@ -7,16 +7,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-  :root { --bg:#1d2024; --panel:#272b30; --fg:#e8eaed; --muted:#9aa0a6; --acc:#ff3b30; --ok:#34c759; --warn:#ffd400; }
+  :root { --bg:#1d2024; --panel:#272b30; --rib:#2b2f35; --top:#17191c; --line:#3a3f46; --fg:#e8eaed; --muted:#9aa0a6;
+          --acc:#ff3b30; --tab:#4cbb6c; --ok:#34c759; --warn:#ffd400; }
   * { box-sizing:border-box; }
   html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:14px/1.4 system-ui,Segoe UI,sans-serif; }
-  #app { display:flex; height:100%; }
-  #side { width:320px; flex:none; background:var(--panel); padding:14px; overflow-y:auto; }
-  #mapwrap { flex:1; position:relative; display:flex; }
-  #map { flex:1; }
-  #map.pick { cursor:crosshair; }
-  h1 { font-size:17px; margin:0 0 10px; }
-  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:18px 0 6px; }
+  #app { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+  #app > * { min-width:0; }
   button { width:100%; padding:9px; margin:4px 0; border:0; border-radius:6px; background:#3c4148; color:var(--fg); font:inherit; cursor:pointer; }
   button:hover { background:#4a5058; }
   button.primary { background:var(--acc); color:#fff; font-weight:600; }
@@ -28,9 +24,70 @@
   .info { background:#1d2024; border-radius:6px; padding:8px; font-variant-numeric:tabular-nums; margin:6px 0; }
   .muted { color:var(--muted); font-size:12.5px; }
   .warn { color:var(--warn); }
-  #status { margin-top:8px; font-size:13px; min-height:1.4em; }
-  #status.ok { color:var(--ok); } #status.err { color:var(--acc); }
   ul { padding-left:18px; margin:4px 0; } li { margin:2px 0; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:14px 0 6px; }
+  h2:first-child { margin-top:0; }
+  .ic { width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+  /* Kopfzeile: Name, Schnellzugriff (Speichern, Rückgängig), Sprache */
+  #qat { display:flex; align-items:center; gap:8px; height:38px; padding:0 10px; background:var(--top); }
+  #qat .logo { color:var(--tab); display:flex; }
+  #qat .logo .ic { width:22px; height:22px; }
+  #docTitle { min-width:0; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #docTitle .fld { font-weight:400; color:var(--muted); }
+  #docTitle .dot { color:var(--warn); }
+  .qbtn { width:auto; margin:0; padding:4px 10px; display:flex; align-items:center; gap:6px; font-size:13px; }
+  .qbtn .ic { width:18px; height:18px; }
+  #qat .grow { flex:1; }
+  .lang { display:flex; flex:none; }
+  .lang button { width:auto; margin:0; padding:3px 7px; font-size:12px; border-radius:0; background:#1d2024; color:var(--muted); }
+  .lang button:first-child { border-radius:5px 0 0 5px; }
+  .lang button:last-child { border-radius:0 5px 5px 0; }
+  .lang button.on { background:#3c4148; color:var(--fg); font-weight:600; }
+
+  /* Register und Ribbon */
+  #tabs { display:flex; gap:2px; padding:0 8px; background:var(--top); overflow-x:auto; scrollbar-width:none; }
+  #tabs button { width:auto; margin:0; padding:6px 14px 5px; border-radius:6px 6px 0 0; background:transparent; color:var(--muted); white-space:nowrap; border-bottom:2px solid transparent; }
+  #tabs button:hover { color:var(--fg); background:#24272b; }
+  #tabs button.on { background:var(--rib); color:var(--fg); border-bottom-color:var(--tab); }
+  #ribbon { height:104px; background:var(--rib); border-bottom:1px solid #000; overflow-x:auto; overflow-y:hidden; }
+  .rpanel { display:none; height:100%; padding:5px 4px 0; }
+  .rpanel.on { display:flex; }
+  .grp { display:flex; flex-direction:column; padding:0 6px; border-right:1px solid var(--line); flex:none; }
+  .gbody { flex:1; display:flex; align-items:flex-start; gap:2px; }
+  .gcap { font-size:11px; color:var(--muted); text-align:center; padding:2px 0 4px; white-space:nowrap; }
+  .big { display:flex; flex-direction:column; align-items:center; gap:4px; width:auto; min-width:62px; max-width:96px; height:74px;
+         margin:0; padding:7px 6px 4px; background:transparent; border-radius:5px; font-size:12px; line-height:1.15; text-align:center; }
+  .big:hover { background:#3a3f46; }
+  .big.on { background:rgba(255,212,0,.22); color:var(--fg); box-shadow:inset 0 0 0 1px var(--warn); }
+  .big.sel { background:#3c4148; box-shadow:inset 0 -2px 0 var(--tab); }
+  .gcol { display:flex; flex-direction:column; justify-content:center; gap:4px; height:74px; font-size:12.5px; }
+  .gcol input[type=number] { width:76px; padding:4px 6px; }
+  .gchecks { display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; column-gap:16px; height:74px; padding-top:2px; }
+  .gchecks .check { margin:1px 0; font-size:12.5px; white-space:nowrap; }
+  .gchecks .check.dis { opacity:.4; }
+  .gchecks:empty::before { content:'–'; color:var(--muted); }
+  .c-bnd .ic { color:#ff6b5e; } .c-trk .ic { color:#ff4fd8; } .c-flag .ic { color:#ff3b30; } .c-org .ic { color:#00c8ff; }
+  .c-meas .ic { color:var(--warn); } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
+
+  /* Hauptbereich: Feldliste | Karte | Eigenschaften */
+  #main { flex:1; display:flex; min-height:0; }
+  #nav, #props { flex:none; background:var(--panel); overflow-y:auto; padding:12px; }
+  #nav { width:250px; border-right:1px solid #000; }
+  #props { width:310px; border-left:1px solid #000; }
+  #nav.hide, #props.hide { display:none; }
+  .pp { display:none; } .pp.on { display:block; }
+  #mapwrap { flex:1; position:relative; display:flex; min-width:0; }
+  #map { flex:1; }
+  #map.pick { cursor:crosshair; }
+  #fieldList { height:calc(100% - 150px); min-height:160px; }
+
+  /* Statusleiste */
+  #statusbar { display:flex; gap:14px; align-items:center; min-height:26px; padding:3px 10px; background:var(--top); font-size:12.5px; border-top:1px solid #000; }
+  #status { flex:1; min-width:0; }
+  #status.ok { color:var(--ok); } #status.err { color:var(--acc); }
+  #sbCoord { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
   .pt { background:#fff; border:2px solid var(--acc); border-radius:50%; }
   .pt.sel { background:var(--warn); border-color:#000; }
   .flag { position:relative; width:18px; height:24px; }
@@ -43,161 +100,265 @@
   .origin::after { top:50%; left:-6px; height:2px; width:28px; margin-top:-1px; }
   .check { display:flex; gap:8px; align-items:center; margin:4px 0; font-size:13px; cursor:pointer; }
   .check input { width:auto; }
+  .check .mini { width:auto; margin:0 0 0 auto; padding:2px 7px; font-size:12px; }
+  .gchecks .check .mini { margin-left:2px; padding:0 5px; }
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
-  #nameList { max-height:260px; overflow-y:auto; }
-  #nameList .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
+  .mlabel { display:inline-block; transform:translate(-50%,-140%); background:rgba(0,0,0,.8); color:var(--warn); font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
+  .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }
+  .bndrow:hover { background:#30353b; }
+  .bndrow.on { background:#3c4148; box-shadow:inset 3px 0 0 var(--acc); }
+  .bndrow.off .nm { opacity:.45; text-decoration:line-through; }
   .bndrow input { flex:1; min-width:0; padding:4px 6px; }
   .bndrow.off input { opacity:.45; text-decoration:line-through; }
-  .titlebar { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px; }
-  .titlebar h1 { margin:0; }
-  .lang { display:flex; flex:none; }
-  .lang button { width:auto; margin:0; padding:3px 7px; font-size:12px; border-radius:0; background:#1d2024; color:var(--muted); }
-  .lang button:first-child { border-radius:5px 0 0 5px; }
-  .lang button:last-child { border-radius:0 5px 5px 0; }
-  .lang button.on { background:#3c4148; color:var(--fg); font-weight:600; }
+  .bndrow .nm { flex:1; }
+  .bndrow label { display:flex; gap:3px; align-items:center; font-size:12px; color:var(--muted); }
+  .bndrow label input { width:auto; }
+  .bndrow .mini { width:auto; margin:0; padding:2px 7px; font-size:12px; }
   #toolbox { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:1001; background:rgba(20,22,25,.93); color:#fff;
              padding:8px 10px; border-radius:8px; display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap;
              max-width:calc(100% - 24px); font-size:13px; box-shadow:0 2px 10px rgba(0,0,0,.5); }
   #toolbox button { width:auto; margin:0; padding:7px 12px; }
   #toolbox input[type=range] { width:170px; padding:0; }
-  .sec-head { cursor:pointer; user-select:none; }
-  .sec-head::before { content:'▾ '; }
-  .sec-head.closed::before { content:'▸ '; }
-  .sec-head.closed + .sec-body { display:none; }
-  .check .mini { width:auto; margin:0 0 0 auto; padding:2px 7px; font-size:12px; }
   #toolActions { display:flex; gap:8px; }
   #toolActions:empty { display:none; }
-  .row > button.mini { flex:0 0 32px; padding:6px 0; margin:0; }
-  .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }
-  .bndrow:hover { background:#30353b; }
-  .bndrow.on { background:#3c4148; box-shadow:inset 3px 0 0 var(--acc); }
-  .bndrow.off .nm { opacity:.45; text-decoration:line-through; }
-  .bndrow .nm { flex:1; }
-  .bndrow label { display:flex; gap:3px; align-items:center; font-size:12px; color:var(--muted); }
-  .bndrow label input { width:auto; }
-  .bndrow .mini { width:auto; margin:0; padding:2px 7px; font-size:12px; }
   #hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1000; background:rgba(0,0,0,.8); color:#fff; padding:6px 12px; border-radius:6px; display:none; pointer-events:none; }
-  @media (max-width:700px) { #app { flex-direction:column; } #side { width:100%; max-height:45%; } }
+  @media (max-width:800px) {
+    #main { flex-direction:column; }
+    #nav, #props { width:100%; max-height:34%; border:0; border-top:1px solid #000; }
+    #nav { order:2; } #mapwrap { order:1; min-height:50%; } #props { order:3; }
+    #qat .qtxt { display:none; }
+  }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></symbol>
+  <symbol id="i-newfield" viewBox="0 0 24 24"><path d="M3 20l2-10 8-3 4 7-5 6z"/><path d="M19 2v6M16 5h6"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 1-2z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+  <symbol id="i-panelr" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></symbol>
+  <symbol id="i-outer" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><circle cx="4" cy="17" r="1.4" fill="currentColor"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="3" r="1.4" fill="currentColor"/><circle cx="21" cy="11" r="1.4" fill="currentColor"/><circle cx="15" cy="20" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="i-inner" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><path d="M10 11l4-1.5 1.5 4-4 1.5z" stroke-dasharray="2 1.6"/></symbol>
+  <symbol id="i-delpt" viewBox="0 0 24 24"><path d="M3 19l6-10 5 5"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><path d="M15 3l6 6M21 3l-6 6"/></symbol>
+  <symbol id="i-simp" viewBox="0 0 24 24"><path d="M3 9l2.5-3 2.5 4 2.5-4 2.5 4 2.5-4 2.5 4 2.5-3"/><path d="M3 18l18-3"/></symbol>
+  <symbol id="i-ab" viewBox="0 0 24 24"><path d="M4 20L20 4"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></symbol>
+  <symbol id="i-bndtrack" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><path d="M8 15l1.5-7 5-1.8 3.5 4.8-4 6z" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-smooth" viewBox="0 0 24 24"><path d="M3 16c3 0 3-7 6-7s3 7 6 7 3-7 6-7"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/></symbol>
+  <symbol id="i-ocenter" viewBox="0 0 24 24"><path d="M4 18l2-12 12-2 2 12z"/><circle cx="12" cy="11" r="2.6"/><path d="M12 6v2M12 14v2M7 11h2M15 11h2"/></symbol>
+  <symbol id="i-oclick" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M9 2v3M9 13v3M2 9h3M13 9h3"/><path d="M14 14l7 3-3 1-1 3z"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M4.6 10A8 8 0 1 1 6 17"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></symbol>
+  <symbol id="i-sat" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 14l5-4 4 3 4-5 5 5"/><circle cx="8" cy="7.5" r="1.5"/></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="M8 15l2-6 6 1-1 5z"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></symbol>
+  <symbol id="i-area" viewBox="0 0 24 24"><path d="M4 19L6 6l12-2 2 12z"/><path d="M7 14l6-7M8 18l9-10M13 18l5-6" stroke-width="1"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
+</svg>
 <div id="app">
-  <div id="side">
-    <div class="titlebar">
-      <h1 data-i18n="h1">AgOpenGPS Feldeditor</h1>
+  <header>
+    <div id="qat">
+      <span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span>
+      <span id="docTitle"></span>
+      <button id="btnSave" class="qbtn primary" disabled><svg class="ic"><use href="#i-save"/></svg><span class="qtxt" data-i18n="btnSave">Speichern</span></button>
+      <button id="btnUndo" class="qbtn" disabled data-i18n-title="btnUndo"><svg class="ic"><use href="#i-undo"/></svg></button>
+      <span class="grow"></span>
       <div class="lang"><button data-lang="de">DE</button><button data-lang="en">EN</button></div>
     </div>
-
-    <h2 data-i18n="hFields">Felder</h2>
-    <div id="rootName" class="muted" data-i18n="rootNone">Noch kein Felder-Ordner gewählt</div>
-    <button id="btnRoot" class="primary" data-i18n="btnRoot">Felder-Ordner wählen…</button>
-    <button id="btnRegrant" style="display:none" data-i18n="btnRegrant">Zugriff auf den Felder-Ordner erlauben</button>
-    <button id="btnNewField" data-i18n="btnNewField">Neues Feld…</button>
-    <input id="fieldFilter" data-i18n-ph="phFilter" placeholder="Feld suchen…" style="display:none;margin-top:4px">
-    <select id="fieldList" size="10" style="display:none;margin-top:4px"></select>
-    <div class="muted" data-i18n="rootHelp">Einmal Dokumente\AgOpenGPS\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.</div>
-    <div id="fallback" style="display:none">
-      <div class="muted" data-i18n-html="fallback">Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):</div>
-      <input type="file" id="fileIn" multiple accept=".txt,.png">
-    </div>
-    <div id="agshare" class="muted warn" style="display:none;margin-top:6px" data-i18n="agshare">
-      Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.
-    </div>
-
-    <h2 data-i18n="hBoundary">Schlaggrenze</h2>
-    <div id="bndList" class="muted">–</div>
-    <div class="info" id="info">–</div>
-    <div class="row">
-      <button id="btnDel" disabled data-i18n="btnDel">Punkt löschen</button>
-      <button id="btnUndo" disabled data-i18n="btnUndo">Rückgängig</button>
-    </div>
-    <ul class="muted" data-i18n-html="editHelp">
-      <li><b>Verschieben:</b> Punkt ziehen</li>
-      <li><b>Einfügen:</b> auf die rote Linie klicken</li>
-      <li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>
-    </ul>
-    <label class="muted" data-i18n="simpLabel">Punkte ausdünnen (Toleranz in m)</label>
-    <div class="row">
-      <input id="tol" type="number" value="0.01" min="0.001" step="0.01">
-      <button id="btnSimp" disabled data-i18n="btnSimp">Ausdünnen</button>
-    </div>
-    <div class="row">
-      <button id="btnNewOuter" disabled data-i18n="btnNewOuter">Neue Außengrenze</button>
-      <button id="btnNewInner" disabled data-i18n="btnNewInner">Neue Innengrenze</button>
-    </div>
-
-    <h2 data-i18n="hFlags">Fahnen</h2>
-    <button id="btnAddFlag" disabled data-i18n="btnAddFlag">Fahne setzen (dann in Karte klicken)</button>
-    <div id="flagEdit" style="display:none" class="info">
-      <div id="flagTitle"></div>
-      <div class="row" style="margin-top:6px">
-        <select id="flagColor"><option value="0" data-i18n="red">Rot</option><option value="1" data-i18n="green">Grün</option><option value="2" data-i18n="purple">Lila</option></select>
-        <button id="btnDelFlag" data-i18n="btnDelFlag">Löschen</button>
+    <nav id="tabs">
+      <button data-tab="feld" data-i18n="tabFeld">Feld</button>
+      <button data-tab="grenze" data-i18n="tabGrenze">Grenze</button>
+      <button data-tab="spuren" data-i18n="tabSpuren">Spuren</button>
+      <button data-tab="vorgewende" data-i18n="tabVorgewende">Vorgewende</button>
+      <button data-tab="fahrgassen" data-i18n="tabFahrgassen">Fahrgassen</button>
+      <button data-tab="fahnen" data-i18n="tabFahnen">Fahnen</button>
+      <button data-tab="ursprung" data-i18n="tabUrsprung">Ursprung</button>
+      <button data-tab="ansicht" data-i18n="tabAnsicht">Ansicht</button>
+      <button data-tab="messen" data-i18n="tabMessen">Messen</button>
+    </nav>
+    <div id="ribbon">
+      <div class="rpanel" data-tab="feld">
+        <div class="grp"><div class="gbody">
+          <button class="big c-file" id="btnRoot"><svg class="ic"><use href="#i-folder"/></svg><span data-i18n="btnRoot">Felder-Ordner wählen</span></button>
+          <button class="big c-file" id="btnRegrant" style="display:none"><svg class="ic"><use href="#i-key"/></svg><span data-i18n="btnRegrant">Zugriff erlauben</span></button>
+          <button class="big c-file" id="btnNewField"><svg class="ic"><use href="#i-newfield"/></svg><span data-i18n="btnNewField">Neues Feld</span></button>
+        </div><div class="gcap" data-i18n="gFields">Felder</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big" id="btnNav"><svg class="ic"><use href="#i-panel"/></svg><span data-i18n="btnNav">Feldliste</span></button>
+          <button class="big" id="btnProps"><svg class="ic"><use href="#i-panelr"/></svg><span data-i18n="btnProps">Seitenleiste</span></button>
+        </div><div class="gcap" data-i18n="gPanels">Fenster</div></div>
       </div>
-      <input id="flagNotes" data-i18n-ph="phNote" placeholder="Notiz" style="margin-top:4px">
+      <div class="rpanel" data-tab="grenze">
+        <div class="grp"><div class="gbody">
+          <button class="big c-bnd" id="btnNewOuter" disabled><svg class="ic"><use href="#i-outer"/></svg><span data-i18n="btnNewOuter">Außengrenze</span></button>
+          <button class="big c-bnd" id="btnNewInner" disabled><svg class="ic"><use href="#i-inner"/></svg><span data-i18n="btnNewInner">Innengrenze</span></button>
+        </div><div class="gcap" data-i18n="gNew">Neu zeichnen</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-bnd" id="btnDel" disabled><svg class="ic"><use href="#i-delpt"/></svg><span data-i18n="btnDel">Punkt löschen</span></button>
+        </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
+        <div class="grp"><div class="gbody">
+          <div class="gcol"><label class="muted" for="tol" data-i18n="simpLabel">Toleranz (m)</label><input id="tol" type="number" value="0.01" min="0.001" step="0.01"></div>
+          <button class="big c-bnd" id="btnSimp" disabled><svg class="ic"><use href="#i-simp"/></svg><span data-i18n="btnSimp">Ausdünnen</span></button>
+        </div><div class="gcap" data-i18n="gReduce">Punkte ausdünnen</div></div>
+      </div>
+      <div class="rpanel" data-tab="spuren">
+        <div class="grp"><div class="gbody">
+          <button class="big c-trk" id="btnNewAB" disabled><svg class="ic"><use href="#i-ab"/></svg><span data-i18n="btnNewAB">AB / Kurve an Grenze</span></button>
+          <button class="big c-trk" id="btnBndCurve" disabled><svg class="ic"><use href="#i-bndtrack"/></svg><span data-i18n="btnBndCurve">Grenze als Spur</span></button>
+        </div><div class="gcap" data-i18n="gNew">Neu</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-trk" id="btnSmooth" disabled><svg class="ic"><use href="#i-smooth"/></svg><span data-i18n="btnSmooth">Glätten</span></button>
+        </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-spuren"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
+      </div>
+      <div class="rpanel" data-tab="vorgewende">
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-vorgewende"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
+      </div>
+      <div class="rpanel" data-tab="fahrgassen">
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahrgassen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
+      </div>
+      <div class="rpanel" data-tab="fahnen">
+        <div class="grp"><div class="gbody">
+          <button class="big c-flag" id="btnAddFlag" disabled><svg class="ic"><use href="#i-flag"/></svg><span data-i18n="btnAddFlag">Fahne setzen</span></button>
+        </div><div class="gcap" data-i18n="gNew">Neu</div></div>
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahnen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
+      </div>
+      <div class="rpanel" data-tab="ursprung">
+        <div class="grp"><div class="gbody">
+          <button class="big c-org" id="btnOriginCenter" disabled><svg class="ic"><use href="#i-ocenter"/></svg><span data-i18n="btnOriginCenter">In Feldmitte</span></button>
+          <button class="big c-org" id="btnOriginClick" disabled><svg class="ic"><use href="#i-oclick"/></svg><span data-i18n="btnOriginClick">Per Klick setzen</span></button>
+          <button class="big c-org" id="btnOriginReset" disabled><svg class="ic"><use href="#i-reset"/></svg><span data-i18n="btnOriginReset">Zurücksetzen</span></button>
+        </div><div class="gcap" data-i18n="gOrigin">Feld-Ursprung (StartFix)</div></div>
+      </div>
+      <div class="rpanel" data-tab="ansicht">
+        <div class="grp"><div class="gbody">
+          <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
+          <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
+          <button class="big c-view" data-base="osm"><svg class="ic"><use href="#i-map"/></svg><span>OpenStreetMap</span></button>
+        </div><div class="gcap" data-i18n="gMap">Kartenhintergrund</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-view" id="btnFit" disabled><svg class="ic"><use href="#i-fit"/></svg><span data-i18n="btnFit">Ganzes Feld</span></button>
+        </div><div class="gcap">Zoom</div></div>
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-ansicht"></div></div><div class="gcap" data-i18n="gLayers">Ebenen</div></div>
+      </div>
+      <div class="rpanel" data-tab="messen">
+        <div class="grp"><div class="gbody">
+          <button class="big c-meas" id="btnMeasDist"><svg class="ic"><use href="#i-ruler"/></svg><span data-i18n="btnMeasDist">Strecke</span></button>
+          <button class="big c-meas" id="btnMeasArea"><svg class="ic"><use href="#i-area"/></svg><span data-i18n="btnMeasArea">Fläche</span></button>
+        </div><div class="gcap" data-i18n="gMeasure">Messen</div></div>
+      </div>
     </div>
-    <div class="muted" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
+  </header>
 
-    <h2 data-i18n="hLayers">Anzeigen</h2>
-    <div id="layerList" class="muted">–</div>
+  <div id="main">
+    <aside id="nav">
+      <h2 data-i18n="hFields">Felder</h2>
+      <div id="rootName" class="muted" data-i18n="rootNone">Noch kein Felder-Ordner gewählt</div>
+      <input id="fieldFilter" data-i18n-ph="phFilter" placeholder="Feld suchen…" style="display:none;margin-top:6px">
+      <select id="fieldList" size="10" style="display:none;margin-top:4px"></select>
+      <div class="muted" style="margin-top:6px" data-i18n="rootHelp">Einmal Dokumente\AgOpenGPS\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.</div>
+      <div id="fallback" style="display:none">
+        <div class="muted" data-i18n-html="fallback">Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):</div>
+        <input type="file" id="fileIn" multiple accept=".txt,.png">
+      </div>
+      <div id="agshare" class="muted warn" style="display:none;margin-top:6px" data-i18n="agshare">
+        Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.
+      </div>
+    </aside>
 
-    <h2 data-i18n="hNames">Spuren</h2>
-    <div id="nameList" class="muted">–</div>
-    <div class="row">
-      <button id="btnNewAB" disabled data-i18n="btnNewAB">AB / Kurve an Grenze</button>
-      <button id="btnBndCurve" disabled data-i18n="btnBndCurve">Grenze als Spur</button>
+    <div id="mapwrap"><div id="map"></div><div id="hint"></div>
+      <div id="toolbox" style="display:none">
+        <span id="toolMsg"></span>
+        <input type="range" id="toolRange" style="display:none">
+        <label id="toolBndWrap" class="check" style="display:none;margin:0"><input type="checkbox" id="toolBnd"> <span id="toolBndTxt"></span></label>
+        <span id="toolActions"></span>
+        <button id="toolOk" class="primary"></button>
+        <button id="toolCancel"></button>
+      </div>
     </div>
-    <div class="muted" data-i18n="namesHelp">Ins Feld klicken markiert die Spur gelb auf der Karte. Fahnen benennst du über ihre Notiz.</div>
 
-    <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
-    <div class="info" id="originInfo">–</div>
-    <button id="btnOriginCenter" disabled data-i18n="btnOriginCenter">Ursprung in Feldmitte setzen</button>
-    <button id="btnOriginClick" disabled data-i18n="btnOriginClick">Ursprung per Klick setzen</button>
-    <button id="btnOriginReset" disabled data-i18n="btnOriginReset">Ursprung zurücksetzen</button>
-    <div class="muted" data-i18n="originHelp">Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.</div>
-
-    <h2 data-i18n="hSave">Speichern</h2>
-    <button id="btnSave" class="primary" disabled data-i18n="btnSave">Änderungen speichern</button>
-    <div id="status"></div>
-    <ul class="muted" data-i18n-html="saveHelp">
-      <li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li>
-      <li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li>
-      <li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>
-    </ul>
+    <aside id="props">
+      <div class="pp" data-tab="feld">
+        <h2 data-i18n="hSave">Speichern</h2>
+        <ul class="muted" data-i18n-html="saveHelp">
+          <li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li>
+          <li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li>
+          <li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>
+        </ul>
+      </div>
+      <div class="pp" data-tab="grenze">
+        <h2 data-i18n="hBoundary">Schlaggrenze</h2>
+        <div id="bndList" class="muted">–</div>
+        <div class="info" id="info">–</div>
+        <ul class="muted" data-i18n-html="editHelp"></ul>
+      </div>
+      <div class="pp" data-tab="spuren">
+        <h2 data-i18n="hNames">Spuren</h2>
+        <div id="nameList" class="muted">–</div>
+        <div class="muted" style="margin-top:6px" data-i18n="namesHelp"></div>
+      </div>
+      <div class="pp" data-tab="vorgewende">
+        <h2 data-i18n="L_headlines">Vorgewende-Linien</h2>
+        <div id="headList" class="muted">–</div>
+      </div>
+      <div class="pp" data-tab="fahnen">
+        <h2 data-i18n="hFlags">Fahnen</h2>
+        <div id="flagEdit" style="display:none" class="info">
+          <div id="flagTitle"></div>
+          <div class="row" style="margin-top:6px">
+            <select id="flagColor"><option value="0" data-i18n="red">Rot</option><option value="1" data-i18n="green">Grün</option><option value="2" data-i18n="purple">Lila</option></select>
+            <button id="btnDelFlag" data-i18n="btnDelFlag">Löschen</button>
+          </div>
+          <input id="flagNotes" data-i18n-ph="phNote" placeholder="Notiz" style="margin-top:4px">
+        </div>
+        <div class="muted" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
+      </div>
+      <div class="pp" data-tab="ursprung">
+        <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
+        <div class="info" id="originInfo">–</div>
+        <div class="muted" data-i18n="originHelp"></div>
+      </div>
+    </aside>
   </div>
-  <div id="mapwrap"><div id="map"></div><div id="hint"></div>
-    <div id="toolbox" style="display:none">
-      <span id="toolMsg"></span>
-      <input type="range" id="toolRange" style="display:none">
-      <label id="toolBndWrap" class="check" style="display:none;margin:0"><input type="checkbox" id="toolBnd"> <span id="toolBndTxt"></span></label>
-      <span id="toolActions"></span>
-      <button id="toolOk" class="primary"></button>
-      <button id="toolCancel" data-i18n="cancel">Abbrechen</button>
-    </div>
-  </div>
+
+  <footer id="statusbar"><span id="status"></span><span id="sbCoord"></span></footer>
 </div>
 
 <script>
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    title: 'AOG Feldeditor', h1: 'AgOpenGPS Feldeditor',
+    title: 'AOG Feldeditor',
+    tabFeld: 'Feld', tabGrenze: 'Grenze', tabSpuren: 'Spuren', tabVorgewende: 'Vorgewende', tabFahrgassen: 'Fahrgassen',
+    tabFahnen: 'Fahnen', tabUrsprung: 'Ursprung', tabAnsicht: 'Ansicht', tabMessen: 'Messen',
+    gFields: 'Felder', gPanels: 'Fenster', gNew: 'Neu', gEdit: 'Bearbeiten', gReduce: 'Punkte ausdünnen', gShow: 'Anzeigen',
+    gOrigin: 'Feld-Ursprung (StartFix)', gMap: 'Kartenhintergrund', gLayers: 'Ebenen', gMeasure: 'Messen',
+    btnNav: 'Feldliste', btnProps: 'Seitenleiste', btnSmooth: 'Glätten', btnFit: 'Ganzes Feld',
+    smoothNeedSel: 'Zuerst rechts in der Liste eine Kurve anklicken.', bmEsri: 'Satellit (Esri)', bmAt: 'Orthofoto AT',
+    btnMeasDist: 'Strecke', btnMeasArea: 'Fläche', close: 'Schließen',
+    measDistMsg: 'Punkte auf die Karte klicken – die Strecke wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
+    measAreaMsg: 'Eckpunkte auf die Karte klicken – die Fläche wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
+    measDist: 'Strecke: <b>{0} m</b>', measArea: 'Fläche: <b>{0} ha</b> ({1} m²) · Umfang: {2} m',
+    noField: 'kein Feld geöffnet', noHeadlines: 'Keine Vorgewende-Linien in diesem Feld.',
     hFields: 'Felder', rootNone: 'Noch kein Felder-Ordner gewählt', rootIs: 'Felder-Ordner: {0}',
-    btnRoot: 'Felder-Ordner wählen…', btnRegrant: 'Zugriff auf den Felder-Ordner erlauben', phFilter: 'Feld suchen…',
+    btnRoot: 'Felder-Ordner wählen', btnRegrant: 'Zugriff erlauben', phFilter: 'Feld suchen…',
     rootHelp: 'Einmal Dokumente\\AgOpenGPS\\Fields wählen – der Ordner wird gemerkt. Danach einfach ein Feld anklicken.',
     fallback: 'Dein Browser kann keine Ordner öffnen. Markiere im Feldordner <b>alle Dateien</b> (Strg+A):',
     agshare: 'Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.',
     hBoundary: 'Schlaggrenze', btnDel: 'Punkt löschen', btnUndo: 'Rückgängig',
     editHelp: '<li><b>Verschieben:</b> Punkt ziehen</li><li><b>Einfügen:</b> auf die rote Linie klicken</li><li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>',
-    simpLabel: 'Punkte ausdünnen (Toleranz in m)', btnSimp: 'Ausdünnen',
-    hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen (dann in Karte klicken)', red: 'Rot', green: 'Grün', purple: 'Lila',
-    btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.',
-    hLayers: 'Anzeigen', hNames: 'Spuren',
-    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve (auf Wunsch mit der Grenze), 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
-    hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'Ursprung in Feldmitte setzen', btnOriginClick: 'Ursprung per Klick setzen',
-    btnOriginReset: 'Ursprung zurücksetzen',
+    simpLabel: 'Toleranz (m)', btnSimp: 'Ausdünnen',
+    hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen', red: 'Rot', green: 'Grün', purple: 'Lila',
+    btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne setzen, dann in die Karte klicken. Fahne ziehen zum Verschieben, anklicken zum Bearbeiten. Benannt wird sie über die Notiz.',
+    hNames: 'Spuren',
+    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte – eine Kurve kannst du dann oben mit „Glätten“ bearbeiten (auf Wunsch mit der Grenze). Namen direkt umbenennen, 👁 blendet ein/aus, ✕ löscht.',
+    hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'In Feldmitte', btnOriginClick: 'Per Klick setzen',
+    btnOriginReset: 'Zurücksetzen',
     originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
-    hSave: 'Speichern', btnSave: 'Änderungen speichern',
+    hSave: 'Speichern', btnSave: 'Speichern',
     saveHelp: '<li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li><li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li><li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>',
     zoomIn: 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen', flagTip: 'Fahne {0}', flagTitle: '<b>Fahne {0}</b> · {1}',
     min3: 'Eine Grenze braucht mindestens 3 Punkte.',
@@ -207,7 +368,7 @@ const I18N = {
     errBoundary: 'Unerwartetes Format in Boundary.txt, Zeile {0}', errNoField: 'Field.txt fehlt – ist das ein Feldordner?',
     outer: 'Außengrenze', inner: 'Innengrenze {0}', ptsShort: '{0} Pkt.',
     loaded: 'Geladen: {0}', unreadable: ' – nicht lesbar: {0}',
-    sparse: 'Achtung: Die Grenze hat zu wenige Punkte – AOG berechnet daraus eine falsche Wendelinie. Einfach „Änderungen speichern“ drücken, dann wird sie für AOG verdichtet.',
+    sparse: 'Achtung: Die Grenze hat zu wenige Punkte – AOG berechnet daraus eine falsche Wendelinie. Einfach „Speichern“ drücken, dann wird sie für AOG verdichtet.',
     noFields: 'In „{0}“ wurden keine Felder gefunden – bitte Dokumente\\AgOpenGPS\\Fields wählen.',
     error: 'Fehler: {0}', discard: 'Ungespeicherte Änderungen verwerfen?', fieldLoaded: 'Feld „{0}“ geladen.',
     nothingToSave: 'Keine Änderungen zum Speichern.', saved: 'Gespeichert: {0}',
@@ -221,7 +382,7 @@ const I18N = {
     distCenter: 'Abstand zur Feldmitte: <b>{0} m</b>', farthest: 'Weitester Grenzpunkt: <b>{0} m</b>',
     outside500: 'Teile des Felds liegen außerhalb von 500 m – dort findet „Drive In“ das Feld nicht.',
     movedBy: 'Verschoben um {0} m (nicht gespeichert)', tolTooBig: 'Toleranz zu groß.', reduced: '{0} → {1} Punkte',
-    btnNewOuter: 'Neue Außengrenze', btnNewInner: 'Neue Innengrenze',
+    btnNewOuter: 'Außengrenze', btnNewInner: 'Innengrenze',
     editTitle: 'Zum Bearbeiten auswählen', visTitle: 'Ein-/ausblenden', driveThru: 'befahrbar',
     driveThruTitle: 'Befahrbare Innengrenze (Durchfahrt, z. B. Graben oder Weg): AOG legt dort keine Wendelinie an.',
     drawBndMsg: 'Punkte auf die Karte klicken ({0}). Doppelklick oder „Fertig“ schließt die Grenze, Strg+Z nimmt den letzten Punkt zurück.',
@@ -236,39 +397,50 @@ const I18N = {
     abDrawChoose: 'AB-Linie oder Kurve entlang der Grenze (gelb) anlegen?', abDrawChooseFree: 'AB-Linie anlegen?',
     mkAB: 'AB-Linie', mkCurve: 'Kurve entlang Grenze', pickBndMsg: 'Die Grenze anklicken, die als Spur angelegt werden soll.',
     abTooShort: 'Die Punkte liegen zu nah beieinander.',
-    btnNewField: 'Neues Feld…', newFieldName: 'Name des neuen Feldes:', needRoot: 'Zuerst oben den Felder-Ordner wählen.',
+    btnNewField: 'Neues Feld', newFieldName: 'Name des neuen Feldes:', needRoot: 'Zuerst den Felder-Ordner wählen (Register „Feld“).',
     fieldExists: 'Ein Feld „{0}“ gibt es schon – bitte einen anderen Namen wählen.',
-    newFieldStarted: 'Neues Feld „{0}“: jetzt die Außengrenze auf die Karte klicken. Angelegt wird es mit „Änderungen speichern“, der Ursprung kommt dann in die Feldmitte.',
+    newFieldStarted: 'Neues Feld „{0}“: jetzt die Außengrenze auf die Karte klicken. Angelegt wird es mit „Speichern“, der Ursprung kommt dann in die Feldmitte.',
     fieldCreated: 'Feld „{0}“ angelegt.',
     clearTitle: 'Alles löschen', confirmClear: '„{0}“ komplett löschen? Das wird erst beim Speichern übernommen, die alte Datei kommt in die Sicherung.',
     cleared: '„{0}“ gelöscht – wird beim Speichern übernommen.',
     smoothPickMsg: 'Glätten: {0} m – ganze Kurve. Zwei Punkte auf der Kurve anklicken, um nur dazwischen zu glätten.',
     smoothPick2: 'Zweiten Punkt auf der Kurve anklicken.',
     smoothSectionMsg: 'Rundung: {0} % – der orange Abschnitt wird durch einen glatten Bogen ersetzt. Ein neuer Klick setzt neu an.',
-    noActive: 'Keine Grenze ausgewählt – zum Bearbeiten den Namen anklicken.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
+    noActive: 'Keine Grenze ausgewählt – zum Bearbeiten den Namen anklicken.', delTitle: 'Löschen',
     moveBndToo: 'Grenze mitziehen', moveBndNo: 'Grenze mitziehen (hier liegt die Kurve auf keiner Grenze)',
     bndMoved: '„{0}“ geglättet und {1} mitgezogen – nach dem Speichern in AOG das Vorgewende neu erstellen. Strg+Z macht die Grenze rückgängig.',
     confirmDelTrack: '„{0}“ löschen?', trackCreated: '„{0}“ angelegt.', trackChanged: '„{0}“ geändert.',
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    title: 'AOG Field Editor', h1: 'AgOpenGPS Field Editor',
+    title: 'AOG Field Editor',
+    tabFeld: 'Field', tabGrenze: 'Boundary', tabSpuren: 'Tracks', tabVorgewende: 'Headland', tabFahrgassen: 'Tramlines',
+    tabFahnen: 'Flags', tabUrsprung: 'Origin', tabAnsicht: 'View', tabMessen: 'Measure',
+    gFields: 'Fields', gPanels: 'Panels', gNew: 'New', gEdit: 'Edit', gReduce: 'Reduce points', gShow: 'Show',
+    gOrigin: 'Field origin (StartFix)', gMap: 'Map background', gLayers: 'Layers', gMeasure: 'Measure',
+    btnNav: 'Field list', btnProps: 'Side panel', btnSmooth: 'Smooth', btnFit: 'Whole field',
+    smoothNeedSel: 'Click a curve in the list on the right first.', bmEsri: 'Satellite (Esri)', bmAt: 'Orthophoto AT',
+    btnMeasDist: 'Distance', btnMeasArea: 'Area', close: 'Close',
+    measDistMsg: 'Click points on the map to measure the distance. Ctrl+Z removes the last point.',
+    measAreaMsg: 'Click the corners on the map to measure the area. Ctrl+Z removes the last point.',
+    measDist: 'Distance: <b>{0} m</b>', measArea: 'Area: <b>{0} ha</b> ({1} m²) · Perimeter: {2} m',
+    noField: 'no field open', noHeadlines: 'No headland lines in this field.',
     hFields: 'Fields', rootNone: 'No fields folder selected yet', rootIs: 'Fields folder: {0}',
-    btnRoot: 'Choose fields folder…', btnRegrant: 'Allow access to the fields folder', phFilter: 'Search field…',
+    btnRoot: 'Choose fields folder', btnRegrant: 'Allow access', phFilter: 'Search field…',
     rootHelp: 'Choose Documents\\AgOpenGPS\\Fields once – the folder is remembered. Then just click a field.',
     fallback: 'Your browser cannot open folders. Select <b>all files</b> in the field folder (Ctrl+A):',
     agshare: 'This field is linked to AgShare. If “auto load” is enabled there, AOG replaces your changes with the cloud version when the field is opened.',
     hBoundary: 'Field boundary', btnDel: 'Delete point', btnUndo: 'Undo',
     editHelp: '<li><b>Move:</b> drag a point</li><li><b>Insert:</b> click the red line</li><li><b>Delete:</b> right-click a point, or select it + Del</li>',
-    simpLabel: 'Reduce points (tolerance in m)', btnSimp: 'Reduce',
-    hFlags: 'Flags', btnAddFlag: 'Add flag (then click the map)', red: 'Red', green: 'Green', purple: 'Purple',
-    btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Drag a flag to move it, click it to edit.',
-    hLayers: 'Show', hNames: 'Tracks',
-    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve (optionally with the boundary), 👁 shows/hides, ✕ deletes. Flags are named via their note.',
-    hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'Move origin to field center', btnOriginClick: 'Set origin by clicking the map',
-    btnOriginReset: 'Reset origin',
+    simpLabel: 'Tolerance (m)', btnSimp: 'Reduce',
+    hFlags: 'Flags', btnAddFlag: 'Add flag', red: 'Red', green: 'Green', purple: 'Purple',
+    btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Add flag, then click the map. Drag a flag to move it, click it to edit. Flags are named via their note.',
+    hNames: 'Tracks',
+    namesHelp: 'Click a row to highlight the track in yellow on the map – a curve can then be smoothed with “Smooth” at the top (optionally with the boundary). Rename it right there, 👁 shows/hides, ✕ deletes.',
+    hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'To field center', btnOriginClick: 'Set by click',
+    btnOriginReset: 'Reset',
     originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
-    hSave: 'Save', btnSave: 'Save changes',
+    hSave: 'Save', btnSave: 'Save',
     saveHelp: '<li><b>Close</b> the field in AgOpenGPS first.</li><li>All changed files are backed up to a <i>Backup_…</i> subfolder first.</li><li>After changing the boundary, <b>rebuild the headland</b> in AOG.</li>',
     zoomIn: 'Zoom in further to edit the boundary points', flagTip: 'Flag {0}', flagTitle: '<b>Flag {0}</b> · {1}',
     min3: 'A boundary needs at least 3 points.',
@@ -278,7 +450,7 @@ const I18N = {
     errBoundary: 'Unexpected format in Boundary.txt, line {0}', errNoField: 'Field.txt is missing – is this a field folder?',
     outer: 'Outer boundary', inner: 'Inner boundary {0}', ptsShort: '{0} pts',
     loaded: 'Loaded: {0}', unreadable: ' – unreadable: {0}',
-    sparse: 'Note: the boundary has too few points – AOG would build a wrong U-turn line from it. Just press “Save changes” and it will be densified for AOG.',
+    sparse: 'Note: the boundary has too few points – AOG would build a wrong U-turn line from it. Just press “Save” and it will be densified for AOG.',
     noFields: 'No fields found in “{0}” – please choose Documents\\AgOpenGPS\\Fields.',
     error: 'Error: {0}', discard: 'Discard unsaved changes?', fieldLoaded: 'Field “{0}” loaded.',
     nothingToSave: 'No changes to save.', saved: 'Saved: {0}',
@@ -292,7 +464,7 @@ const I18N = {
     distCenter: 'Distance to field center: <b>{0} m</b>', farthest: 'Farthest boundary point: <b>{0} m</b>',
     outside500: 'Parts of the field are more than 500 m away – “Drive In” won’t find the field from there.',
     movedBy: 'Moved by {0} m (not saved)', tolTooBig: 'Tolerance too large.', reduced: '{0} → {1} points',
-    btnNewOuter: 'New outer boundary', btnNewInner: 'New inner boundary',
+    btnNewOuter: 'Outer boundary', btnNewInner: 'Inner boundary',
     editTitle: 'Select for editing', visTitle: 'Show/hide', driveThru: 'drive-through',
     driveThruTitle: 'Drive-through inner boundary (e.g. a ditch or path): AOG builds no U-turn line there.',
     drawBndMsg: 'Click points on the map ({0}). Double-click or “Done” closes the boundary, Ctrl+Z removes the last point.',
@@ -307,16 +479,16 @@ const I18N = {
     abDrawChoose: 'Create an AB line or a curve along the boundary (yellow)?', abDrawChooseFree: 'Create an AB line?',
     mkAB: 'AB line', mkCurve: 'Curve along boundary', pickBndMsg: 'Click the boundary that should become a track.',
     abTooShort: 'The points are too close together.',
-    btnNewField: 'New field…', newFieldName: 'Name of the new field:', needRoot: 'Choose the fields folder above first.',
+    btnNewField: 'New field', newFieldName: 'Name of the new field:', needRoot: 'Choose the fields folder first (tab “Field”).',
     fieldExists: 'A field “{0}” already exists – please choose another name.',
-    newFieldStarted: 'New field “{0}”: now click the outer boundary on the map. The field is created with “Save changes”, and the origin is then moved to the field center.',
+    newFieldStarted: 'New field “{0}”: now click the outer boundary on the map. The field is created with “Save”, and the origin is then moved to the field center.',
     fieldCreated: 'Field “{0}” created.',
     clearTitle: 'Delete all', confirmClear: 'Delete all “{0}”? This is applied when you save, and the old file goes into the backup.',
     cleared: '“{0}” deleted – applied when you save.',
     smoothPickMsg: 'Smoothing: {0} m – whole curve. Click two points on the curve to smooth only between them.',
     smoothPick2: 'Click the second point on the curve.',
     smoothSectionMsg: 'Rounding: {0} % – the orange section is replaced by a smooth arc. A new click starts over.',
-    noActive: 'No boundary selected – click a name to edit it.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
+    noActive: 'No boundary selected – click a name to edit it.', delTitle: 'Delete',
     moveBndToo: 'Move boundary too', moveBndNo: 'Move boundary too (the curve is not on a boundary here)',
     bndMoved: '“{0}” smoothed and {1} moved along – after saving, rebuild the headland in AOG. Ctrl+Z undoes the boundary change.',
     confirmDelTrack: 'Delete “{0}”?', trackCreated: '“{0}” created.', trackChanged: '“{0}” changed.',
@@ -363,15 +535,26 @@ const originChanged = () => plane && (plane.lat0 !== diskPlane.lat0 || plane.lon
 // ---------- Karte ----------
 const map = L.map('map', { maxZoom: 22, doubleClickZoom: false }).setView([47.6, 14], 7);
 const bases = {
-  'Esri World Imagery': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  esri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     { maxZoom: 22, maxNativeZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' }),
-  'basemap.at Orthofoto (AT)': L.tileLayer('https://mapsneu.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg',
+  at: L.tileLayer('https://mapsneu.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg',
     { maxZoom: 22, maxNativeZoom: 19, attribution: 'basemap.at' }),
-  'OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  osm: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     { maxZoom: 22, maxNativeZoom: 19, attribution: '© OpenStreetMap' })
 };
-bases['Esri World Imagery'].addTo(map);
-L.control.layers(bases).addTo(map);
+// Kartenhintergrund (Register „Ansicht“), wird gemerkt
+function setBase(k) {
+  if (!bases[k]) k = 'esri';
+  for (const b in bases) if (b !== k) map.removeLayer(bases[b]);
+  bases[k].addTo(map);
+  document.querySelectorAll('[data-base]').forEach(el => el.classList.toggle('sel', el.dataset.base === k));
+  try { localStorage.setItem('aogBase', k); } catch (e) { }
+}
+let savedBase = 'esri';
+try { savedBase = localStorage.getItem('aogBase') || 'esri'; } catch (e) { }
+setBase(savedBase);
+document.querySelectorAll('[data-base]').forEach(el => { el.onclick = () => setBase(el.dataset.base); });
+map.on('mousemove', e => { $('sbCoord').textContent = e.latlng.lat.toFixed(7) + ', ' + e.latlng.lng.toFixed(7); });
 
 const otherLayer = L.layerGroup().addTo(map);
 const markerLayer = L.layerGroup().addTo(map);
@@ -433,7 +616,7 @@ function drawFlags() {
     m.bindTooltip(t('flagTip', i + 1) + (f.notes ? ': ' + f.notes : ''), { direction: 'top', offset: [6, -24] });
     m.on('dragstart', () => showGhost(L.latLng(f.lat, f.lon)));
     m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
-    m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
+    m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); showTab('fahnen'); });
     m.addTo(flagLayer);
   });
 }
@@ -762,11 +945,10 @@ function load(found, keepView) {
   active = 0; sel = -1; selFlag = -1; undo = []; unsaved = false; flagsDirty = false;
   renderBndList();
   document.getElementById('agshare').style.display = files['agshare.txt'] !== undefined ? 'block' : 'none';
-  ['btnAddFlag', 'btnOriginClick', 'btnOriginReset', 'btnSave'].forEach(id => document.getElementById(id).disabled = false);
+  ['btnAddFlag', 'btnOriginClick', 'btnOriginReset', 'btnSave', 'btnFit'].forEach(id => document.getElementById(id).disabled = false);
   document.getElementById('btnOriginCenter').disabled = !bnds.length;
   document.getElementById('btnSimp').disabled = !bnds.length;
-  const pts = bnds.flatMap(b => b.pts.map(ll)).concat(flags.map(f => L.latLng(f.lat, f.lon)), [L.latLng(la, lo)]);
-  if (!keepView) map.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 18 });
+  if (!keepView) fitField();
   drawAll();
   const bad = initExtras();
   const list = Object.keys(files).filter(n => n !== 'agshare.txt').join(', ');
@@ -776,6 +958,13 @@ function load(found, keepView) {
     sparse.forEach(b => b.dirty = true); unsaved = true; updateInfo();
     setStatus(t('sparse'), 'err');
   }
+}
+
+// Ganzes Feld zeigen: Grenzen, Fahnen und Ursprung
+function fitField() {
+  if (!plane) return;
+  const pts = bnds.flatMap(b => b.pts.map(ll)).concat(flags.map(f => L.latLng(f.lat, f.lon)), [L.latLng(plane.lat0, plane.lon0)]);
+  map.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 18 });
 }
 
 // Grenzen als Liste: Name anklicken = bearbeiten, 👁 = ein-/ausblenden, ✕ = löschen, bei Innengrenzen „befahrbar“
@@ -870,6 +1059,7 @@ function renderFieldList() {
 }
 
 $('btnRoot').onclick = async () => {
+  if (!ui.nav) { ui.nav = true; applyUi(); }                // Feldliste bzw. Dateiauswahl sichtbar machen
   if (!window.showDirectoryPicker) { $('fallback').style.display = 'block'; return; }
   try {
     const h = await window.showDirectoryPicker({ id: 'aogFields', mode: 'readwrite', startIn: 'documents' });
@@ -1156,16 +1346,18 @@ function drawLayer(id) {
 
 function showLayer(id) { if (layerOn[id]) map.addLayer(exLayers[id]); else map.removeLayer(exLayers[id]); }
 
+// Jede Ebene steht im Ribbon bei ihrem Register (Spuren, Vorgewende, …), der Rest unter „Ansicht“
+const LAYER_TAB = { tracks: 'spuren', headland: 'vorgewende', headlines: 'vorgewende', tram: 'fahrgassen', flags: 'fahnen' };
 function renderLayerList() {
-  const box = $('layerList');
-  box.innerHTML = '';
+  document.querySelectorAll('.gchecks[id^="lay-"]').forEach(b => { b.innerHTML = ''; });
+  if (!plane) return;
   EXTRA_DEFS.forEach(([id]) => {
-    const n = exCount(id), label = t('L_' + id);
-    if (!n && id !== 'flags') { map.removeLayer(exLayers[id]); return; }
-    const extra = id === 'sections' ? ` (${fmtNum(ex.sections.area / 10000, 2)} ha)` : n > 1 ? ` (${n})` : '';
+    const n = exCount(id), label = t('L_' + id), box = $('lay-' + (LAYER_TAB[id] || 'ansicht'));
+    const extra = id === 'sections' && n ? ` (${fmtNum(ex.sections.area / 10000, 2)} ha)` : n > 1 ? ` (${n})` : '';
     const lab = document.createElement('label'), cb = document.createElement('input');
-    lab.className = 'check';
+    lab.className = 'check' + (n || id === 'flags' ? '' : ' dis');
     cb.type = 'checkbox';
+    cb.disabled = !n && id !== 'flags';
     cb.checked = !!layerOn[id];
     cb.onchange = () => {
       layerOn[id] = cb.checked;
@@ -1186,13 +1378,17 @@ function renderLayerList() {
 
 // Spuren und Vorgewende-Linien als Liste wie die Grenzen: Zeile anklicken = gelb markieren (nochmal = aufheben),
 // Name direkt umbenennen, 〰 = Kurve glätten, 👁 = ein-/ausblenden (nur Anzeige), ✕ = löschen
+const smoothable = i => { const tr = ex.tracks[i]; return !!tr && !tr.deleted && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4; };
 function markTrackRows() {
   document.querySelectorAll('#nameList .bndrow[data-kind="tracks"]').forEach(r => r.classList.toggle('on', +r.dataset.i === hiTrack));
+  const b = $('btnSmooth');
+  b.disabled = !smoothable(hiTrack);
+  b.title = b.disabled ? t('smoothNeedSel') : '';
 }
+$('btnSmooth').onclick = () => { const i = hiTrack; if (smoothable(i)) startSmooth(i); };
 function renderNames() {
-  const box = $('nameList');
-  box.innerHTML = '';
-  box.className = '';
+  const boxes = { tracks: $('nameList'), headlines: $('headList') };
+  for (const k in boxes) { boxes[k].innerHTML = ''; boxes[k].className = ''; }
   const mini = (txt, title, fn) => {
     const b = document.createElement('button');
     b.className = 'mini'; b.textContent = txt; b.title = title;
@@ -1221,9 +1417,7 @@ function renderNames() {
       inp.onfocus = () => select(true);
       row.onclick = () => select(hiTrack !== i);
     }
-    row.append(tag, inp);
-    if (kind === 'tracks' && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
-    row.append(
+    row.append(tag, inp,
       mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
       mini('✕', t('delTitle'), () => {
         if (!confirm(t('confirmDelTrack', tr.name || t('noName')))) return;
@@ -1231,11 +1425,13 @@ function renderNames() {
         if (hiTrack === i) hiTrack = -1;
         drawLayer(kind); renderLayerList(); renderNames();
       }));
-    box.append(row);
+    boxes[kind].append(row);
   });
   add('tracks', ex.tracks, tr => tr.mode === 2 ? t('tagAB') : tr.mode === 4 ? t('tagCurve') : t('tagTrack'));
   add('headlines', ex.headlines, () => t('tagHeadline'));
-  if (!box.children.length) { box.className = 'muted'; box.textContent = t('noNames'); }
+  const empty = { tracks: 'noNames', headlines: 'noHeadlines' };
+  for (const k in boxes) if (!boxes[k].children.length) { boxes[k].className = 'muted'; boxes[k].textContent = plane ? t(empty[k]) : '–'; }
+  markTrackRows();
 }
 
 function nameLines(f) {
@@ -1275,12 +1471,14 @@ function closeTool() {
   drawMarkers();
   toolLayer.clearLayers();
   $('toolbox').style.display = 'none';
+  $('btnMeasDist').classList.remove('on'); $('btnMeasArea').classList.remove('on');
   map.getContainer().classList.toggle('pick', !!mode);
   if (hiTrack >= 0) { hiTrack = -1; drawLayer('tracks'); markTrackRows(); }
 }
 function updateToolbox() {
   if (!tool) return;
-  $('toolMsg').textContent = tool.msg();
+  $('toolMsg')[tool.msgHtml ? 'innerHTML' : 'textContent'] = tool.msg();
+  $('toolCancel').textContent = t(tool.cancelLabel || 'cancel');
   const ok = $('toolOk');
   ok.style.display = tool.ok && !tool.hideOk ? '' : 'none';
   ok.textContent = t(tool.okLabel || 'apply');
@@ -1598,7 +1796,7 @@ let newFieldName = null, clearedFiles = {};
 const clearGhost = () => ghostLayer.clearLayers();
 map.on('click', clearGhost);
 document.addEventListener('keydown', clearGhost, true);
-document.addEventListener('click', e => { if (e.target.closest('#side, #toolbox')) clearGhost(); }, true);
+document.addEventListener('click', e => { if (e.target.closest('header, #nav, #props, #toolbox')) clearGhost(); }, true);
 function showGhost(p, ring) {
   ghostLayer.clearLayers();
   if (ring) L.polyline(ring, { color: '#fff', weight: 1.5, opacity: .85, dashArray: '6 6', interactive: false }).addTo(ghostLayer);
@@ -1823,26 +2021,77 @@ function makeBoundaryTracks() {
   });
 }
 
-// --- Seitenleiste: Bereiche auf- und zuklappen (wird gemerkt) ---
-(function makeCollapsible() {
-  let state = {};
-  try { state = JSON.parse(localStorage.getItem('aogSections') || '{}'); } catch (e) { }
-  [...document.querySelectorAll('#side > h2')].forEach(h => {
-    if (h.dataset.i18n === 'hSave') return;                // Speichern + Statusmeldungen immer sichtbar
-    const body = document.createElement('div');
-    body.className = 'sec-body';
-    while (h.nextSibling && h.nextSibling.tagName !== 'H2') body.append(h.nextSibling);
-    h.after(body);
-    h.classList.add('sec-head');
-    const key = h.dataset.i18n;
-    if (state[key]) h.classList.add('closed');
-    h.onclick = () => {
-      h.classList.toggle('closed');
-      state[key] = h.classList.contains('closed');
-      try { localStorage.setItem('aogSections', JSON.stringify(state)); } catch (e) { }
-    };
+// --- Messen: Strecke oder Fläche (geht auch ohne geöffnetes Feld) ---
+function startMeasure(isArea) {
+  const P = () => dedupeClicks(tool.pts);
+  const result = () => {
+    const pts = P(), pl = Plane(pts[0].lat, pts[0].lng), q = pts.map(p => pl.fwd(p.lat, p.lng));
+    let len = 0;
+    for (let i = 1; i < q.length; i++) len += dist(q[i - 1], q[i]);
+    if (!isArea) return t('measDist', fmtNum(len, 2));
+    const a = Math.abs(fenceSignedArea(q) / 2);
+    return t('measArea', fmtNum(a / 10000, 4), fmtNum(a, 0), fmtNum(len + dist(q[q.length - 1], q[0]), 1));
+  };
+  startTool({
+    pts: [],
+    msg: () => P().length < (isArea ? 3 : 2) ? t(isArea ? 'measAreaMsg' : 'measDistMsg') : result(),
+    msgHtml: true,
+    onClick: p => { tool.pts.push(p); redrawTool(); },
+    onUndo: () => { tool.pts.pop(); redrawTool(); },
+    cancelLabel: 'close',
+    draw: g => {
+      const pts = P(), style = { color: '#ffd400', weight: 2.5, interactive: false };
+      if (isArea && pts.length > 2) L.polygon(pts, { ...style, fillOpacity: .15 }).addTo(g);
+      else if (pts.length > 1) L.polyline(pts, style).addTo(g);
+      pts.forEach(p => dot(p, '#ffd400').addTo(g));
+      if (!isArea) {                                   // Teilstrecken beschriften
+        for (let i = 1; i < pts.length; i++) {
+          const m = L.latLng((pts[i - 1].lat + pts[i].lat) / 2, (pts[i - 1].lng + pts[i].lng) / 2);
+          L.marker(m, { interactive: false, icon: L.divIcon({ className: '', html: `<span class="mlabel">${fmtNum(map.distance(pts[i - 1], pts[i]), 1)} m</span>`, iconSize: [0, 0] }) }).addTo(g);
+        }
+      }
+    }
   });
-})();
+  $('btnMeasDist').classList.toggle('on', !isArea);
+  $('btnMeasArea').classList.toggle('on', isArea);
+}
+$('btnMeasDist').onclick = () => startMeasure(false);
+$('btnMeasArea').onclick = () => startMeasure(true);
+
+// --- Ribbon: Register umschalten, Feldliste und Seitenleiste ein-/ausblenden (wird gemerkt) ---
+const ui = { tab: 'feld', nav: true, props: true };
+try { Object.assign(ui, JSON.parse(localStorage.getItem('aogUi') || '{}')); } catch (e) { }
+function applyUi() {
+  if (!document.querySelector(`.rpanel[data-tab="${ui.tab}"]`)) ui.tab = 'feld';
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
+  document.querySelectorAll('.rpanel').forEach(p => p.classList.toggle('on', p.dataset.tab === ui.tab));
+  document.querySelectorAll('.pp').forEach(p => p.classList.toggle('on', p.dataset.tab === ui.tab));
+  const hasProps = !!document.querySelector(`.pp[data-tab="${ui.tab}"]`);
+  $('nav').classList.toggle('hide', !ui.nav);
+  $('props').classList.toggle('hide', !ui.props || !hasProps);
+  $('btnNav').classList.toggle('sel', ui.nav);
+  $('btnProps').classList.toggle('sel', ui.props);
+  try { localStorage.setItem('aogUi', JSON.stringify(ui)); } catch (e) { }
+  map.invalidateSize();
+}
+function showTab(tab) { if (ui.tab !== tab) { ui.tab = tab; applyUi(); } }
+document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
+$('btnNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
+$('btnProps').onclick = () => { ui.props = !ui.props; applyUi(); };
+applyUi();
+
+// Titel oben: Feldname, Punkt = ungespeicherte Änderungen
+function updateTitle() {
+  const name = newFieldName || currentField, el = $('docTitle');
+  el.innerHTML = '';
+  el.append(t('title'));
+  const f = document.createElement('span');
+  f.className = 'fld';
+  f.textContent = ' — ' + (name || (plane ? '' : t('noField')));
+  if (name || !plane) el.append(f);
+  if (unsaved) { const d = document.createElement('span'); d.className = 'dot'; d.textContent = ' ●'; el.append(d); }
+}
+setInterval(updateTitle, 400);
 
 $('btnNewField').onclick = newField;
 $('btnBndCurve').onclick = makeBoundaryTracks;
@@ -1937,6 +2186,8 @@ function applyLang(l) {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  updateTitle(); markTrackRows(); if (tool) updateToolbox();
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
   if (rootLabel) showRoot(rootLabel);
   if (plane) { renderBndList(); updateInfo(); drawFlags(); drawMarkers(); renderLayerList(); renderNames(); drawLayer('headlines'); }
