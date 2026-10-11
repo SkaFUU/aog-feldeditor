@@ -192,7 +192,7 @@ const I18N = {
     hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen (dann in Karte klicken)', red: 'Rot', green: 'Grün', purple: 'Lila',
     btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.',
     hLayers: 'Anzeigen', hNames: 'Spuren',
-    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve, 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
+    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte. Namen direkt umbenennen, 〰 glättet eine Kurve, ⊡ übernimmt eine Grenz-Spur als Schlaggrenze, 👁 blendet ein/aus, ✕ löscht. Fahnen benennst du über ihre Notiz.',
     hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'Ursprung in Feldmitte setzen', btnOriginClick: 'Ursprung per Klick setzen',
     btnOriginReset: 'Ursprung zurücksetzen',
     originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
@@ -245,6 +245,9 @@ const I18N = {
     smoothPick2: 'Zweiten Punkt auf der Kurve anklicken.',
     smoothSectionMsg: 'Rundung: {0} % – der orange Abschnitt wird durch einen glatten Bogen ersetzt. Ein neuer Klick setzt neu an.',
     noActive: 'Keine Grenze ausgewählt – zum Bearbeiten den Namen anklicken.', smoothTitle: 'Kurve glätten', delTitle: 'Löschen',
+    useAsBndTitle: 'Als Grenze übernehmen – ersetzt die zugehörige Schlaggrenze durch diese Spur',
+    confirmUseAsBnd: '{0} durch die Spur „{1}“ ersetzen? Strg+Z macht das rückgängig.',
+    bndFromTrack: '{0} durch „{1}“ ersetzt – nach dem Speichern in AOG das Vorgewende neu erstellen.',
     confirmDelTrack: '„{0}“ löschen?', trackCreated: '„{0}“ angelegt.', trackChanged: '„{0}“ geändert.',
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
@@ -261,7 +264,7 @@ const I18N = {
     hFlags: 'Flags', btnAddFlag: 'Add flag (then click the map)', red: 'Red', green: 'Green', purple: 'Purple',
     btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Drag a flag to move it, click it to edit.',
     hLayers: 'Show', hNames: 'Tracks',
-    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve, 👁 shows/hides, ✕ deletes. Flags are named via their note.',
+    namesHelp: 'Click a row to highlight the track in yellow on the map. Rename it right there, 〰 smooths a curve, ⊡ uses a boundary track as the field boundary, 👁 shows/hides, ✕ deletes. Flags are named via their note.',
     hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'Move origin to field center', btnOriginClick: 'Set origin by clicking the map',
     btnOriginReset: 'Reset origin',
     originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
@@ -314,6 +317,9 @@ const I18N = {
     smoothPick2: 'Click the second point on the curve.',
     smoothSectionMsg: 'Rounding: {0} % – the orange section is replaced by a smooth arc. A new click starts over.',
     noActive: 'No boundary selected – click a name to edit it.', smoothTitle: 'Smooth curve', delTitle: 'Delete',
+    useAsBndTitle: 'Use as boundary – replaces the matching field boundary with this track',
+    confirmUseAsBnd: 'Replace the {0} with the track “{1}”? Ctrl+Z undoes this.',
+    bndFromTrack: '{0} replaced by “{1}” – after saving, rebuild the headland in AOG.',
     confirmDelTrack: 'Delete “{0}”?', trackCreated: '“{0}” created.', trackChanged: '“{0}” changed.',
     twolNo: 'This track file uses an old format – new or changed tracks are not possible here.'
   }
@@ -1218,6 +1224,7 @@ function renderNames() {
     }
     row.append(tag, inp);
     if (kind === 'tracks' && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4) row.append(mini('〰', t('smoothTitle'), () => startSmooth(i)));
+    if (kind === 'tracks' && tr.mode === 32 && tr.pts.length > 3) row.append(mini('⊡', t('useAsBndTitle'), () => useTrackAsBoundary(i)));
     row.append(
       mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
       mini('✕', t('delTitle'), () => {
@@ -1718,6 +1725,39 @@ function startDrawAB() {
   });
 }
 // „Grenze als Spur“ (wie „Boundary Curve“ in AOG): die gewählte Grenze wird zu einer Spur entlang der Grenze
+// „Als Grenze übernehmen“: eine (z. B. geglättete) Grenz-Spur ersetzt die zugehörige Schlaggrenze, damit Grenze,
+// Spur und Vorgewende wieder genau zusammenpassen. Welche Grenze gemeint ist, wird über die Lage bestimmt.
+function closestBoundary(P) {
+  let best = -1, bd = Infinity;
+  const step = Math.max(1, Math.floor(P.length / 60));
+  bnds.forEach((b, i) => {
+    if (b.pts.length < 3) return;
+    let sum = 0, cnt = 0;
+    for (let k = 0; k < P.length; k += step) {
+      let m = Infinity;
+      b.pts.forEach(v => { const d = (v.e - P[k].e) ** 2 + (v.n - P[k].n) ** 2; if (d < m) m = d; });
+      sum += Math.sqrt(m); cnt++;
+    }
+    if (sum / cnt < bd) { bd = sum / cnt; best = i; }
+  });
+  return best;
+}
+function useTrackAsBoundary(i) {
+  const tr = ex.tracks[i], P = tr.pts.map(([la, lo]) => plane.fwd(la, lo));
+  if (P.length < 4) return;
+  let q = closestBoundary(P);
+  if (q < 0) q = 0;                                        // keine Grenze vorhanden: als Außengrenze anlegen
+  const label = q === 0 ? t('outer') : t('inner', q);
+  if (bnds[q] && !confirm(t('confirmUseAsBnd', label, tr.name))) return;
+  if (!bnds[q]) bnds[q] = { flagLines: ['False'], pts: [], orig: [], dirty: true };
+  active = q;
+  pushUndo();                                              // Strg+Z holt die alte Grenze zurück
+  bnds[q].pts = P.map(p => ({ e: p.e, n: p.n }));
+  bnds[q].dirty = true; bndListDirty = true; unsaved = true; sel = -1;
+  drawAll();
+  setStatus(t('bndFromTrack', label, tr.name), 'ok');
+}
+
 function boundaryTrack(q) {
   const F = prepareFence(bnds[q].pts, q);       // dicht und richtig herum, wie AOG die Grenze speichert
   if (F.length < 4) { setStatus(t('abTooShort'), 'err'); return; }
