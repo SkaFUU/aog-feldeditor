@@ -19,7 +19,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Jeder Punkt ist auf dem Satellitenbild sichtbar und lässt sich verschieben, einfügen (Klick auf die Linie) oder löschen (Rechtsklick oder Entf). Strg+Z macht den letzten Schritt rückgängig.
 - Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion.
 - Neue Außen- oder Innengrenze zeichnen: Punkte auf die Karte klicken.
-- Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), 👁 blendet ein oder aus, ✕ löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
+- Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), das Auge blendet ein oder aus, der Papierkorb löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
 - „Ausdünnen“ entfernt überflüssige Punkte.
 - Beim Speichern wird die Grenze so aufbereitet, wie AgOpenGPS sie selbst speichert: Punktabstand, Umlaufrichtung und Richtung jedes Punkts. Nur dann berechnet AgOpenGPS daraus eine korrekte Wendelinie.
 - Grenzen mit zu wenigen Punkten erkennt der Editor beim Öffnen und repariert sie beim Speichern.
@@ -31,14 +31,14 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 
 **Fahnen**
-- Fahnen setzen, verschieben und löschen, Farbe und Notiz ändern.
+- Fahnen setzen, verschieben und löschen. Rechts stehen alle Fahnen; ein Klick (in der Liste oder auf der Karte) klappt Farbe, Notiz und Koordinaten auf. Das Register „Fahnen“ blendet die Fahnen auf der Karte ein.
 
 **Feld-Ursprung (StartFix)**
 - Der Ursprung lässt sich in die Feldmitte oder an eine beliebige Stelle verschieben. Alle Dateien im Feldordner werden dabei mit umgerechnet: Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahrgassen, Pfade, Höhendaten und Hintergrundbild.
 - Ein Kreis zeigt die 500 m, in denen „Drive In“ das Feld findet. „Drive In“ zeigt ein Feld nur an, wenn du höchstens 500 m vom StartFix entfernt bist, also von der Stelle, an der beim Anlegen „Neu“ gedrückt wurde.
 
 **Anzeigen**
-- Alles, was das Feld enthält, lässt sich einzeln ein- und ausblenden und mit 🗑 komplett löschen (wie „Bearbeitete Fläche löschen“ in AgOpenGPS):
+- Alles, was das Feld enthält, lässt sich einzeln mit dem Auge in seinem Register ein- und ausblenden (das Register anwählen blendet seine Ebenen ein) und mit dem Papierkorb komplett löschen (wie „Bearbeitete Fläche löschen“ in AgOpenGPS):
   - bearbeitete Fläche, mit ha-Angabe; doppelt bearbeitete Stellen werden dunkler
   - AB-Linien und Kurven
   - Vorgewende und Vorgewende-Linien

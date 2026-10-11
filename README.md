@@ -19,7 +19,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Every point is shown on the satellite image. You can drag points, insert them (click the line) or delete them (right-click or Del). Ctrl+Z undoes the last step.
 - While you drag a point, a dashed ghost of the old point and the old boundary stays visible until your next action.
 - Draw a new outer or inner boundary by clicking points on the map.
-- All boundaries are listed: click a name to edit it (click again to stop editing), 👁 shows or hides it, ✕ deletes it. Inner boundaries can be marked as **drive-through** (e.g. a ditch or path), and AgOpenGPS builds no U-turn line there.
+- All boundaries are listed: click a name to edit it (click again to stop editing), the eye shows or hides it, the bin deletes it. Inner boundaries can be marked as **drive-through** (e.g. a ditch or path), and AgOpenGPS builds no U-turn line there.
 - "Reduce" removes unnecessary points.
 - When saving, the boundary is prepared the same way AgOpenGPS stores it: point spacing, winding direction and the heading of every point. Only then does AgOpenGPS build a correct U-turn line from it.
 - Boundaries with too few points are detected when a field is opened and repaired when it is saved.
@@ -31,14 +31,14 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 
 **Flags**
-- Add, move and delete flags, change their color and note.
+- Add, move and delete flags. All flags are listed on the right; click one (in the list or on the map) to show its color, note and coordinates. Selecting the Flags tab shows the flags on the map.
 
 **Field origin (StartFix)**
 - Move the origin to the field center or to any other point. All files in the field folder are converted along with it: boundary, headland, tracks, coverage, tramlines, recorded paths, elevation data and background image.
 - A circle shows the 500 m within which "Drive In" finds the field. "Drive In" only lists a field when you are within 500 m of its StartFix, which is where you pressed "New" when the field was created.
 
 **Show**
-- Everything the field contains can be shown or hidden individually, and deleted completely with 🗑 (like "Delete applied area" in AgOpenGPS):
+- Everything the field contains can be shown or hidden individually, with the eye button in its tab (selecting a tab shows its layers), and deleted completely with the bin (like "Delete applied area" in AgOpenGPS):
   - coverage, with area in ha; areas covered twice are drawn darker
   - AB lines and curves
   - headland and headland lines

@@ -67,6 +67,29 @@
   .gchecks .check { margin:1px 0; font-size:12.5px; white-space:nowrap; }
   .gchecks .check.dis { opacity:.4; }
   .gchecks:empty::before { content:'–'; color:var(--muted); }
+  .lrow { display:flex; align-items:center; gap:2px; }
+  .lbtn { display:flex; align-items:center; gap:6px; width:auto; margin:0; padding:3px 8px 3px 5px; background:transparent; color:var(--muted); font-size:12.5px; white-space:nowrap; border-radius:5px; }
+  .lbtn .ic { width:17px; height:17px; }
+  button.lbtn.on { background:transparent; color:var(--fg); }
+  button.lbtn.on:hover { background:#3a3f46; }
+  .lbtn.on .ic { color:var(--tab); }
+  .lbtn:hover { background:#3a3f46; }
+  .mini .ic { width:15px; height:15px; display:block; }
+  button.mini { display:inline-flex; align-items:center; justify-content:center; background:transparent; color:var(--muted); }
+  button.mini:hover { background:#3a3f46; color:var(--fg); }
+  button.mini.off .ic { opacity:.6; }
+  .flagrow { border-radius:6px; margin:2px 0; }
+  .flagrow.on { background:#30353b; box-shadow:inset 3px 0 0 var(--warn); }
+  .flagrow .bndrow { margin:0; }
+  .flagrow .fic { flex:none; width:11px; height:11px; border:1px solid #000; border-radius:2px; }
+  .flagrow .nm { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .flagrow .nm i { color:var(--muted); font-style:normal; }
+  .fdet { padding:2px 8px 8px 22px; font-size:12.5px; }
+  .fdet .coord { color:var(--muted); font-variant-numeric:tabular-nums; margin-bottom:6px; }
+  .swatches { display:flex; gap:6px; margin-bottom:6px; }
+  .swatches button { width:auto; margin:0; padding:3px 10px 3px 6px; display:flex; align-items:center; gap:6px; font-size:12.5px; background:#1d2024; }
+  .swatches button.on { background:#1d2024; color:var(--fg); box-shadow:inset 0 0 0 2px var(--warn); }
+  .swatches span { width:11px; height:11px; border:1px solid #000; border-radius:2px; }
   .c-bnd .ic { color:#ff6b5e; } .c-trk .ic { color:#ff4fd8; } .c-flag .ic { color:#ff3b30; } .c-org .ic { color:#00c8ff; }
   .c-meas .ic { color:var(--warn); } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
 
@@ -156,6 +179,10 @@
   <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="M8 15l2-6 6 1-1 5z"/></symbol>
   <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></symbol>
   <symbol id="i-area" viewBox="0 0 24 24"><path d="M4 19L6 6l12-2 2 12z"/><path d="M7 14l6-7M8 18l9-10M13 18l5-6" stroke-width="1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.5 7-10 7c-2 0-3.7-.7-5.1-1.6"/><path d="M3 3l18 18"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
   <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
 </svg>
 <div id="app">
@@ -306,15 +333,8 @@
       </div>
       <div class="pp" data-tab="fahnen">
         <h2 data-i18n="hFlags">Fahnen</h2>
-        <div id="flagEdit" style="display:none" class="info">
-          <div id="flagTitle"></div>
-          <div class="row" style="margin-top:6px">
-            <select id="flagColor"><option value="0" data-i18n="red">Rot</option><option value="1" data-i18n="green">Grün</option><option value="2" data-i18n="purple">Lila</option></select>
-            <button id="btnDelFlag" data-i18n="btnDelFlag">Löschen</button>
-          </div>
-          <input id="flagNotes" data-i18n-ph="phNote" placeholder="Notiz" style="margin-top:4px">
-        </div>
-        <div class="muted" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
+        <div id="flagList" class="muted">–</div>
+        <div class="muted" style="margin-top:6px" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
       </div>
       <div class="pp" data-tab="ursprung">
         <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
@@ -352,15 +372,16 @@ const I18N = {
     editHelp: '<li><b>Verschieben:</b> Punkt ziehen</li><li><b>Einfügen:</b> auf die rote Linie klicken</li><li><b>Löschen:</b> Rechtsklick auf Punkt, oder anklicken + Entf</li>',
     simpLabel: 'Toleranz (m)', btnSimp: 'Ausdünnen',
     hFlags: 'Fahnen', btnAddFlag: 'Fahne setzen', red: 'Rot', green: 'Grün', purple: 'Lila',
-    btnDelFlag: 'Löschen', phNote: 'Notiz', flagHelp: 'Fahne setzen, dann in die Karte klicken. Fahne ziehen zum Verschieben, anklicken zum Bearbeiten. Benannt wird sie über die Notiz.',
+    phNote: 'Notiz (Name der Fahne)', noFlags: 'Keine Fahnen in diesem Feld.', flagZoom: 'Hinzoomen',
+    flagHelp: '„Fahne setzen“, dann in die Karte klicken. Eine Fahne in der Liste oder auf der Karte anklicken klappt ihre Optionen auf. Auf der Karte ziehen verschiebt sie.',
     hNames: 'Spuren',
-    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte – eine Kurve kannst du dann oben mit „Glätten“ bearbeiten (auf Wunsch mit der Grenze). Namen direkt umbenennen, 👁 blendet ein/aus, ✕ löscht.',
+    namesHelp: 'Zeile anklicken markiert die Spur gelb auf der Karte – eine Kurve kannst du dann oben mit „Glätten“ bearbeiten (auf Wunsch mit der Grenze). Namen direkt umbenennen, das Auge blendet ein/aus, der Papierkorb löscht.',
     hOrigin: 'Feld-Ursprung (StartFix)', btnOriginCenter: 'In Feldmitte', btnOriginClick: 'Per Klick setzen',
     btnOriginReset: 'Zurücksetzen',
     originHelp: 'Blauer Kreis = 500 m. Nur wenn du in diesem Kreis stehst, zeigt „Drive In“ das Feld an.',
     hSave: 'Speichern', btnSave: 'Speichern',
     saveHelp: '<li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li><li>Alle geänderten Dateien werden vorher in den Unterordner <i>Backup_…</i> gesichert.</li><li>Nach Grenzänderung in AOG das <b>Vorgewende neu erstellen</b>.</li>',
-    zoomIn: 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen', flagTip: 'Fahne {0}', flagTitle: '<b>Fahne {0}</b> · {1}',
+    zoomIn: 'Zum Bearbeiten der Grenzpunkte weiter hineinzoomen', flagTip: 'Fahne {0}',
     min3: 'Eine Grenze braucht mindestens 3 Punkte.',
     confirmOrigin: 'Ursprung um {0} m verschieben?\n\nBeim Speichern werden Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahnen, Fahrgassen und aufgezeichnete Pfade mit umgerechnet.',
     originMoved: 'Ursprung verschoben – noch nicht gespeichert.', originReset: 'Ursprung zurückgesetzt.',
@@ -434,15 +455,16 @@ const I18N = {
     editHelp: '<li><b>Move:</b> drag a point</li><li><b>Insert:</b> click the red line</li><li><b>Delete:</b> right-click a point, or select it + Del</li>',
     simpLabel: 'Tolerance (m)', btnSimp: 'Reduce',
     hFlags: 'Flags', btnAddFlag: 'Add flag', red: 'Red', green: 'Green', purple: 'Purple',
-    btnDelFlag: 'Delete', phNote: 'Note', flagHelp: 'Add flag, then click the map. Drag a flag to move it, click it to edit. Flags are named via their note.',
+    phNote: 'Note (flag name)', noFlags: 'No flags in this field.', flagZoom: 'Zoom to flag',
+    flagHelp: '“Add flag”, then click the map. Click a flag in the list or on the map to show its options. Drag it on the map to move it.',
     hNames: 'Tracks',
-    namesHelp: 'Click a row to highlight the track in yellow on the map – a curve can then be smoothed with “Smooth” at the top (optionally with the boundary). Rename it right there, 👁 shows/hides, ✕ deletes.',
+    namesHelp: 'Click a row to highlight the track in yellow on the map – a curve can then be smoothed with “Smooth” at the top (optionally with the boundary). Rename it right there, the eye shows/hides, the bin deletes.',
     hOrigin: 'Field origin (StartFix)', btnOriginCenter: 'To field center', btnOriginClick: 'Set by click',
     btnOriginReset: 'Reset',
     originHelp: 'Blue circle = 500 m. “Drive In” only lists the field when you are inside this circle.',
     hSave: 'Save', btnSave: 'Save',
     saveHelp: '<li><b>Close</b> the field in AgOpenGPS first.</li><li>All changed files are backed up to a <i>Backup_…</i> subfolder first.</li><li>After changing the boundary, <b>rebuild the headland</b> in AOG.</li>',
-    zoomIn: 'Zoom in further to edit the boundary points', flagTip: 'Flag {0}', flagTitle: '<b>Flag {0}</b> · {1}',
+    zoomIn: 'Zoom in further to edit the boundary points', flagTip: 'Flag {0}',
     min3: 'A boundary needs at least 3 points.',
     confirmOrigin: 'Move the origin by {0} m?\n\nWhen saving, boundary, headland, tracks, coverage, flags, tramlines and recorded paths are converted as well.',
     originMoved: 'Origin moved – not saved yet.', originReset: 'Origin reset.',
@@ -967,13 +989,12 @@ function fitField() {
   map.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 18 });
 }
 
-// Grenzen als Liste: Name anklicken = bearbeiten, 👁 = ein-/ausblenden, ✕ = löschen, bei Innengrenzen „befahrbar“
+// Grenzen als Liste: Name anklicken = bearbeiten, Auge = ein-/ausblenden, Papierkorb = löschen, bei Innengrenzen „befahrbar“
 function renderBndList() {
   const box = document.getElementById('bndList');
   box.innerHTML = '';
   if (!bnds.length) { box.className = 'muted'; box.textContent = plane ? t('noBoundary') : '–'; return; }
   box.className = '';
-  const mini = (txt, title, fn) => { const b = document.createElement('button'); b.className = 'mini'; b.textContent = txt; b.title = title; b.onclick = fn; return b; };
   bnds.forEach((b, i) => {
     const row = document.createElement('div'), nm = document.createElement('span');
     row.className = 'bndrow' + (i === active ? ' on' : '') + (b.hidden ? ' off' : '');
@@ -993,8 +1014,8 @@ function renderBndList() {
       row.append(lab);
     }
     row.append(
-      mini(b.hidden ? '◌' : '👁', t('visTitle'), ev => { ev.stopPropagation(); b.hidden = !b.hidden; drawAll(); }),
-      mini('✕', t('delTitle'), ev => { ev.stopPropagation(); active = i; deleteBoundary(); }));
+      iconBtn(b.hidden ? 'eyeoff' : 'eye', t('visTitle'), () => { b.hidden = !b.hidden; drawAll(); }, b.hidden ? 'off' : ''),
+      iconBtn('trash', t('delTitle'), () => { active = i; deleteBoundary(); }));
     box.append(row);
   });
 }
@@ -1348,36 +1369,42 @@ function showLayer(id) { if (layerOn[id]) map.addLayer(exLayers[id]); else map.r
 
 // Jede Ebene steht im Ribbon bei ihrem Register (Spuren, Vorgewende, …), der Rest unter „Ansicht“
 const LAYER_TAB = { tracks: 'spuren', headland: 'vorgewende', headlines: 'vorgewende', tram: 'fahrgassen', flags: 'fahnen' };
+// Kleiner Knopf mit Symbol (Auge, Papierkorb …) für Listen und das Ribbon
+function iconBtn(icon, title, fn, cls) {
+  const b = document.createElement('button');
+  b.className = 'mini ' + (cls || ''); b.title = title;
+  b.innerHTML = `<svg class="ic"><use href="#i-${icon}"/></svg>`;
+  b.onclick = ev => { ev.preventDefault(); ev.stopPropagation(); fn(); };
+  return b;
+}
+function setLayer(id, on) {
+  layerOn[id] = on;
+  try { localStorage.setItem('aogLayers', JSON.stringify(layerOn)); } catch (e) { }
+  showLayer(id);
+}
 function renderLayerList() {
   document.querySelectorAll('.gchecks[id^="lay-"]').forEach(b => { b.innerHTML = ''; });
   if (!plane) return;
   EXTRA_DEFS.forEach(([id]) => {
     const n = exCount(id), label = t('L_' + id), box = $('lay-' + (LAYER_TAB[id] || 'ansicht'));
     const extra = id === 'sections' && n ? ` (${fmtNum(ex.sections.area / 10000, 2)} ha)` : n > 1 ? ` (${n})` : '';
-    const lab = document.createElement('label'), cb = document.createElement('input');
-    lab.className = 'check' + (n || id === 'flags' ? '' : ' dis');
-    cb.type = 'checkbox';
-    cb.disabled = !n && id !== 'flags';
-    cb.checked = !!layerOn[id];
-    cb.onchange = () => {
-      layerOn[id] = cb.checked;
-      try { localStorage.setItem('aogLayers', JSON.stringify(layerOn)); } catch (e) { }
-      showLayer(id);
-    };
-    lab.append(cb, ' ' + label + extra);
-    if ((CLEAR_FILES[id] || id === 'flags') && n) {
-      const del = document.createElement('button');
-      del.className = 'mini'; del.textContent = '🗑'; del.title = t('clearTitle');
-      del.onclick = ev => { ev.preventDefault(); clearLayer(id, label); };
-      lab.append(del);
-    }
-    box.append(lab);
+    const row = document.createElement('div'), eye = document.createElement('button');
+    row.className = 'lrow';
+    eye.className = 'lbtn' + (layerOn[id] ? ' on' : '');
+    eye.disabled = !n && id !== 'flags';
+    eye.title = t('visTitle');
+    eye.innerHTML = `<svg class="ic"><use href="#i-${layerOn[id] ? 'eye' : 'eyeoff'}"/></svg>`;
+    eye.append(label + extra);
+    eye.onclick = () => { setLayer(id, !layerOn[id]); renderLayerList(); };
+    row.append(eye);
+    if ((CLEAR_FILES[id] || id === 'flags') && n) row.append(iconBtn('trash', t('clearTitle'), () => clearLayer(id, label)));
+    box.append(row);
     showLayer(id);
   });
 }
 
 // Spuren und Vorgewende-Linien als Liste wie die Grenzen: Zeile anklicken = gelb markieren (nochmal = aufheben),
-// Name direkt umbenennen, 〰 = Kurve glätten, 👁 = ein-/ausblenden (nur Anzeige), ✕ = löschen
+// Name direkt umbenennen, Auge = ein-/ausblenden (nur Anzeige), Papierkorb = löschen
 const smoothable = i => { const tr = ex.tracks[i]; return !!tr && !tr.deleted && (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 4; };
 function markTrackRows() {
   document.querySelectorAll('#nameList .bndrow[data-kind="tracks"]').forEach(r => r.classList.toggle('on', +r.dataset.i === hiTrack));
@@ -1389,12 +1416,6 @@ $('btnSmooth').onclick = () => { const i = hiTrack; if (smoothable(i)) startSmoo
 function renderNames() {
   const boxes = { tracks: $('nameList'), headlines: $('headList') };
   for (const k in boxes) { boxes[k].innerHTML = ''; boxes[k].className = ''; }
-  const mini = (txt, title, fn) => {
-    const b = document.createElement('button');
-    b.className = 'mini'; b.textContent = txt; b.title = title;
-    b.onclick = ev => { ev.stopPropagation(); fn(); };
-    return b;
-  };
   const add = (kind, list, tagOf) => list.forEach((tr, i) => {
     if (tr.deleted || (kind === 'headlines' && !tr.show)) return;
     const row = document.createElement('div'), tag = document.createElement('span'), inp = document.createElement('input');
@@ -1418,8 +1439,8 @@ function renderNames() {
       row.onclick = () => select(hiTrack !== i);
     }
     row.append(tag, inp,
-      mini(tr.hidden ? '◌' : '👁', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }),
-      mini('✕', t('delTitle'), () => {
+      iconBtn(tr.hidden ? 'eyeoff' : 'eye', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }, tr.hidden ? 'off' : ''),
+      iconBtn('trash', t('delTitle'), () => {
         if (!confirm(t('confirmDelTrack', tr.name || t('noName')))) return;
         tr.deleted = true; listDirty[kind] = true; unsaved = true;
         if (hiTrack === i) hiTrack = -1;
@@ -2074,7 +2095,14 @@ function applyUi() {
   try { localStorage.setItem('aogUi', JSON.stringify(ui)); } catch (e) { }
   map.invalidateSize();
 }
-function showTab(tab) { if (ui.tab !== tab) { ui.tab = tab; applyUi(); } }
+// Register anwählen blendet seine Ebenen ein (Fahnen, Spuren, Vorgewende, Fahrgassen)
+function showTab(tab) {
+  if (ui.tab !== tab) { ui.tab = tab; applyUi(); }
+  if (!plane) return;
+  let ch = false;
+  for (const id in LAYER_TAB) if (LAYER_TAB[id] === tab && !layerOn[id] && (exCount(id) || id === 'flags')) { setLayer(id, true); ch = true; }
+  if (ch) renderLayerList();
+}
 document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
 $('btnNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
 $('btnProps').onclick = () => { ui.props = !ui.props; applyUi(); };
@@ -2113,13 +2141,7 @@ function updateInfo() {
   document.getElementById('btnSimp').disabled = !bnds[active];
   document.getElementById('btnOriginCenter').disabled = !bnds[0];
 
-  const fe = document.getElementById('flagEdit'), f = flags[selFlag];
-  fe.style.display = f ? 'block' : 'none';
-  if (f) {
-    document.getElementById('flagTitle').innerHTML = t('flagTitle', selFlag + 1, f.lat.toFixed(7) + ', ' + f.lon.toFixed(7));
-    document.getElementById('flagColor').value = f.color;
-    if (document.activeElement !== document.getElementById('flagNotes')) document.getElementById('flagNotes').value = f.notes || '';
-  }
+  renderFlagList();
 
   const oi = document.getElementById('originInfo');
   if (!plane) { oi.textContent = '–'; return; }
@@ -2159,18 +2181,65 @@ document.getElementById('btnOriginCenter').onclick = () => {
 document.getElementById('btnOriginReset').onclick = () => {
   if (originChanged()) { setOrigin(diskPlane.lat0, diskPlane.lon0); setStatus(t('originReset'), 'ok'); }
 };
-document.getElementById('flagColor').onchange = e => { flags[selFlag].color = +e.target.value; flagsDirty = unsaved = true; drawFlags(); };
-document.getElementById('flagNotes').oninput = e => { flags[selFlag].notes = e.target.value.replace(/,/g, ' '); flagsDirty = unsaved = true; drawFlags(); };
-document.getElementById('btnDelFlag').onclick = () => {
-  if (selFlag < 0) return;
-  flags.splice(selFlag, 1); selFlag = -1; flagsDirty = unsaved = true; drawFlags(); updateInfo();
-};
+// --- Fahnen als Liste: alle Fahnen, die gewählte aufgeklappt mit Farbe, Notiz, Löschen ---
+function deleteFlag(i) {
+  if (!flags[i]) return;
+  flags.splice(i, 1); selFlag = -1; flagsDirty = unsaved = true;
+  drawFlags(); updateInfo(); renderLayerList();
+}
+function selectFlag(i) {
+  selFlag = selFlag === i ? -1 : i; sel = -1;
+  const f = flags[selFlag];
+  if (f && !map.getBounds().pad(-0.1).contains([f.lat, f.lon])) map.panTo([f.lat, f.lon]);
+  drawFlags(); drawMarkers(); updateInfo();
+}
+function renderFlagList(force) {
+  const box = $('flagList'), act = document.activeElement;
+  if (!force && act && box.contains(act) && act.tagName === 'INPUT') return;      // beim Tippen der Notiz nicht neu aufbauen
+  box.innerHTML = '';
+  if (!flags.length) { box.className = 'muted'; box.textContent = plane ? t('noFlags') : '–'; return; }
+  box.className = '';
+  flags.forEach((f, i) => {
+    const wrap = document.createElement('div'), row = document.createElement('div'), ic = document.createElement('span'), nm = document.createElement('span');
+    wrap.className = 'flagrow' + (i === selFlag ? ' on' : '');
+    row.className = 'bndrow';
+    row.onclick = () => selectFlag(i);
+    ic.className = 'fic'; ic.style.background = FLAG_COLORS[f.color] || FLAG_COLORS[0];
+    nm.className = 'nm';
+    nm.append(t('flagTip', i + 1));
+    if (f.notes) { const n = document.createElement('i'); n.textContent = ' · ' + f.notes; nm.append(n); }
+    row.append(ic, nm,
+      iconBtn('target', t('flagZoom'), () => { map.setView([f.lat, f.lon], Math.max(map.getZoom(), 18)); if (selFlag !== i) selectFlag(i); }),
+      iconBtn('trash', t('delTitle'), () => deleteFlag(i)));
+    wrap.append(row);
+    if (i === selFlag) {
+      const det = document.createElement('div'), co = document.createElement('div'), sw = document.createElement('div'), note = document.createElement('input');
+      det.className = 'fdet';
+      co.className = 'coord'; co.textContent = f.lat.toFixed(7) + ', ' + f.lon.toFixed(7);
+      sw.className = 'swatches';
+      ['red', 'green', 'purple'].forEach((c, k) => {
+        const b = document.createElement('button'), s = document.createElement('span');
+        b.className = f.color === k ? 'on' : '';
+        s.style.background = FLAG_COLORS[k];
+        b.append(s, t(c));
+        b.onclick = () => { f.color = k; flagsDirty = unsaved = true; drawFlags(); renderFlagList(); };
+        sw.append(b);
+      });
+      note.placeholder = t('phNote'); note.value = f.notes || '';
+      note.oninput = () => { f.notes = note.value.replace(/,/g, ' '); flagsDirty = unsaved = true; drawFlags(); };
+      note.onchange = () => renderFlagList(true);
+      det.append(co, sw, note);
+      wrap.append(det);
+    }
+    box.append(wrap);
+  });
+}
 
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
   if (e.key === 'Delete' || e.key === 'Backspace') {
     e.preventDefault();
-    if (selFlag >= 0) document.getElementById('btnDelFlag').click();
+    if (selFlag >= 0) deleteFlag(selFlag);
     else if (sel >= 0) deletePoint(sel);
   }
   else if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (tool && tool.onUndo) tool.onUndo(); else doUndo(); }
