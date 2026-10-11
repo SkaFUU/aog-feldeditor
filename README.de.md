@@ -30,6 +30,16 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - **Glätten** einer Kurve oder Grenz-Spur (rechts in der Liste anklicken, dann „Glätten“): ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen. Liegt die Spur auf einer Grenze, rasten die Klicks auf den Grenzpunkten ein, und **„Grenze mitziehen“** passt die Grenzpunkte gleich mit an, damit Grenze, Spur und Vorgewende zusammenpassen.
 - AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 
+**Vorgewende** (gerechnet wie „Headland“ in AgOpenGPS 6.8)
+- **Rundum bauen:** Abstand in Metern oder als Anzahl Arbeitsbreiten eines Geräts aus AgOpenGPS (Breite minus Überlappung). Radius 0 = genau wie AgOpenGPS, ein Radius rundet die Ecken, z. B. passend zum Wenderadius.
+- **Teilstück:** zwei Punkte auf der Außengrenze anklicken (z. B. die Ecken einer Seite), Kurve entlang der Grenze oder gerade Linie wählen. Das Vorgewende wird an dieser Seite mit dem eingestellten Abstand neu gesetzt.
+- Vor dem Übernehmen zeigt eine Vorschau das Ergebnis, Werte ändern sie sofort.
+
+**Fahrgassen** (gerechnet wie „Tramlines“ in AgOpenGPS 6.8)
+- Fahrzeug aus den AgOpenGPS-Profilen wählen (Spurweite), Fahrgassenabstand und Durchgänge kommen aus den AgOpenGPS-Einstellungen. Alles lässt sich auch von Hand eingeben.
+- Spur (AB-Linie oder Kurve) und Seite wählen, Fahrgassen und/oder Randfahrgasse erzeugen. Vorhandene Fahrgassen lassen sich ersetzen oder behalten, so kann man wie bei „Tramlines Multi“ mehrere Spuren kombinieren.
+- Mit echten Feldern geprüft: Die von AgOpenGPS erzeugten Fahrgassen kommen auf 0–2 cm genau gleich heraus.
+
 **Fahnen**
 - Fahnen setzen, verschieben und löschen. Rechts stehen alle Fahnen; ein Klick (in der Liste oder auf der Karte) klappt Farbe, Notiz und Koordinaten auf. Das Register „Fahnen“ blendet die Fahnen auf der Karte ein.
 
@@ -52,12 +62,12 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Strecke (mit Länge jeder Teilstrecke) oder Fläche mit Umfang: Punkte auf die Karte klicken. Geht auch ohne geöffnetes Feld.
 
 **Felder-Liste**
-- Einmal den Ordner `Dokumente\AgOpenGPS\Fields` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Der Ordner wird gemerkt.
+- Einmal den Ordner `Dokumente\AgOpenGPS` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Fahrzeuge und Geräte liest der Editor aus demselben Ordner. Der Ordner wird gemerkt. (Wer nur `Fields` wählt, kann die Felder bearbeiten, hat aber keine Fahrzeug-/Geräteprofile.)
 
 ## Benutzung
 
 1. **https://skafuu.github.io/aog-feldeditor/** in **Chrome oder Edge** öffnen. Alternativ `index.html` herunterladen und vom eigenen Rechner öffnen.
-2. Im Register **Feld** auf **„Felder-Ordner wählen“** klicken und `Dokumente\AgOpenGPS\Fields` auswählen.
+2. Im Register **Feld** auf **„AgOpenGPS-Ordner wählen“** klicken und `Dokumente\AgOpenGPS` auswählen.
 3. Links ein Feld anklicken, bearbeiten, oben **„Speichern“**.
 
 Wichtig:

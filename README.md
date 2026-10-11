@@ -30,6 +30,16 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - **Smooth** a curve or boundary track (click it in the list on the right, then "Smooth"): either the whole track, or only between two points. In that case the section is replaced by a smooth arc that joins the track without a kink, with extra points in tight bends. If the track lies on a boundary, clicks snap to the boundary points, and **"Move boundary too"** moves the matching boundary points along, so boundary, track and headland stay consistent.
 - Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 
+**Headland** (calculated like "Headland" in AgOpenGPS 6.8)
+- **Build around:** distance in metres or as a number of tool widths of a tool from AgOpenGPS (width minus overlap). Radius 0 = exactly like AgOpenGPS, a radius rounds the corners, e.g. to match the turning radius.
+- **Section:** click two points on the outer boundary (e.g. the corners of one side), choose a curve along the boundary or a straight line. The headland is rebuilt on that side with the distance set.
+- A preview shows the result before you apply it, and changing the values updates it immediately.
+
+**Tramlines** (calculated like "Tramlines" in AgOpenGPS 6.8)
+- Pick a vehicle from the AgOpenGPS profiles (wheel track); tramline spacing and passes come from the AgOpenGPS settings. Everything can also be typed in.
+- Choose a track (AB line or curve) and a side, then create tramlines and/or the boundary tram. Existing tramlines can be replaced or kept, so several tracks can be combined like with "Tramlines Multi".
+- Checked with real fields: tramlines created by AgOpenGPS come out the same within 0–2 cm.
+
 **Flags**
 - Add, move and delete flags. All flags are listed on the right; click one (in the list or on the map) to show its color, note and coordinates. Selecting the Flags tab shows the flags on the map.
 
@@ -52,12 +62,12 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Distance (with the length of each segment) or area with perimeter: click points on the map. Works without an open field too.
 
 **Field list**
-- Choose the folder `Documents\AgOpenGPS\Fields` once. All fields then appear in a searchable list, and one click opens a field. The folder is remembered.
+- Choose the folder `Documents\AgOpenGPS` once. All fields then appear in a searchable list, and one click opens a field. Vehicles and tools are read from the same folder. The folder is remembered. (If you choose only `Fields`, you can edit fields but have no vehicle/tool profiles.)
 
 ## Usage
 
 1. Open **https://skafuu.github.io/aog-feldeditor/** in **Chrome or Edge**. Alternatively, download `index.html` and open it from your computer.
-2. In the **Field** tab, click **"Choose fields folder"** and select `Documents\AgOpenGPS\Fields`.
+2. In the **Field** tab, click **"Choose AgOpenGPS folder"** and select `Documents\AgOpenGPS`.
 3. Click a field on the left, edit it, then click **"Save"** at the top.
 
 Important:
