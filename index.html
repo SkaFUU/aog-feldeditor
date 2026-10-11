@@ -1484,6 +1484,14 @@ function startSmooth(idx) {
   // Grenz-Spur = geschlossener Ring: auch das Stück vom letzten zum ersten Punkt gehört dazu
   let base = closed ? resample(orig.concat([orig[0]]), 1).slice(0, -1) : resample(orig, 1);
   const n = base.length;
+  // Liegt die Kurve auf einer Grenze, rasten die Klicks nur auf den Grenzpunkten ein, die auf der Kurve liegen.
+  // Es zählt nur die Grenze, auf der die Kurve wirklich liegt (die mit den meisten Punkten auf der Kurve).
+  let onCurve = [];
+  bnds.forEach(b => {
+    const on = b.pts.filter(v => { for (let i = 0; i + 1 < orig.length; i++) if (segDist(v, orig[i], orig[i + 1]) < 0.5) return true; return false; });
+    if (on.length > onCurve.length) onCurve = on;
+  });
+  const snapPts = onCurve.length >= 2 ? onCurve : orig;
   const nearest = (P, q) => { let bi = 0, bd = Infinity; P.forEach((v, i) => { const d = (v.e - q.e) ** 2 + (v.n - q.n) ** 2; if (d < bd) { bd = d; bi = i; } }); return bi; };
   // Richtung der Kurve an Punkt i, über ~5 m gemessen (vor dem Abschnitt hinein, nach dem Abschnitt hinaus)
   const dirAt = (i, before) => {
@@ -1519,7 +1527,8 @@ function startSmooth(idx) {
     msg: () => tool.picks.length === 1 ? t('smoothPick2') : tool.sec ? t('smoothSectionMsg', tool.round) : t('smoothPickMsg', tool.value),
     onClick: p => {
       // Klick rastet auf dem nächsten Punkt der Kurve ein
-      const v = orig[nearest(orig, plane.fwd(p.lat, p.lng))], bi = nearest(base, v);
+      const v = snapPts[nearest(snapPts, plane.fwd(p.lat, p.lng))], bi = nearest(base, v);
+      base[bi] = { e: v.e, n: v.n };               // genau auf den Punkt setzen (liegt auf der Kurve, ändert ihre Form nicht)
       tool.picks = tool.picks.length === 1 ? [tool.picks[0], bi] : [bi];          // dritter Klick setzt neu an
       // Ring: den kürzeren Weg nehmen – liegt er über dem Anfangspunkt, wird der Ring so gedreht, dass er am Stück liegt
       if (closed && tool.picks.length === 2 && Math.abs(tool.picks[0] - tool.picks[1]) > n / 2) {
@@ -1536,7 +1545,7 @@ function startSmooth(idx) {
       if (tool.sec) L.polyline(base.slice(tool.sec[0], tool.sec[1] + 1).map(ll), { color: '#ff8c00', weight: 9, opacity: .45, interactive: false }).addTo(g);
       if (tool.result) L.polyline(tool.result.map(ll), { color: '#ffd400', weight: 3, interactive: false }).addTo(g);
       // Punkte der Kurve (im sichtbaren Ausschnitt), damit man sie gezielt anklicken kann
-      const vb = map.getBounds().pad(0.2), vis = orig.map(ll).filter(q => vb.contains(q));
+      const vb = map.getBounds().pad(0.2), vis = snapPts.map(ll).filter(q => vb.contains(q));
       if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff4fd8', fillOpacity: 1, interactive: false }).addTo(g));
       tool.picks.forEach(i => L.circleMarker(ll(base[i]), { radius: 8, color: '#fff', weight: 3, fillColor: '#ff8c00', fillOpacity: 1, interactive: false }).addTo(g));
     },
@@ -1737,14 +1746,14 @@ function startDrawAB() {
   });
 }
 // „Grenze mitziehen“: Grenzpunkte, die genau auf dem alten Kurvenstück liegen (≤ 30 cm), werden durch das
-// geglättete Stück ersetzt. Das trifft bei „Kurve entlang Grenze“ und „Grenze als Spur“ zu; der Rest der Grenze bleibt.
+// geglättete Stück ersetzt (Toleranz 50 cm). Das trifft bei „Kurve entlang Grenze“ und „Grenze als Spur“ zu; der Rest bleibt.
 let moveBndPref = false;
 function planBoundaryBend(Sorig, Snew) {
-  const tol = 0.3, near = v => { for (let i = 0; i + 1 < Sorig.length; i++) if (segDist(v, Sorig[i], Sorig[i + 1]) < tol) return true; return false; };
+  const tol = 0.5, near = v => { for (let i = 0; i + 1 < Sorig.length; i++) if (segDist(v, Sorig[i], Sorig[i + 1]) < tol) return true; return false; };
   let best = null;
   bnds.forEach((b, bi) => {
     const F = b.pts, n = F.length;
-    if (n < 3 || b.hidden) return;
+    if (n < 3) return;                                   // auch ausgeblendete Grenzen
     const on = F.map(near);
     if (on.every(Boolean)) { if (!best || n > best.len) best = { bi, i0: 0, len: n }; return; }
     // längster zusammenhängender Lauf auf dem Ring
