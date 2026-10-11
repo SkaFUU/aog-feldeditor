@@ -25,7 +25,7 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 **Spuren**
 - **AB / Kurve an Grenze**, wie „AB zeichnen“ in AgOpenGPS: zwei Punkte anklicken, die auf der Grenze einrasten, dann eine AB-Linie oder eine Kurve entlang der Grenze dazwischen anlegen.
 - **Grenze als Spur** („Boundary Curve“): macht aus einer Grenze eine Spur. Bei mehreren Grenzen klickst du die gewünschte an.
-- **Glätten** einer Kurve oder Grenz-Spur: ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen.
+- **Glätten** einer Kurve oder Grenz-Spur: ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen. Liegt die Spur auf einer Grenze, rasten die Klicks auf den Grenzpunkten ein, und **„Grenze mitziehen“** passt die Grenzpunkte gleich mit an, damit Grenze, Spur und Vorgewende zusammenpassen.
 - AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 
 **Fahnen**
