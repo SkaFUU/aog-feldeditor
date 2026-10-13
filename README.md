@@ -31,14 +31,17 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 
 **Headland** (calculated like "Headland" in AgOpenGPS 6.8)
-- **Build around:** distance in metres or as a number of tool widths of a tool from AgOpenGPS (width minus overlap). Radius 0 = exactly like AgOpenGPS, a radius rounds the corners, e.g. to match the turning radius.
-- **Section:** click two points on the outer boundary (e.g. the corners of one side), choose a curve along the boundary or a straight line. The headland is rebuilt on that side with the distance set.
-- A preview shows the result before you apply it, and changing the values updates it immediately.
+- Press **Build around** or **Section**; the settings appear in the side panel: distance in metres or as a number of tool widths of the tool chosen at the top (width minus overlap), and rounded corners with a radius (0 = exactly like AgOpenGPS).
+- **Section:** click the two corners of one side, choose a curve along the boundary or a straight line. The headland is rebuilt on that side with the distance set.
+- A yellow preview shows the result and follows every change immediately.
 
-**Tramlines** (calculated like "Tramlines Multi" in AgOpenGPS 6.8)
-- Pick a **vehicle** from the AgOpenGPS profiles (wheel track), a **tool** (e.g. a sprayer, the spacing is then its working width) and the **number** of tramlines. Everything can also be typed in.
-- Choose the **reference line** (AB line or curve) and side; the line is highlighted in yellow on the map. If there are tramlines already, the editor asks before applying: replace or add.
-- **Boundary tram** around the outer boundary, optionally with rounded corners. With a radius, the centre line is calculated first and both tracks are placed exactly parallel to it.
+**Tramlines**
+- Choose the **vehicle** (wheel track) and the **tool** at the top, e.g. the sprayer: the tramline spacing is then its working width. Everything can also be typed in.
+- **Along line:** a given number of tramlines next to a reference line (AB line or curve), calculated like "Tramlines Multi" in AgOpenGPS.
+- **Fill field:** the whole field parallel to the reference line, on one or both sides.
+- **Between two lines:** from two lines towards each other; the number per side is suggested and can be changed.
+- **Boundary tram** around the outer boundary, optionally with rounded corners (both tracks exactly parallel). The other functions can create it at the same time; tramlines then end at it, otherwise at the boundary.
+- The reference line is extended so the tramlines reach the boundary. If there are tramlines already, you choose **Replace** or **Add** before applying.
 - Checked with real fields: tramlines created by AgOpenGPS come out the same within 0–2 cm.
 
 **Flags**
