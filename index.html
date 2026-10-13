@@ -92,8 +92,9 @@
   .swatches span { width:11px; height:11px; border:1px solid #000; border-radius:2px; }
   .c-bnd .ic { color:#ff6b5e; } .c-trk .ic { color:#ff4fd8; } .c-flag .ic { color:#ff3b30; } .c-org .ic { color:#00c8ff; }
   .c-meas .ic { color:var(--warn); } .c-hl .ic { color:#ff9500; } .c-tram .ic { color:#ff8c00; }
-  .form { display:grid; grid-template-columns:1fr 120px; gap:6px 8px; align-items:center; font-size:12.5px; }
-  .form input, .form select { padding:4px 6px; } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
+  .rf { display:grid; grid-template-columns:auto 118px; gap:3px 8px; align-items:center; align-content:center; height:74px; font-size:12px; }
+  .rf input, .rf select { padding:2px 5px; font-size:12px; height:22px; border-radius:4px; }
+  .rf label { color:var(--muted); white-space:nowrap; } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
 
   /* Hauptbereich: Feldliste | Karte | Eigenschaften */
   #main { flex:1; display:flex; min-height:0; }
@@ -188,6 +189,7 @@
   <symbol id="i-hdaround" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M7.5 16l1-8.5 8.5-1 .6 9z" stroke-dasharray="2.2 1.8"/></symbol>
   <symbol id="i-hdslice" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M4 9l17-2" stroke-dasharray="2.2 1.8"/><circle cx="4.4" cy="9" r="1.5" fill="currentColor"/><circle cx="20.6" cy="7" r="1.5" fill="currentColor"/></symbol>
   <symbol id="i-tram" viewBox="0 0 24 24"><path d="M3 21l2-18M21 21l-2-18"/><path d="M8.5 21l.8-18M10.5 21l.4-18M13.5 21l-.4-18M15.5 21l-.8-18"/></symbol>
+  <symbol id="i-tramring" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M6.5 17.2l1.4-10.3 10.3-1.4.6 11.2z"/><path d="M8.3 15.6l1-7.3 7.3-1 .4 8z"/></symbol>
   <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
 </svg>
 <div id="app">
@@ -251,12 +253,39 @@
           <button class="big c-hl" id="btnHdAround" disabled><svg class="ic"><use href="#i-hdaround"/></svg><span data-i18n="btnHdAround">Rundum bauen</span></button>
           <button class="big c-hl" id="btnHdSlice" disabled><svg class="ic"><use href="#i-hdslice"/></svg><span data-i18n="btnHdSlice">Teilstück</span></button>
         </div><div class="gcap" data-i18n="gHdBuild">Vorgewende bauen</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfHdDist" data-i18n="fDist">Abstand (m)</label><input id="cfHdDist" data-cfg="hdDist" type="number" step="0.1" min="0">
+          <label for="cfTool" data-i18n="fTool">Gerät</label><select id="cfTool" data-cfg="tool"></select>
+          <label for="cfWidths" data-i18n="fWidths">× Arbeitsbreiten</label><input id="cfWidths" data-cfg="hdWidths" type="number" step="1" min="0">
+        </div></div><div class="gcap" data-i18n="gDist">Abstand</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfRadius1" data-i18n="fRadiusS">Radius (m)</label><input id="cfRadius1" data-cfg="radius" type="number" step="0.5" min="0">
+          <span class="muted" data-i18n="radius0" style="grid-column:1/3">0 = wie AOG</span>
+        </div></div><div class="gcap" data-i18n="gCorners">Ecken runden</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-vorgewende"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
       </div>
       <div class="rpanel" data-tab="fahrgassen">
         <div class="grp"><div class="gbody">
-          <button class="big c-tram" id="btnTram" disabled><svg class="ic"><use href="#i-tram"/></svg><span data-i18n="btnTram">Fahrgassen erzeugen</span></button>
+          <button class="big c-tram" id="btnTram" disabled><svg class="ic"><use href="#i-tram"/></svg><span data-i18n="btnTram">Fahrgassen</span></button>
+          <button class="big c-tram" id="btnTramRing" disabled><svg class="ic"><use href="#i-tramring"/></svg><span data-i18n="btnTramRing">Randfahrgasse</span></button>
         </div><div class="gcap" data-i18n="gTramBuild">Erzeugen</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfVehicle" data-i18n="fVehicle">Fahrzeug</label><select id="cfVehicle" data-cfg="vehicle"></select>
+          <label for="cfTrackW" data-i18n="fTrackW">Spurweite (m)</label><input id="cfTrackW" data-cfg="trackWidth" type="number" step="0.01" min="0">
+        </div></div><div class="gcap" data-i18n="hVehicle">Fahrzeug</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfSprayer" data-i18n="fSprayer">Gerät</label><select id="cfSprayer" data-cfg="sprayer"></select>
+          <label for="cfTramW" data-i18n="fTramWidth">Abstand (m)</label><input id="cfTramW" data-cfg="tramWidth" type="number" step="0.5" min="1">
+          <label for="cfPasses" data-i18n="fPasses">Anzahl</label><input id="cfPasses" data-cfg="passes" type="number" step="1" min="1">
+        </div></div><div class="gcap" data-i18n="tabFahrgassen">Fahrgassen</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfTramTrack" data-i18n="fRefLine">Linie</label><select id="cfTramTrack" data-cfg="tramTrack"></select>
+          <label for="cfSide" data-i18n="fSide">Seite</label><select id="cfSide" data-cfg="side"><option value="0" data-i18n="sideAuto">automatisch</option><option value="1" data-i18n="sideR">rechts</option><option value="-1" data-i18n="sideL">links</option></select>
+        </div></div><div class="gcap" data-i18n="gRefLine">Referenzlinie</div></div>
+        <div class="grp"><div class="gbody"><div class="rf">
+          <label for="cfRadius2" data-i18n="fRadiusS">Radius (m)</label><input id="cfRadius2" data-cfg="radius" type="number" step="0.5" min="0">
+          <span class="muted" data-i18n="radius0" style="grid-column:1/3">0 = wie AOG</span>
+        </div></div><div class="gcap" data-i18n="gCornersRing">Randfahrgasse: Ecken</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahrgassen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
       </div>
       <div class="rpanel" data-tab="fahnen">
@@ -341,12 +370,6 @@
       </div>
       <div class="pp" data-tab="vorgewende">
         <h2 data-i18n="gHdBuild">Vorgewende bauen</h2>
-        <div class="form">
-          <label for="cfHdDist" data-i18n="fDist">Abstand (m)</label><input id="cfHdDist" data-cfg="hdDist" type="number" step="0.1" min="0">
-          <label for="cfTool" data-i18n="fTool">Gerät</label><select id="cfTool" data-cfg="tool"></select>
-          <label for="cfWidths" data-i18n="fWidths">× Arbeitsbreiten</label><input id="cfWidths" data-cfg="hdWidths" type="number" step="1" min="0">
-          <label data-i18n="fRadius">Ecken runden: Radius (m)</label><input data-cfg="radius" type="number" step="0.5" min="0">
-        </div>
         <div class="muted" id="cfToolInfo"></div>
         <div class="muted" style="margin-top:6px" data-i18n="hdHelp"></div>
         <div class="muted warn cfNoProf" style="margin-top:6px" data-i18n="noProfiles"></div>
@@ -354,23 +377,10 @@
         <div id="headList" class="muted">–</div>
       </div>
       <div class="pp" data-tab="fahrgassen">
-        <h2 data-i18n="hVehicle">Fahrzeug</h2>
-        <div class="form">
-          <label for="cfVehicle" data-i18n="fVehicle">Fahrzeug</label><select id="cfVehicle" data-cfg="vehicle"></select>
-          <label for="cfTrackW" data-i18n="fTrackW">Spurweite (m)</label><input id="cfTrackW" data-cfg="trackWidth" type="number" step="0.01" min="0">
-        </div>
-        <div class="muted warn cfNoProf" style="margin-top:6px" data-i18n="noProfiles"></div>
         <h2 data-i18n="tabFahrgassen">Fahrgassen</h2>
-        <div class="form">
-          <label for="cfTramW" data-i18n="fTramWidth">Fahrgassenabstand (m)</label><input id="cfTramW" data-cfg="tramWidth" type="number" step="0.5" min="1">
-          <label for="cfPasses" data-i18n="fPasses">Durchgänge</label><input id="cfPasses" data-cfg="passes" type="number" step="1" min="1">
-          <label for="cfTramTrack" data-i18n="fTramTrack">Spur</label><select id="cfTramTrack" data-cfg="tramTrack"></select>
-          <label for="cfSide" data-i18n="fSide">Seite</label><select id="cfSide" data-cfg="side"><option value="0" data-i18n="sideAuto">automatisch</option><option value="1" data-i18n="sideR">rechts</option><option value="-1" data-i18n="sideL">links</option></select>
-          <label for="cfAddTo" data-i18n="fAddTo">Vorhandene</label><select id="cfAddTo" data-cfg="addTo"><option value="0" data-i18n="addReplace">ersetzen</option><option value="1" data-i18n="addKeep">behalten, neue dazu</option></select>
-          <label for="cfMode" data-i18n="fMode">Erzeugen</label><select id="cfMode" data-cfg="mode"><option value="0" data-i18n="modeAll">alles</option><option value="1" data-i18n="modeLines">nur Fahrgassen</option><option value="2" data-i18n="modeOuter">nur Randfahrgasse</option></select>
-          <label data-i18n="fRadius">Ecken runden: Radius (m)</label><input data-cfg="radius" type="number" step="0.5" min="0">
-        </div>
+        <div class="info" id="tramInfo">–</div>
         <div class="muted" style="margin-top:6px" data-i18n="tramHelp"></div>
+        <div class="muted warn cfNoProf" style="margin-top:6px" data-i18n="noProfiles"></div>
       </div>
       <div class="pp" data-tab="fahnen">
         <h2 data-i18n="hFlags">Fahnen</h2>
@@ -404,22 +414,22 @@ const I18N = {
     measAreaMsg: 'Eckpunkte auf die Karte klicken – die Fläche wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
     measDist: 'Strecke: <b>{0} m</b>', measArea: 'Fläche: <b>{0} ha</b> ({1} m²) · Umfang: {2} m',
     noField: 'kein Feld geöffnet', noHeadlines: 'Keine Vorgewende-Linien in diesem Feld.',
-    btnHdAround: 'Rundum bauen', btnHdSlice: 'Teilstück', gHdBuild: 'Vorgewende bauen', btnTram: 'Fahrgassen erzeugen', gTramBuild: 'Erzeugen',
-    fDist: 'Abstand (m)', fTool: 'Gerät', fWidths: '× Arbeitsbreiten', fRadius: 'Ecken runden: Radius (m)', manual: '– von Hand –',
+    btnHdAround: 'Rundum bauen', btnHdSlice: 'Teilstück', gHdBuild: 'Vorgewende bauen', btnTram: 'Fahrgassen', btnTramRing: 'Randfahrgasse', gTramBuild: 'Erzeugen',
+    fDist: 'Abstand (m)', fTool: 'Gerät', fWidths: '× Arbeitsbreiten', fRadiusS: 'Radius (m)', radius0: '0 = Ecken wie AOG', gDist: 'Abstand', gCorners: 'Ecken runden', gCornersRing: 'Randfahrgasse: Ecken', manual: '– von Hand –',
     toolInfo: 'Arbeitsbreite {0} m (Breite {1} m − Überlappung {2} m)',
-    hdHelp: 'Wie „Headland“ in AgOpenGPS, um die Außengrenze. Radius 0 = genau wie AOG (Ecken gerade abgeschnitten), ein Radius rundet die Ecken, z. B. passend zum Wenderadius. „Teilstück“ setzt das Vorgewende zwischen zwei Grenzpunkten neu, mit dem Abstand oben.',
-    hdAroundMsg: 'Vorgewende rundum mit {0} m{1} – gelb gestrichelt die Vorschau. Werte rechts ändern sie sofort.', hdRound: ', Ecken mit {0} m Radius', hdSharp: ', Ecken wie AOG',
+    hdHelp: 'Wie „Headland“ in AgOpenGPS, um die Außengrenze. Abstand und Ecken stellst du oben ein. Radius 0 = genau wie AOG (Ecken gerade abgeschnitten), ein Radius rundet die Ecken, z. B. passend zum Wenderadius. „Teilstück“: zwei Ecken einer Seite anklicken – das Vorgewende wird an dieser Seite mit dem Abstand oben neu gesetzt.',
+    hdAroundMsg: 'Vorgewende rundum mit {0} m{1} – gelb gestrichelt die Vorschau. Werte oben ändern sie sofort.', hdRound: ', Ecken mit {0} m Radius', hdSharp: ', Ecken wie AOG',
     hdFail: 'Mit diesem Abstand bleibt kein Vorgewende übrig.', hdRoundTooBig: 'Das Feld ist für diesen Radius zu schmal – die Ecken bleiben wie in AOG. Kleineren Radius wählen.', hdDone: 'Vorgewende gebaut – wird beim Speichern übernommen.',
     needHeadland: 'Zuerst ein Vorgewende bauen („Rundum bauen“).', hdSliceA: 'Teilstück: ersten Punkt auf der Außengrenze anklicken.',
     hdSliceOk: 'Teilstück mit {0} m Abstand – orange die neue Linie, gelb das Vorgewende danach. Kurve oder Linie wählen, dann Übernehmen.',
     hdSliceNo: 'Die Linie schneidet das Vorgewende nicht zweimal – andere Punkte oder Abstand wählen.', hdKindCurve: 'Kurve entlang Grenze', hdKindLine: 'Gerade Linie',
-    hVehicle: 'Fahrzeug', fVehicle: 'Fahrzeug', fTrackW: 'Spurweite (m)', fTramWidth: 'Fahrgassenabstand (m)', fPasses: 'Durchgänge', fTramTrack: 'Spur',
-    fSide: 'Seite', sideAuto: 'automatisch (AB rechts, Kurve links)', sideR: 'rechts der Spur', sideL: 'links der Spur',
-    fAddTo: 'Vorhandene Fahrgassen', addReplace: 'ersetzen', addKeep: 'behalten, neue dazu', fMode: 'Erzeugen', modeAll: 'Fahrgassen + Rand', modeLines: 'nur Fahrgassen', modeOuter: 'nur Randfahrgasse',
+    hVehicle: 'Fahrzeug', fVehicle: 'Fahrzeug', fTrackW: 'Spurweite (m)', fSprayer: 'Gerät', fTramWidth: 'Abstand (m)', fPasses: 'Anzahl', fRefLine: 'Linie', gRefLine: 'Referenzlinie',
+    fSide: 'Seite', sideAuto: 'automatisch', sideR: 'rechts', sideL: 'links',
+    tramReplace: 'Ersetzen', tramAdd: 'Ergänzen', tramAsk: 'Es gibt schon Fahrgassen – ersetzen oder ergänzen?', yes: 'ja', no: 'nein', tramHave: 'Vorhanden: <b>{0}</b> Fahrgassen-Spuren · Randfahrgasse: <b>{1}</b>',
     noProfiles: 'Fahrzeuge und Geräte aus AgOpenGPS gibt es, wenn im Register „Feld“ der Ordner AgOpenGPS (statt Fields) gewählt ist.',
-    tramHelp: 'Wie „Tramlines“ in AgOpenGPS: die erste Fahrgasse bei halbem Fahrgassenabstand ± halber Spurweite, dann alle Fahrgassenabstand weiter, auf der gewählten Seite der Spur. Mit Randfahrgasse beginnt es eine Fahrgasse weiter innen. Abstand und Durchgänge kommen aus den AOG-Einstellungen, die Spurweite vom Fahrzeug.',
-    tramMsg: 'Vorschau: {0} Fahrgassen-Spuren{1}. Werte rechts ändern sie sofort.', tramOuter: ' + Randfahrgasse',
-    tramNone: 'Keine Fahrgasse im Feld – andere Seite oder Spur wählen.', tramDone: 'Fahrgassen erzeugt – werden beim Speichern übernommen.',
+    tramHelp: 'Wie „Tramlines Multi“ in AgOpenGPS. Abstand = Arbeitsbreite des Geräts (z. B. Feldspritze), Anzahl = wie viele Fahrgassen neben der Referenzlinie (gelb markiert). Die erste liegt bei halbem Abstand, jede weitere einen Abstand weiter, die zwei Spuren je ± halbe Spurweite. Seite „automatisch“ wie AOG: AB-Linie rechts, Kurve links. Gibt es eine Randfahrgasse, beginnt es eine Fahrgasse weiter innen.',
+    tramMsg: 'Vorschau: {0} Fahrgasse(n) an „{1}“.', tramRingMsg: 'Randfahrgasse: Mitte {0} m von der Grenze{1}. Werte oben ändern sie sofort.',
+    tramNone: 'Keine Fahrgasse im Feld – andere Seite oder Linie wählen.', tramDone: 'Fahrgassen übernommen – werden beim Speichern gespeichert.',
     needTrack: 'Für Fahrgassen zuerst eine AB-Linie oder Kurve anlegen (Register „Spuren“).',
     hFields: 'Felder', rootNone: 'Noch kein Felder-Ordner gewählt', rootIs: 'Felder-Ordner: {0}',
     btnRoot: 'AgOpenGPS-Ordner wählen', btnRegrant: 'Zugriff erlauben', phFilter: 'Feld suchen…',
@@ -504,22 +514,22 @@ const I18N = {
     measAreaMsg: 'Click the corners on the map to measure the area. Ctrl+Z removes the last point.',
     measDist: 'Distance: <b>{0} m</b>', measArea: 'Area: <b>{0} ha</b> ({1} m²) · Perimeter: {2} m',
     noField: 'no field open', noHeadlines: 'No headland lines in this field.',
-    btnHdAround: 'Build around', btnHdSlice: 'Section', gHdBuild: 'Build headland', btnTram: 'Create tramlines', gTramBuild: 'Create',
-    fDist: 'Distance (m)', fTool: 'Tool', fWidths: '× tool widths', fRadius: 'Round corners: radius (m)', manual: '– manual –',
+    btnHdAround: 'Build around', btnHdSlice: 'Section', gHdBuild: 'Build headland', btnTram: 'Tramlines', btnTramRing: 'Boundary tram', gTramBuild: 'Create',
+    fDist: 'Distance (m)', fTool: 'Tool', fWidths: '× tool widths', fRadiusS: 'Radius (m)', radius0: '0 = corners like AOG', gDist: 'Distance', gCorners: 'Round corners', gCornersRing: 'Boundary tram: corners', manual: '– manual –',
     toolInfo: 'Working width {0} m (width {1} m − overlap {2} m)',
-    hdHelp: 'Like “Headland” in AgOpenGPS, around the outer boundary. Radius 0 = exactly like AOG (corners cut straight), a radius rounds the corners, e.g. to match the turning radius. “Section” rebuilds the headland between two boundary points with the distance above.',
-    hdAroundMsg: 'Headland around at {0} m{1} – dashed yellow is the preview. Changing the values on the right updates it.', hdRound: ', corners with {0} m radius', hdSharp: ', corners like AOG',
+    hdHelp: 'Like “Headland” in AgOpenGPS, around the outer boundary. Set distance and corners at the top. Radius 0 = exactly like AOG (corners cut straight), a radius rounds the corners, e.g. to match the turning radius. “Section”: click the two corners of one side – the headland is rebuilt on that side with the distance above.',
+    hdAroundMsg: 'Headland around at {0} m{1} – dashed yellow is the preview. Changing the values at the top updates it.', hdRound: ', corners with {0} m radius', hdSharp: ', corners like AOG',
     hdFail: 'Nothing is left of the headland at this distance.', hdRoundTooBig: 'The field is too narrow for this radius – the corners stay like in AOG. Choose a smaller radius.', hdDone: 'Headland built – applied when you save.',
     needHeadland: 'Build a headland first (“Build around”).', hdSliceA: 'Section: click the first point on the outer boundary.',
     hdSliceOk: 'Section at {0} m – orange is the new line, yellow the headland afterwards. Choose curve or line, then Apply.',
     hdSliceNo: 'The line does not cross the headland twice – choose other points or another distance.', hdKindCurve: 'Curve along boundary', hdKindLine: 'Straight line',
-    hVehicle: 'Vehicle', fVehicle: 'Vehicle', fTrackW: 'Wheel track (m)', fTramWidth: 'Tramline spacing (m)', fPasses: 'Passes', fTramTrack: 'Track',
-    fSide: 'Side', sideAuto: 'automatic (AB right, curve left)', sideR: 'right of track', sideL: 'left of track',
-    fAddTo: 'Existing tramlines', addReplace: 'replace', addKeep: 'keep, add new', fMode: 'Create', modeAll: 'Tramlines + boundary', modeLines: 'tramlines only', modeOuter: 'boundary tram only',
+    hVehicle: 'Vehicle', fVehicle: 'Vehicle', fTrackW: 'Wheel track (m)', fSprayer: 'Tool', fTramWidth: 'Spacing (m)', fPasses: 'Count', fRefLine: 'Line', gRefLine: 'Reference line',
+    fSide: 'Side', sideAuto: 'automatic', sideR: 'right', sideL: 'left',
+    tramReplace: 'Replace', tramAdd: 'Add', tramAsk: 'There are tramlines already – replace or add?', yes: 'yes', no: 'no', tramHave: 'Existing: <b>{0}</b> tram tracks · boundary tram: <b>{1}</b>',
     noProfiles: 'Vehicles and tools from AgOpenGPS are available when the AgOpenGPS folder (instead of Fields) is chosen in the “Field” tab.',
-    tramHelp: 'Like “Tramlines” in AgOpenGPS: the first tramline at half the spacing ± half the wheel track, then every spacing further, on the chosen side of the track. With the boundary tram it starts one tramline further in. Spacing and passes come from the AOG settings, the wheel track from the vehicle.',
-    tramMsg: 'Preview: {0} tram tracks{1}. Changing the values on the right updates it.', tramOuter: ' + boundary tram',
-    tramNone: 'No tramline inside the field – choose the other side or another track.', tramDone: 'Tramlines created – applied when you save.',
+    tramHelp: 'Like “Tramlines Multi” in AgOpenGPS. Spacing = working width of the tool (e.g. sprayer), count = how many tramlines next to the reference line (marked yellow). The first is at half the spacing, each further one a spacing further, the two tracks each ± half the wheel track. Side “automatic” like AOG: AB line right, curve left. If there is a boundary tram, it starts one tramline further in.',
+    tramMsg: 'Preview: {0} tramline(s) along “{1}”.', tramRingMsg: 'Boundary tram: centre {0} m from the boundary{1}. Changing the values at the top updates it.',
+    tramNone: 'No tramline inside the field – choose the other side or another line.', tramDone: 'Tramlines applied – stored when you save.',
     needTrack: 'For tramlines, create an AB line or curve first (tab “Tracks”).',
     hFields: 'Fields', rootNone: 'No fields folder selected yet', rootIs: 'Fields folder: {0}',
     btnRoot: 'Choose AgOpenGPS folder', btnRegrant: 'Allow access', phFilter: 'Search field…',
@@ -625,6 +635,9 @@ let plane = null, diskPlane = null;  // aktueller Ursprung / Ursprung der Dateie
 let bnds = [], flags = [], flagsDirty = false;
 let active = 0, sel = -1, selFlag = -1, undo = [], unsaved = false, mode = '';
 let dirHandle = null;
+// Oberfläche: gewähltes Register, Feldliste/Seitenleiste ein (gemerkt). Bearbeitbar ist nur, was zum Register gehört.
+const ui = { tab: 'feld', nav: true, props: true };
+try { Object.assign(ui, JSON.parse(localStorage.getItem('aogUi') || '{}')); } catch (e) { }
 
 const ll = p => { const [a, b] = plane.inv(p.e, p.n); return L.latLng(a, b); };
 const originChanged = () => plane && (plane.lat0 !== diskPlane.lat0 || plane.lon0 !== diskPlane.lon0);
@@ -680,7 +693,8 @@ function drawActive() {
   if (r.length) r.push(r[0]);
   if (!lineLayer) {
     lineLayer = L.polyline(r, { color: '#ff3b30', weight: 3, interactive: false }).addTo(map);
-    hitLayer = L.polyline(r, { color: '#000', opacity: 0, weight: 18 }).addTo(map);
+    hitLayer = L.polyline(r, { color: '#000', opacity: 0, weight: 18 });
+    if (ui.tab === 'grenze') hitLayer.addTo(map);             // Punkt einfügen nur im Register Grenze
     hitLayer.on('click', onLineClick);
   } else { lineLayer.setLatLngs(r); hitLayer.setLatLngs(r); }
 }
@@ -689,7 +703,7 @@ function drawMarkers() {
   markerLayer.clearLayers();
   const b = bnds[active], hint = document.getElementById('hint');
   hint.style.display = 'none';
-  if (!b || tool || b.hidden) return;                                 // während eines Werkzeugs nicht bearbeitbar
+  if (!b || tool || b.hidden || ui.tab !== 'grenze') return;          // nur im Register Grenze, nicht während eines Werkzeugs
   const vb = map.getBounds().pad(0.1), vis = [];
   b.pts.forEach((p, i) => { const q = ll(p); if (vb.contains(q)) vis.push([i, q]); });
   if (vis.length > MAX_MARKERS) { hint.textContent = t('zoomIn'); hint.style.display = 'block'; return; }
@@ -709,11 +723,12 @@ function drawFlags() {
   flagLayer.clearLayers();
   flags.forEach((f, i) => {
     const ic = L.divIcon({ className: '', html: `<div class="flag${i === selFlag ? ' sel' : ''}" style="--c:${FLAG_COLORS[f.color] || FLAG_COLORS[0]}"></div>`, iconSize: [18, 24], iconAnchor: [2, 24] });
-    const m = L.marker([f.lat, f.lon], { icon: ic, draggable: true, zIndexOffset: 1000 });
+    const edit = ui.tab === 'fahnen';                      // nur im Register Fahnen verschiebbar und anklickbar
+    const m = L.marker([f.lat, f.lon], { icon: ic, draggable: edit, interactive: edit, zIndexOffset: 1000 });
     m.bindTooltip(t('flagTip', i + 1) + (f.notes ? ': ' + f.notes : ''), { direction: 'top', offset: [6, -24] });
     m.on('dragstart', () => showGhost(L.latLng(f.lat, f.lon)));
     m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
-    m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); showTab('fahnen'); });
+    m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
     m.addTo(flagLayer);
   });
 }
@@ -1580,6 +1595,7 @@ function closeTool() {
   $('btnMeasDist').classList.remove('on'); $('btnMeasArea').classList.remove('on');
   map.getContainer().classList.toggle('pick', !!mode);
   if (hiTrack >= 0) { hiTrack = -1; drawLayer('tracks'); markTrackRows(); }
+  markRef();                                      // im Register Fahrgassen bleibt die Referenzlinie markiert
 }
 function updateToolbox() {
   if (!tool) return;
@@ -1936,6 +1952,7 @@ function newField() {
   dirHandle = null; currentField = ''; newFieldName = name; unsaved = true;
   renderFieldList();
   setStatus(t('newFieldStarted', name), 'ok');
+  showTab('grenze');
   startDrawBoundary(false);
 }
 
@@ -2299,25 +2316,45 @@ function reduceByAngle(P, ang, spread) {
   }
   return out;
 }
-// Fahrgassen wie „Tramlines“ in AOG: Randfahrgasse innen/außen und Fahrgassen parallel zur Spur
-function buildTram(c, tr) {
+// Geschlossene Linie um w parallel versetzen (dir > 0 nach innen, < 0 nach außen), Schleifen fallen weg
+function offsetRing(C, w, dir) {
+  const R = C.slice();
+  while (R.length > 3 && dSq(R[0], R[R.length - 1]) < 1e-6) R.pop();
+  const n = R.length;
+  if (n < 4 || !(w > 0)) return C;
+  const H = R.map((p, i) => Math.atan2(R[(i + 1) % n].e - R[(i - 1 + n) % n].e, R[(i + 1) % n].n - R[(i - 1 + n) % n].n));
+  const g = grid(minSpacing(R.concat([R[0]]), 0.3), w), out = [];
+  R.forEach((p, i) => {
+    const q = dir > 0 ? offIn(p, H[i], w) : offRight(p, H[i], w);
+    if (g.near(q, w * w * 0.999)) return;
+    if (!out.length || dSq(q, out[out.length - 1]) > 0.25) out.push(q);
+  });
+  if (out.length < 4) return out;
+  out.push({ ...out[0] });
+  return minSpacing(out, 1.2);
+}
+// Randfahrgasse: Radius 0 wie AOG (jede Spur einzeln von der Grenze), mit Radius erst die Mitte, dann beide Spuren genau parallel
+function buildTramRing(c) {
+  if (!bnds[0]) return { outer: [], inner: [] };
+  const F = aogFence(0), tw = c.tramWidth, hw = c.trackWidth / 2, xy = P => P.map(p => ({ e: p.e, n: p.n }));
+  if (!(c.radius > 0)) return { outer: xy(buildAround(F, 0.5 * tw - hw)), inner: xy(buildAround(F, 0.5 * tw + hw)) };
+  const mid = roundedAround(F, 0.5 * tw, c.radius);
+  if (mid.length < 4) return { outer: [], inner: [] };
+  return { outer: xy(offsetRing(mid, hw, -1)), inner: xy(offsetRing(mid, hw, 1)), rFail: buildAround(F, 0.5 * tw + c.radius).length < 4 };
+}
+// Fahrgassen wie „Tramlines Multi“ in AOG: Fahrgasse i bei Abstand/2 + Abstand·i ± halbe Spurweite, i = start … start+Anzahl−1
+function buildTramLines(c, tr, start) {
   const tw = c.tramWidth, hw = c.trackWidth / 2, F = bnds[0] ? aogFence(0) : null, ear = F ? fenceEar(F) : null;
-  const res = { outer: [], inner: [], lines: [] };
-  if (c.mode !== 1 && F) {
-    res.outer = aroundRing(F, 0.5 * tw - hw, c.radius).map(p => ({ e: p.e, n: p.n }));
-    res.inner = aroundRing(F, 0.5 * tw + hw, c.radius).map(p => ({ e: p.e, n: p.n }));
-  }
-  if (c.mode === 2 || !tr) return res;
-  // Seite automatisch wie „Tramlines Multi“: AB rechts, Kurve links
-  const side = c.side ? Math.sign(c.side) : tr.mode === 2 ? 1 : -1, first = F && c.mode !== 1 ? 1 : 0, last = tr.mode === 2 ? c.passes - 1 : c.passes, W = [];
-  for (let i = first; i <= last; i++) W.push(tw * 0.5 - hw + tw * i);
-  for (let i = first; i <= last; i++) W.push(tw * 0.5 + hw + tw * i);
+  // Seite automatisch wie AOG: AB rechts, Kurve links
+  const side = c.side ? Math.sign(c.side) : tr.mode === 2 ? 1 : -1, W = [];
+  for (let i = start; i < start + c.passes; i++) W.push(tw * 0.5 - hw + tw * i);
+  for (let i = start; i < start + c.passes; i++) W.push(tw * 0.5 + hw + tw * i);
   const inside = q => !ear || inPoly(q, ear);
   let lines;
   if (tr.mode === 2) {
     const toP = v => { const [la, lo] = wgs(v[0], v[1]); return plane.fwd(la, lo); };
     const A = toP(tr.a), B = toP(tr.b), h = tr.heading, s = Math.sin(h), co = Math.cos(h), ref = [];
-    for (let k = 0; k * 4 <= dist(A, B) + 4000; k++) ref.push({ e: A.e - s * 2000 + s * 4 * k, n: A.n - co * 2000 + co * 4 * k });
+    for (let k = 0; k * 2 <= dist(A, B) + 4000; k++) ref.push({ e: A.e - s * 2000 + s * 2 * k, n: A.n - co * 2000 + co * 2 * k });
     lines = W.map(w => ref.map(p => offRight(p, h, w * side)).filter(inside));
   } else {
     const P = openHeadings(tr.pts.map(([la, lo]) => plane.fwd(la, lo))), g = grid(P, Math.max(...W, 1));
@@ -2326,17 +2363,16 @@ function buildTram(c, tr) {
       for (const p of P) {
         const q = offRight(p, p.h, w * side);
         if (g.near(q, w * w * 0.999999) || !inside(q)) continue;
-        if (!L.length || dSq(q, L[L.length - 1]) > 2) L.push(q);
+        if (!L.length || dSq(q, L[L.length - 1]) > 1.2) L.push(q);
       }
       return L;
     });
   }
-  res.lines = lines.map(L => reduceByAngle(L, 0.01, 100)).filter(L => L.length > 1);
-  return res;
+  return lines.map(L => reduceByAngle(L, 0.01, 200)).filter(L => L.length > 1);
 }
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
-const cfg = { vehicle: '', tool: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 2, hdDist: 12, hdWidths: 0, radius: 0, side: 0, mode: 0, addTo: 0, tramSet: false };
+const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 1, hdDist: 12, hdWidths: 0, radius: 0, side: 0, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null }, tramTrack = -1;
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2358,8 +2394,8 @@ async function loadProfiles() {
       profiles[key].sort((a, b) => a.name.localeCompare(b.name, 'de'));
     }
     try { profiles.env = await readSettings(await (await aogRoot.getDirectoryHandle('Environment')).getFileHandle('environment.xml')); } catch (e) { }
-    if (profiles.env && !cfg.tramSet) { cfg.tramWidth = num(profiles.env.setTram_tramWidth, cfg.tramWidth); cfg.passes = Math.round(num(profiles.env.setTram_passes, cfg.passes)); }
-    pickVehicle(cfg.vehicle, true); pickTool(cfg.tool, true);
+    if (profiles.env && !cfg.tramSet) cfg.tramWidth = num(profiles.env.setTram_tramWidth, cfg.tramWidth);
+    pickVehicle(cfg.vehicle, true); pickTool(cfg.tool, true); pickSprayer(cfg.sprayer, true);
   }
   renderCfg();
 }
@@ -2375,6 +2411,19 @@ function pickTool(name, keep) {
   if (!cfg.tool) cfg.hdWidths = 0;
   if (cfg.hdWidths > 0 && cfg.toolWidth > 0) cfg.hdDist = Math.round((cfg.toolWidth - cfg.overlap) * cfg.hdWidths * 10) / 10;
 }
+// Gerät für den Fahrgassenabstand (z. B. Feldspritze): Abstand = Arbeitsbreite des Geräts
+function pickSprayer(name, keep) {
+  const p = profiles.tools.find(v => v.name === name);
+  cfg.sprayer = p ? name : (keep && !profiles.tools.length ? cfg.sprayer : '');
+  if (p) { const w = num(p.s.setVehicle_toolWidth, 0); if (w > 0) { cfg.tramWidth = w; cfg.tramSet = true; } }
+}
+// Referenzlinie im Register Fahrgassen gelb hervorheben
+function markRef() {
+  if (ui.tab !== 'fahrgassen' || !plane) return;
+  hiTrack = ex.tracks[tramTrack] && !ex.tracks[tramTrack].deleted ? tramTrack : -1;
+  if (hiTrack >= 0 && !layerOn.tracks) setLayer('tracks', true);
+  drawLayer('tracks');
+}
 const smallTracks = () => ex.tracks.map((tr, i) => ({ tr, i })).filter(({ tr }) => !tr.deleted && (tr.mode === 2 ? true : (tr.mode === 4 || tr.mode === 32) && tr.pts.length > 3));
 function renderCfg() {
   const opt = (sel, list, val) => {
@@ -2385,7 +2434,8 @@ function renderCfg() {
   };
   opt($('cfVehicle'), profiles.vehicles, cfg.vehicle);
   opt($('cfTool'), profiles.tools, cfg.tool);
-  $('cfVehicle').disabled = !profiles.vehicles.length; $('cfTool').disabled = !profiles.tools.length;
+  opt($('cfSprayer'), profiles.tools, cfg.sprayer);
+  $('cfVehicle').disabled = !profiles.vehicles.length; $('cfTool').disabled = $('cfSprayer').disabled = !profiles.tools.length;
   $('cfWidths').disabled = !cfg.tool;
   const tsel = $('cfTramTrack'), list = plane ? smallTracks() : [];
   tsel.innerHTML = '';
@@ -2394,26 +2444,31 @@ function renderCfg() {
   tsel.value = String(tramTrack);
   document.querySelectorAll('[data-cfg]').forEach(el => {
     const k = el.dataset.cfg;
-    if (k === 'vehicle' || k === 'tool' || k === 'tramTrack' || document.activeElement === el) return;
+    if (k === 'vehicle' || k === 'tool' || k === 'sprayer' || k === 'tramTrack' || document.activeElement === el) return;
     el.value = String(cfg[k]);
   });
   $('cfToolInfo').textContent = cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : '';
   document.querySelectorAll('.cfNoProf').forEach(el => { el.style.display = aogRoot ? 'none' : ''; });
-  ['btnHdAround', 'btnHdSlice', 'btnTram'].forEach(id => { $(id).disabled = !bnds[0]; });
-  $('btnTram').disabled = !plane || (!bnds[0] && !list.length);
+  ['btnHdAround', 'btnHdSlice', 'btnTramRing'].forEach(id => { $(id).disabled = !bnds[0]; });
+  $('btnTram').disabled = !plane || !list.length;
+  $('btnTram').title = plane && !list.length ? t('needTrack') : '';
+  const T = ex.tram;
+  $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
 document.querySelectorAll('[data-cfg]').forEach(el => {
   el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => {
     const k = el.dataset.cfg;
     if (k === 'vehicle') pickVehicle(el.value);
     else if (k === 'tool') pickTool(el.value);
-    else if (k === 'tramTrack') tramTrack = +el.value;
+    else if (k === 'sprayer') pickSprayer(el.value);
+    else if (k === 'tramTrack') { tramTrack = +el.value; markRef(); }
     else {
       const v = parseFloat(el.value);
       if (!isFinite(v) || (v < 0 && k !== 'side')) return;
-      cfg[k] = k === 'passes' || k === 'mode' || k === 'side' || k === 'hdWidths' || k === 'addTo' ? Math.round(v) : v;
+      if (k === 'passes' && v < 1) return;
+      cfg[k] = k === 'passes' || k === 'side' || k === 'hdWidths' ? Math.round(v) : v;
       if (k === 'trackWidth') cfg.vehicle = '';
-      if (k === 'tramWidth' || k === 'passes') cfg.tramSet = true;
+      if (k === 'tramWidth') { cfg.tramSet = true; cfg.sprayer = ''; }
       if (k === 'hdDist') cfg.hdWidths = 0;
       if (k === 'hdWidths') pickTool(cfg.tool, true);
     }
@@ -2431,13 +2486,11 @@ function setHeadland(L) {
   delete clearedFiles['Headland.txt'];
   unsaved = true; setLayer('headland', true); drawLayer('headland'); renderLayerList();
 }
-function setTram(res) {
-  const W = a => a.map(p => plane.inv(p.e, p.n)), T = { outer: W(res.outer), inner: W(res.inner), lines: res.lines.map(W) };
-  const old = cfg.addTo && ex.tram ? ex.tram : null;          // „behalten, neue dazu“ wie „Add lines“ in Tramlines Multi
-  if (old) {
-    T.lines = old.lines.concat(T.lines);
-    if (!T.outer.length) { T.outer = old.outer; T.inner = old.inner; }
-  }
+// Fahrgassen übernehmen: lines = neue Fahrgassen (add: zu den vorhandenen, sonst ersetzen), ring = neue Randfahrgasse
+function setTram({ lines, add, ring }) {
+  const W = a => a.map(p => plane.inv(p.e, p.n)), old = ex.tram || { outer: [], inner: [], lines: [] };
+  const T = { outer: ring ? W(ring.outer) : old.outer, inner: ring ? W(ring.inner) : old.inner, lines: old.lines };
+  if (lines) T.lines = (add ? old.lines : []).concat(lines.map(W));
   ex.tram = T;
   generated['Tram.txt'] = () => {
     const P = a => a.map(([la, lo]) => { const p = plane.fwd(la, lo); return r3(p.e) + ',' + r3(p.n); });
@@ -2446,7 +2499,7 @@ function setTram(res) {
     return out.join('\r\n') + '\r\n';
   };
   delete clearedFiles['Tram.txt'];
-  unsaved = true; setLayer('tram', true); drawLayer('tram'); renderLayerList();
+  unsaved = true; setLayer('tram', true); drawLayer('tram'); renderLayerList(); renderCfg();
 }
 
 // --- Werkzeuge: Vorgewende rundum, Teilstück, Fahrgassen (mit Vorschau, Werte rechts ändern die Vorschau sofort) ---
@@ -2491,25 +2544,37 @@ function startHdSlice() {
     ok() { setHeadland(hdExit(this.res.hd, true)); setStatus(t('hdDone'), 'ok'); }
   });
 }
+// Fahrgassen entlang der Referenzlinie. Gibt es schon welche: vor dem Übernehmen „Ersetzen“ oder „Ergänzen“.
+// Mit Randfahrgasse beginnt es wie in AOG eine Fahrgasse weiter innen.
 function startTram() {
-  const list = smallTracks();
-  if (!bnds[0] && !list.length) return;
-  if (!list.length && cfg.mode !== 2) setStatus(t('needTrack'), 'err');
+  const tr = ex.tracks[tramTrack];
+  if (!tr || tr.deleted) { setStatus(t('needTrack'), 'err'); return; }
+  const have = () => ex.tram && ex.tram.lines.length > 0;
   startTool({
-    hideLayer: cfg.addTo ? '' : 'tram',
-    msg: () => {
-      const r = tool.res;
-      if (!r || (!r.lines.length && !r.outer.length)) return t('tramNone');
-      return t('tramMsg', r.lines.length, r.outer.length ? t('tramOuter') : '');
-    },
-    recalc() { const tr = ex.tracks[tramTrack]; this.res = buildTram(cfg, tr && !tr.deleted ? tr : null); redrawTool(); },
-    draw: g => {
-      const r = tool.res; if (!r) return;
-      prevLine(g, r.outer, '#ffd400', true, '8 6'); prevLine(g, r.inner, '#ffd400', true, '8 6');
-      r.lines.forEach(l => prevLine(g, l, '#ffd400', false));
-    },
-    okEnabled: () => !!(tool.res && (tool.res.lines.length || tool.res.outer.length)),
-    ok() { setTram(this.res); setStatus(t('tramDone'), 'ok'); }
+    res: [],
+    msg: () => !tool.res.length ? t('tramNone') : t('tramMsg', tool.res.length / 2, tr.name) + (have() ? ' ' + t('tramAsk') : ''),
+    recalc() { this.res = buildTramLines(cfg, tr, ex.tram && ex.tram.outer.length > 1 ? 1 : 0); redrawTool(); },
+    draw: g => tool.res.forEach(l => prevLine(g, l, '#ffd400', false)),
+    okEnabled: () => tool.res.length > 0,
+    hideOk: false,
+    actions: () => have() && tool.res.length ? [
+      { label: 'tramReplace', run() { setTram({ lines: this.res }); setStatus(t('tramDone'), 'ok'); } },
+      { label: 'tramAdd', run() { setTram({ lines: this.res, add: true }); setStatus(t('tramDone'), 'ok'); } }] : [],
+    ok() { setTram({ lines: this.res }); setStatus(t('tramDone'), 'ok'); }
+  });
+  tool.hideOk = have();
+  tool.recalc();
+}
+function startTramRing() {
+  if (!bnds[0]) return;
+  startTool({
+    res: { outer: [], inner: [] },
+    msg: () => !tool.res.outer.length ? t('hdFail') : tool.res.rFail ? t('hdRoundTooBig') :
+      t('tramRingMsg', fmtNum(cfg.tramWidth / 2, 2), cfg.radius > 0 ? t('hdRound', fmtNum(cfg.radius, 1)) : t('hdSharp')),
+    recalc() { this.res = buildTramRing(cfg); redrawTool(); },
+    draw: g => { prevLine(g, tool.res.outer, '#ffd400', true); prevLine(g, tool.res.inner, '#ffd400', true); },
+    okEnabled: () => tool.res.outer.length > 3,
+    ok() { setTram({ ring: this.res }); setStatus(t('tramDone'), 'ok'); }
   });
   tool.recalc();
 }
@@ -2517,6 +2582,7 @@ renderCfg();
 $('btnHdAround').onclick = startHdAround;
 $('btnHdSlice').onclick = startHdSlice;
 $('btnTram').onclick = startTram;
+$('btnTramRing').onclick = startTramRing;
 
 // --- Messen: Strecke oder Fläche (geht auch ohne geöffnetes Feld) ---
 function startMeasure(isArea) {
@@ -2556,8 +2622,6 @@ $('btnMeasDist').onclick = () => startMeasure(false);
 $('btnMeasArea').onclick = () => startMeasure(true);
 
 // --- Ribbon: Register umschalten, Feldliste und Seitenleiste ein-/ausblenden (wird gemerkt) ---
-const ui = { tab: 'feld', nav: true, props: true };
-try { Object.assign(ui, JSON.parse(localStorage.getItem('aogUi') || '{}')); } catch (e) { }
 function applyUi() {
   if (!document.querySelector(`.rpanel[data-tab="${ui.tab}"]`)) ui.tab = 'feld';
   document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
@@ -2573,7 +2637,16 @@ function applyUi() {
 }
 // Register anwählen blendet seine Ebenen ein (Fahnen, Spuren, Vorgewende, Fahrgassen)
 function showTab(tab) {
-  if (ui.tab !== tab) { ui.tab = tab; applyUi(); }
+  if (ui.tab !== tab) {
+    closeTool(); if (mode) setMode(mode);                 // Werkzeuge gehören zum Register
+    sel = -1; selFlag = -1;
+    ui.tab = tab; applyUi();
+    if (hiTrack >= 0) { hiTrack = -1; drawLayer('tracks'); markTrackRows(); }
+    if (plane) {
+      drawMarkers(); drawFlags(); updateInfo(); markRef();
+      if (hitLayer) { if (tab === 'grenze') hitLayer.addTo(map); else map.removeLayer(hitLayer); }
+    }
+  }
   if (!plane) return;
   let ch = false;
   for (const id in LAYER_TAB) if (LAYER_TAB[id] === tab && !layerOn[id] && (exCount(id) || id === 'flags')) { setLayer(id, true); ch = true; }

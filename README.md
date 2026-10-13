@@ -10,7 +10,7 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 
 ## Features
 
-The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags, Origin, View and Measure**, with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be hidden. **Save** and **Undo** are always at the top left.
+The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags, Origin, View and Measure**, with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be hidden. Only what belongs to the selected tab can be edited (e.g. boundary points only under "Boundary", flags only under "Flags"); everything else is only shown. **Save** and **Undo** are always at the top left.
 
 **New field**
 - Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.
@@ -35,9 +35,10 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - **Section:** click two points on the outer boundary (e.g. the corners of one side), choose a curve along the boundary or a straight line. The headland is rebuilt on that side with the distance set.
 - A preview shows the result before you apply it, and changing the values updates it immediately.
 
-**Tramlines** (calculated like "Tramlines" in AgOpenGPS 6.8)
-- Pick a vehicle from the AgOpenGPS profiles (wheel track); tramline spacing and passes come from the AgOpenGPS settings. Everything can also be typed in.
-- Choose a track (AB line or curve) and a side, then create tramlines and/or the boundary tram. Existing tramlines can be replaced or kept, so several tracks can be combined like with "Tramlines Multi".
+**Tramlines** (calculated like "Tramlines Multi" in AgOpenGPS 6.8)
+- Pick a **vehicle** from the AgOpenGPS profiles (wheel track), a **tool** (e.g. a sprayer, the spacing is then its working width) and the **number** of tramlines. Everything can also be typed in.
+- Choose the **reference line** (AB line or curve) and side; the line is highlighted in yellow on the map. If there are tramlines already, the editor asks before applying: replace or add.
+- **Boundary tram** around the outer boundary, optionally with rounded corners. With a radius, the centre line is calculated first and both tracks are placed exactly parallel to it.
 - Checked with real fields: tramlines created by AgOpenGPS come out the same within 0–2 cm.
 
 **Flags**

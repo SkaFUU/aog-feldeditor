@@ -10,7 +10,7 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 
 ## Funktionen
 
-Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen, Ursprung, Ansicht und Messen**, darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich ausblenden. **Speichern** und **Rückgängig** sind immer oben links.
+Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen, Ursprung, Ansicht und Messen**, darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich ausblenden. Bearbeiten lässt sich nur, was zum gewählten Register gehört (z. B. Grenzpunkte nur unter „Grenze“, Fahnen nur unter „Fahnen“), alles andere wird nur angezeigt. **Speichern** und **Rückgängig** sind immer oben links.
 
 **Neues Feld**
 - Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
@@ -35,9 +35,10 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - **Teilstück:** zwei Punkte auf der Außengrenze anklicken (z. B. die Ecken einer Seite), Kurve entlang der Grenze oder gerade Linie wählen. Das Vorgewende wird an dieser Seite mit dem eingestellten Abstand neu gesetzt.
 - Vor dem Übernehmen zeigt eine Vorschau das Ergebnis, Werte ändern sie sofort.
 
-**Fahrgassen** (gerechnet wie „Tramlines“ in AgOpenGPS 6.8)
-- Fahrzeug aus den AgOpenGPS-Profilen wählen (Spurweite), Fahrgassenabstand und Durchgänge kommen aus den AgOpenGPS-Einstellungen. Alles lässt sich auch von Hand eingeben.
-- Spur (AB-Linie oder Kurve) und Seite wählen, Fahrgassen und/oder Randfahrgasse erzeugen. Vorhandene Fahrgassen lassen sich ersetzen oder behalten, so kann man wie bei „Tramlines Multi“ mehrere Spuren kombinieren.
+**Fahrgassen** (gerechnet wie „Tramlines Multi“ in AgOpenGPS 6.8)
+- **Fahrzeug** aus den AgOpenGPS-Profilen wählen (Spurweite), **Gerät** wählen (z. B. Feldspritze, der Abstand ist dann dessen Arbeitsbreite) und die **Anzahl** der Fahrgassen. Alles lässt sich auch von Hand eingeben.
+- **Referenzlinie** (AB-Linie oder Kurve) und Seite wählen, die Linie wird auf der Karte gelb markiert. Gibt es schon Fahrgassen, fragt der Editor vor dem Übernehmen: ersetzen oder ergänzen.
+- **Randfahrgasse** um die Außengrenze, wahlweise mit gerundeten Ecken. Mit Radius wird erst die Mitte gerechnet und beide Spuren genau parallel dazu gelegt.
 - Mit echten Feldern geprüft: Die von AgOpenGPS erzeugten Fahrgassen kommen auf 0–2 cm genau gleich heraus.
 
 **Fahnen**
