@@ -39,8 +39,10 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Oben **Fahrzeug** (Spurweite) und **Gerät** wählen, z. B. die Feldspritze: der Fahrgassenabstand ist dann ihre Arbeitsbreite. Alles lässt sich auch von Hand eingeben.
 - **An Linie:** eine bestimmte Anzahl Fahrgassen neben einer Referenzlinie (AB-Linie oder Kurve), gerechnet wie „Tramlines Multi“ in AgOpenGPS.
 - **Feld füllen:** das ganze Feld parallel zur Referenzlinie, auf einer oder beiden Seiten.
-- **Zwischen zwei Linien:** von zwei Linien aufeinander zu, die Anzahl je Seite wird vorgeschlagen und lässt sich ändern.
-- **Randfahrgasse** um die Außengrenze, wahlweise mit gerundeten Ecken (beide Spuren genau parallel). Bei den anderen Funktionen kann sie gleich mit erzeugt werden; die Fahrgassen enden dann an ihr, sonst an der Grenze.
+- **Zwischen zwei Linien:** von zwei Linien aufeinander zu, die Anzahl je Seite wird vorgeschlagen und lässt sich ändern. Wo sich Fahrgassen beider Seiten kreuzen, können sie am Schnittpunkt zusammengeführt werden (V-Form).
+- **Randfahrgasse** um die Außengrenze, auch mehrere Ringe, wahlweise mit gerundeten Ecken (beide Spuren genau parallel).
+- **Gasse dazwischen:** zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte.
+- Die **Arbeitsbreite** jeder Fahrgasse wird als blaue Fläche gezeigt (doppelt befahren = dunkler), auch schon in der Vorschau; mit dem Auge ausblendbar. Bei den anderen Funktionen kann sie gleich mit erzeugt werden; die Fahrgassen enden dann an ihr, sonst an der Grenze.
 - Die Referenzlinie wird verlängert, damit die Fahrgassen bis zur Grenze reichen. Gibt es schon Fahrgassen, heißt es vor dem Übernehmen: **Ersetzen** oder **Ergänzen**.
 - Mit echten Feldern geprüft: Die von AgOpenGPS erzeugten Fahrgassen kommen auf 0–2 cm genau gleich heraus.
 

@@ -203,6 +203,7 @@
   <symbol id="i-tramring" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M6.5 17.2l1.4-10.3 10.3-1.4.6 11.2z"/><path d="M8.3 15.6l1-7.3 7.3-1 .4 8z"/></symbol>
   <symbol id="i-tramfill" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M6.6 19.5l1-15.6M10.6 19l.6-15.6M14.6 18.6l.2-15.4M18.6 18.2l-.4-15"/></symbol>
   <symbol id="i-tramtwo" viewBox="0 0 24 24"><path d="M3 21L5 3M21 21L19 3" stroke-width="2.4"/><path d="M8.5 21l1-18M11 21l.5-18M13 21l-.5-18M15.5 21l-1-18"/></symbol>
+  <symbol id="i-trammid" viewBox="0 0 24 24"><path d="M3 21L4 3M6 21L7 3M17 21L18 3M20 21L21 3"/><path d="M10.5 21l.5-18M13 21l.5-18" stroke-dasharray="2.2 1.8"/></symbol>
   <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
 </svg>
 <div id="app">
@@ -278,6 +279,7 @@
           <button class="big c-tram" id="btnTramFill" disabled><svg class="ic"><use href="#i-tramfill"/></svg><span data-i18n="btnTramFill">Feld füllen</span></button>
           <button class="big c-tram" id="btnTramTwo" disabled><svg class="ic"><use href="#i-tramtwo"/></svg><span data-i18n="btnTramTwo">Zwischen zwei Linien</span></button>
           <button class="big c-tram" id="btnTramRing" disabled><svg class="ic"><use href="#i-tramring"/></svg><span data-i18n="btnTramRing">Randfahrgasse</span></button>
+          <button class="big c-tram" id="btnTramMid" disabled><svg class="ic"><use href="#i-trammid"/></svg><span data-i18n="btnTramMid">Gasse dazwischen</span></button>
         </div><div class="gcap" data-i18n="gTramBuild">Fahrgassen erzeugen</div></div>
         <div class="grp"><div class="gbody"><div class="rf">
           <label for="cfVehicle" data-i18n="fVehicle">Fahrzeug</label><select id="cfVehicle" data-cfg="vehicle"></select>
@@ -406,6 +408,10 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    btnTramMid: 'Gasse dazwischen', fRingCount: 'Anzahl Randfahrgassen', fMerge: 'Zusammenführen', mergeYes: 'ja – an den Schnittpunkten', mergeNo: 'nein',
+    L_tramw: 'Arbeitsbreite', ringMany: '{0} Ringe.', ringFewer: 'Für mehr Ringe ist das Feld zu schmal.', needTwoTram: 'Dafür braucht es mindestens zwei Fahrgassen.',
+    midPick1: 'Erste Fahrgasse auf der Karte anklicken.', midPick2: 'Zweite Fahrgasse anklicken (die daneben).',
+    midMsg: 'Abstand der beiden Fahrgassen {0} m – die neue liegt genau in der Mitte, {1} m zu jeder.', midFail: 'Die zwei Fahrgassen liegen nicht nebeneinander – zwei benachbarte anklicken.',
     title: 'AOG Feldeditor',
     tabFeld: 'Feld', tabGrenze: 'Grenze', tabSpuren: 'Spuren', tabVorgewende: 'Vorgewende', tabFahrgassen: 'Fahrgassen',
     tabFahnen: 'Fahnen', tabUrsprung: 'Ursprung', tabAnsicht: 'Ansicht', tabMessen: 'Messen',
@@ -431,7 +437,7 @@ const I18N = {
     fSide: 'Seite', sideAuto: 'automatisch (AB rechts, Kurve links)', sideBoth: 'beide Seiten', sideR: 'rechts', sideL: 'links', fWithRing: 'Randfahrgasse', ringNo: 'ohne – Fahrgassen bis zur Grenze', ringYes: 'mit – Fahrgassen enden an ihr', needTwo: 'Dafür braucht es zwei Linien (Register „Spuren“).',
     tramReplace: 'Ersetzen', tramAdd: 'Ergänzen', tramAsk: 'Es gibt schon Fahrgassen – ersetzen oder ergänzen?', yes: 'ja', no: 'nein', tramHave: 'Vorhanden: <b>{0}</b> Fahrgassen-Spuren · Randfahrgasse: <b>{1}</b>',
     noProfiles: 'Fahrzeuge und Geräte aus AgOpenGPS gibt es, wenn im Register „Feld“ der Ordner AgOpenGPS (statt Fields) gewählt ist.',
-    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: eine bestimmte Anzahl neben der Referenzlinie. „Feld füllen“: das ganze Feld parallel zur Linie. „Zwischen zwei Linien“: von zwei Seiten aufeinander zu, die Anzahl je Seite wird vorgeschlagen. Die Fahrgassen reichen bis zur Grenze oder enden an der Randfahrgasse. Abstand = Arbeitsbreite des Geräts, die zwei Spuren je ± halbe Spurweite.',
+    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: eine bestimmte Anzahl neben der Referenzlinie. „Feld füllen“: das ganze Feld parallel zur Linie. „Zwischen zwei Linien“: von zwei Seiten aufeinander zu; wo sie sich kreuzen, können sie zusammengeführt werden. „Randfahrgasse“: auch mehrere Ringe. „Gasse dazwischen“: zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. Die blaue Fläche zeigt die Arbeitsbreite – ausblenden mit dem Auge bei „Arbeitsbreite“.',
     tramMsg: 'Vorschau: {0} Fahrgassen-Spuren', tramWithRing: ' + Randfahrgasse', tramOnlyRing: 'Nur die Randfahrgasse – dazwischen ist kein Platz für weitere Fahrgassen.', tramRingMsg: 'Randfahrgasse: Mitte {0} m von der Grenze{1}.',
     tramNone: 'Keine Fahrgasse im Feld – andere Seite oder Linie wählen.', tramDone: 'Fahrgassen übernommen – werden beim Speichern gespeichert.',
     needTrack: 'Für Fahrgassen zuerst eine AB-Linie oder Kurve anlegen (Register „Spuren“).',
@@ -506,6 +512,10 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    btnTramMid: 'Tramline between', fRingCount: 'Number of boundary trams', fMerge: 'Merge', mergeYes: 'yes – at the crossings', mergeNo: 'no',
+    L_tramw: 'Working width', ringMany: '{0} rings.', ringFewer: 'The field is too narrow for more rings.', needTwoTram: 'This needs at least two tramlines.',
+    midPick1: 'Click the first tramline on the map.', midPick2: 'Click the second tramline (the one next to it).',
+    midMsg: 'The two tramlines are {0} m apart – the new one goes exactly in the middle, {1} m from each.', midFail: 'The two tramlines are not next to each other – click two neighbouring ones.',
     title: 'AOG Field Editor',
     tabFeld: 'Field', tabGrenze: 'Boundary', tabSpuren: 'Tracks', tabVorgewende: 'Headland', tabFahrgassen: 'Tramlines',
     tabFahnen: 'Flags', tabUrsprung: 'Origin', tabAnsicht: 'View', tabMessen: 'Measure',
@@ -531,7 +541,7 @@ const I18N = {
     fSide: 'Side', sideAuto: 'automatic (AB right, curve left)', sideBoth: 'both sides', sideR: 'right', sideL: 'left', fWithRing: 'Boundary tram', ringNo: 'without – tramlines up to the boundary', ringYes: 'with – tramlines end at it', needTwo: 'This needs two lines (tab “Tracks”).',
     tramReplace: 'Replace', tramAdd: 'Add', tramAsk: 'There are tramlines already – replace or add?', yes: 'yes', no: 'no', tramHave: 'Existing: <b>{0}</b> tram tracks · boundary tram: <b>{1}</b>',
     noProfiles: 'Vehicles and tools from AgOpenGPS are available when the AgOpenGPS folder (instead of Fields) is chosen in the “Field” tab.',
-    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: a given number next to the reference line. “Fill field”: the whole field parallel to the line. “Between two lines”: from two sides towards each other, the number per side is suggested. Tramlines reach the boundary or end at the boundary tram. Spacing = working width of the tool, the two tracks each ± half the wheel track.',
+    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: a given number next to the reference line. “Fill field”: the whole field parallel to the line. “Between two lines”: from two sides towards each other; where they cross they can be merged. “Boundary tram”: several rings possible. “Tramline between”: click two tramlines, a new one goes exactly in the middle. The blue area shows the working width – hide it with the eye at “Working width”.',
     tramMsg: 'Preview: {0} tram tracks', tramWithRing: ' + boundary tram', tramOnlyRing: 'Only the boundary tram – there is no room for further tramlines inside it.', tramRingMsg: 'Boundary tram: centre {0} m from the boundary{1}.',
     tramNone: 'No tramline inside the field – choose the other side or another line.', tramDone: 'Tramlines applied – stored when you save.',
     needTrack: 'For tramlines, create an AB line or curve first (tab “Tracks”).',
@@ -1279,11 +1289,11 @@ map.createPane('backpic').style.zIndex = 300;
 map.createPane('extras').style.zIndex = 350;              // unter der Grenze, die bearbeitet wird
 const cv = L.canvas({ pane: 'extras', padding: 0.5 });
 const EXTRA_DEFS = [
-  ['sections'], ['tracks'], ['headland'], ['headlines'], ['tram'], ['contour'], ['recpath'], ['backpic'], ['flags']   // Beschriftung: t('L_' + id)
+  ['sections'], ['tracks'], ['headland'], ['headlines'], ['tram'], ['tramw'], ['contour'], ['recpath'], ['backpic'], ['flags']   // Beschriftung: t('L_' + id)
 ];
 const exLayers = Object.fromEntries(EXTRA_DEFS.map(([id]) => [id, id === 'flags' ? flagLayer : L.layerGroup()]));
 let ex = { tracks: [], headlines: [] }, listDirty = { tracks: false, headlines: false }, hiTrack = -1, backPicUrl = null;
-const layerOn = { sections: true, tracks: true, headland: true, headlines: true, tram: true, contour: false, recpath: true, backpic: false, flags: true };
+const layerOn = { sections: true, tracks: true, headland: true, headlines: true, tram: true, tramw: true, contour: false, recpath: true, backpic: false, flags: true };
 try { Object.assign(layerOn, JSON.parse(localStorage.getItem('aogLayers') || '{}')); } catch (e) { }
 
 function setBackPic(file) {
@@ -1412,6 +1422,7 @@ function exCount(id) {
     case 'headland': return ex.headland.length;
     case 'headlines': return ex.headlines.filter(h => h.show && !h.deleted).length;
     case 'tram': return ex.tram ? ex.tram.lines.length + (ex.tram.outer.length > 1) + (ex.tram.inner.length > 1) : 0;
+    case 'tramw': return ex.tram && (ex.tram.lines.length || ex.tram.outer.length > 1) ? 1 : 0;
     case 'contour': return ex.contour.length;
     case 'recpath': return ex.recpath.length > 1 ? 1 : 0;
     case 'backpic': return ex.backpic && backPicUrl ? 1 : 0;
@@ -1461,6 +1472,10 @@ function drawLayer(id) {
     [ex.tram.outer, ex.tram.inner].forEach(a => { if (a.length > 1) L.polygon(a, { renderer: cv, interactive: false, color: '#ff8c00', weight: 2, fill: false }).addTo(g); });
     ex.tram.lines.forEach(a => line(a, { color: '#ff8c00', weight: 3 }));
   }
+  if (id === 'tramw' && ex.tram && plane) {                // Arbeitsbreite der Fahrgassen als Fläche
+    const P = a => a.map(([la, lo]) => plane.fwd(la, lo));
+    drawBands(g, bandPolys(ex.tram.lines.map(P), { outer: P(ex.tram.outer), inner: P(ex.tram.inner) }, cfg));
+  }
   if (id === 'contour') ex.contour.forEach(a => line(a, { color: '#7fff00', weight: 1.5 }));
   if (id === 'recpath' && ex.recpath.length > 1) line(ex.recpath, { color: '#00e5ff', weight: 2 });
   if (id === 'backpic' && ex.backpic && backPicUrl) L.imageOverlay(backPicUrl, ex.backpic, { pane: 'backpic', opacity: .9 }).addTo(g);
@@ -1469,7 +1484,7 @@ function drawLayer(id) {
 function showLayer(id) { if (layerOn[id]) map.addLayer(exLayers[id]); else map.removeLayer(exLayers[id]); }
 
 // Jede Ebene steht im Ribbon bei ihrem Register (Spuren, Vorgewende, …), der Rest unter „Ansicht“
-const LAYER_TAB = { tracks: 'spuren', headland: 'vorgewende', headlines: 'vorgewende', tram: 'fahrgassen', flags: 'fahnen' };
+const LAYER_TAB = { tracks: 'spuren', headland: 'vorgewende', headlines: 'vorgewende', tram: 'fahrgassen', tramw: 'fahrgassen', flags: 'fahnen' };
 // Kleiner Knopf mit Symbol (Auge, Papierkorb …) für Listen und das Ribbon
 function iconBtn(icon, title, fn, cls) {
   const b = document.createElement('button');
@@ -1989,6 +2004,7 @@ function clearLayer(id, label) {
     ex[id] = ['sections', 'tram', 'backpic'].includes(id) ? null : [];
     if (id === 'headlines') listDirty.headlines = false;
     drawLayer(id);
+    if (id === 'tram') drawLayer('tramw');
   }
   unsaved = true;
   renderLayerList(); renderNames();
@@ -2351,13 +2367,33 @@ function offsetRing(C, w, dir) {
   return minSpacing(out, 1.2);
 }
 // Randfahrgasse: Radius 0 wie AOG (jede Spur einzeln von der Grenze), mit Radius erst die Mitte, dann beide Spuren genau parallel
+// Mehrere Randfahrgassen (Anzahl): Ring k mit der Mitte bei Abstand · (k + ½) von der Grenze.
+// Der erste Ring kommt in Tram.txt als Randfahrgasse, weitere als geschlossene Fahrgassen (extra).
 function buildTramRing(c) {
-  if (!bnds[0]) return { outer: [], inner: [] };
-  const F = aogFence(0), tw = c.tramWidth, hw = c.trackWidth / 2, xy = P => P.map(p => ({ e: p.e, n: p.n }));
-  if (!(c.radius > 0)) return { outer: xy(buildAround(F, 0.5 * tw - hw)), inner: xy(buildAround(F, 0.5 * tw + hw)) };
-  const mid = roundedAround(F, 0.5 * tw, c.radius);
-  if (mid.length < 4) return { outer: [], inner: [] };
-  return { outer: xy(offsetRing(mid, hw, -1)), inner: xy(offsetRing(mid, hw, 1)), rFail: buildAround(F, 0.5 * tw + c.radius).length < 4 };
+  const none = { outer: [], inner: [], extra: [], tracks: [] };
+  if (!bnds[0]) return none;
+  const F = aogFence(0), tw = c.tramWidth, hw = c.trackWidth / 2, n = Math.max(1, Math.round(c.ringCount || 1)), xy = P => P.map(p => ({ e: p.e, n: p.n }));
+  const rings = [];                                        // je Ring [außen, innen]
+  let rFail = false;
+  if (!(c.radius > 0)) {
+    for (let k = 0; k < n; k++) {
+      const o = xy(buildAround(F, tw * (0.5 + k) - hw)), i = xy(buildAround(F, tw * (0.5 + k) + hw));
+      if (o.length < 4 || i.length < 4) break;
+      rings.push([o, i]);
+    }
+  } else {
+    const mid = roundedAround(F, 0.5 * tw, c.radius);
+    if (mid.length < 4) return none;
+    rFail = buildAround(F, 0.5 * tw + c.radius).length < 4;
+    for (let k = 0; k < n; k++) {
+      const m = k ? offsetRing(mid, tw * k, 1) : mid;        // weitere Ringe genau parallel nach innen
+      const o = xy(offsetRing(m, hw, -1)), i = xy(offsetRing(m, hw, 1));
+      if (o.length < 4 || i.length < 4) break;
+      rings.push([o, i]);
+    }
+  }
+  if (!rings.length) return none;
+  return { outer: rings[0][0], inner: rings[0][1], extra: rings.slice(1).flat(), innermost: rings[rings.length - 1][1], count: rings.length, rFail };
 }
 // Referenzlinie für Fahrgassen: AB-Linie oder Kurve, an beiden Enden gerade verlängert, damit die Fahrgassen bis zur Grenze reichen
 function refLine(tr) {
@@ -2431,7 +2467,9 @@ function clipToPoly(L, X) {
 function tramContext(c, withRing) {
   const F = bnds[0] ? aogFence(0) : null, ring = withRing && F ? buildTramRing(c) : null;
   const XF = F ? polyIndex(F) : null, useRing = ring && ring.inner.length > 3;
-  return { F, XF, ring: useRing ? ring : null, X: useRing ? polyIndex(ring.inner) : XF, gF: useRing ? grid(F, c.tramWidth) : null };
+  // r2: Fahrgassen, die überwiegend so nah an der Grenze liegen, fallen auf eine Randfahrgasse und werden ausgelassen
+  return { F, XF, ring: useRing ? ring : null, X: useRing ? polyIndex(ring.innermost) : XF, gF: useRing ? grid(F, c.tramWidth) : null,
+    r2: useRing ? ((ring.count - 0.25) * c.tramWidth) ** 2 : 0 };
 }
 // Fahrgasse Nr. k (Mitte bei Abstand · (k + ½)) neben der Referenz R auf Seite side, beide Spuren abgeschnitten.
 // [] = liegt außerhalb des Feldes, null = liegt auf der Randfahrgasse und wird ausgelassen
@@ -2441,11 +2479,115 @@ function tramPair(R, k, side, c, ctx) {
   if (ctx.gF) {
     const mid = clipToPoly(offsetLine(R, side * wc), ctx.XF).flat();
     if (!mid.length) return [];
-    const r2 = (0.75 * c.tramWidth) ** 2;
-    if (mid.filter(p => ctx.gF.near(p, r2)).length > mid.length * 0.5) return null;
+    if (mid.filter(p => ctx.gF.near(p, ctx.r2)).length > mid.length * 0.5) return null;
   }
   return clip(offsetLine(R, side * (wc - hw))).concat(clip(offsetLine(R, side * (wc + hw))));
 }
+// Nur die Mittellinien der Fahrgassen (für „Zusammenführen“): je das längste Stück im Feld
+function tramCenters(R, side, count, c, ctx) {
+  const out = [];
+  let kept = 0, empty = 0;
+  for (let k = 0; k < 400 && kept < count && empty < 3; k++) {
+    const C = offsetLine(R, side * c.tramWidth * (0.5 + k)), inF = ctx.XF ? clipToPoly(C, ctx.XF) : [C];
+    if (!inF.length) { empty++; continue; }
+    if (ctx.gF) { const m = inF.flat(); if (m.filter(p => ctx.gF.near(p, ctx.r2)).length > m.length * 0.5) continue; }
+    empty = 0; kept++;
+    out.push(inF.reduce((a, b) => pathLen(b) > pathLen(a) ? b : a));
+  }
+  return out;
+}
+// Aus einer Mittellinie die zwei Spuren (± halbe Spurweite), an den Enden verlängert und an Grenze/Randfahrgasse abgeschnitten
+function tracksFromCenter(C, c, ctx) {
+  if (C.length < 2) return [];
+  const P = openHeadings(minSpacing(C.map(p => ({ e: p.e, n: p.n, h: 0 })), 2)), a = P[0], b = P[P.length - 1], pre = [], post = [];
+  for (let d = 40; d >= 2; d -= 2) pre.push({ e: a.e - Math.sin(a.h) * d, n: a.n - Math.cos(a.h) * d, h: a.h });
+  for (let d = 2; d <= 40; d += 2) post.push({ e: b.e + Math.sin(b.h) * d, n: b.n + Math.cos(b.h) * d, h: b.h });
+  const R = pre.concat(P, post), hw = c.trackWidth / 2, clip = L => ctx.X ? clipToPoly(L, ctx.X) : [L];
+  // Wo die Spur wegfällt (z. B. innen an der Spitze eines V), wird sie getrennt statt quer verbunden
+  const split = L => { const out = [[]]; L.forEach((p, i) => { if (i && dSq(p, L[i - 1]) > 9) out.push([]); out[out.length - 1].push(p); }); return out.filter(s => s.length > 1); };
+  return split(offsetLine(R, -hw)).flatMap(clip).concat(split(offsetLine(R, hw)).flatMap(clip));
+}
+// Erster Schnittpunkt zweier offener Linien
+function firstCross(P, Q) {
+  for (let i = 0; i + 1 < P.length; i++) {
+    const a = P[i], b = P[i + 1], r = { e: b.e - a.e, n: b.n - a.n };
+    for (let j = 0; j + 1 < Q.length; j++) {
+      const c = Q[j], d = Q[j + 1];
+      if (Math.max(c.e, d.e) < Math.min(a.e, b.e) || Math.min(c.e, d.e) > Math.max(a.e, b.e) || Math.max(c.n, d.n) < Math.min(a.n, b.n) || Math.min(c.n, d.n) > Math.max(a.n, b.n)) continue;
+      const s = { e: d.e - c.e, n: d.n - c.n }, den = r.e * s.n - r.n * s.e;
+      if (!den) continue;
+      const t1 = ((c.e - a.e) * s.n - (c.n - a.n) * s.e) / den, u = ((c.e - a.e) * r.n - (c.n - a.n) * r.e) / den;
+      if (t1 >= 0 && t1 <= 1 && u >= 0 && u <= 1) return { i, j, pt: { e: a.e + r.e * t1, n: a.n + r.n * t1 } };
+    }
+  }
+  return null;
+}
+// „Am Schnittpunkt umsteigen“: von innen gezählt geht die innerste Fahrgasse von Linie 1 am Schnittpunkt in die innerste von Linie 2 über,
+// die nächsten ebenso, solange sie sich kreuzen. Behalten wird je die Hälfte, die weiter von der anderen Linie weg liegt –
+// so entstehen ineinander liegende V-Formen.
+function mergeCenters(CA, CB, RA, RB) {
+  const dRef = R => { const s = R.filter((_, i) => i % 2 === 0); return q => { let m = Infinity; for (const p of s) m = Math.min(m, dSq(p, q)); return m; }; };
+  const dA = dRef(RA), dB = dRef(RB), n = Math.min(CA.length, CB.length), out = [], done = new Set();
+  for (let m = 0; m < n; m++) {
+    const ia = CA.length - 1 - m, ib = CB.length - 1 - m, P = CA[ia], Q = CB[ib], x = firstCross(P, Q);
+    if (!x) break;                                         // weiter außen kreuzen sie sich nicht mehr
+    done.add('a' + ia); done.add('b' + ib);
+    const A1 = P.slice(0, x.i + 1).concat([x.pt]), A2 = [x.pt].concat(P.slice(x.i + 1));
+    const B1 = Q.slice(0, x.j + 1).concat([x.pt]), B2 = [x.pt].concat(Q.slice(x.j + 1));
+    const keepA = dB(A1[0]) >= dB(A2[A2.length - 1]) ? A1 : A2.slice().reverse();          // endet am Schnittpunkt
+    const keepB = dA(B2[B2.length - 1]) >= dA(B1[0]) ? B2 : B1.slice().reverse();          // beginnt am Schnittpunkt
+    out.push(keepA.concat(keepB.slice(1)));
+  }
+  return out.concat(CA.filter((_, i) => !done.has('a' + i)), CB.filter((_, i) => !done.has('b' + i)));
+}
+// Nächster Punkt auf einer Linie
+function nearestOn(p, P) {
+  let best = P[0], bd = Infinity;
+  for (let i = 0; i + 1 < P.length; i++) {
+    const a = P[i], b = P[i + 1], dx = b.e - a.e, dy = b.n - a.n, l2 = dx * dx + dy * dy;
+    const t1 = l2 ? Math.max(0, Math.min(1, ((p.e - a.e) * dx + (p.n - a.n) * dy) / l2)) : 0, q = { e: a.e + t1 * dx, n: a.n + t1 * dy }, d = dSq(p, q);
+    if (d < bd) { bd = d; best = q; }
+  }
+  return best;
+}
+const bbox = P => { let a = Infinity, b = -Infinity, c = Infinity, d = -Infinity; P.forEach(p => { a = Math.min(a, p.e); b = Math.max(b, p.e); c = Math.min(c, p.n); d = Math.max(d, p.n); }); return [a, b, c, d]; };
+// Spuren zu Fahrgassen paaren (zwei Spuren im Abstand der Spurweite) und deren Mittellinie bilden; einzelne Spuren bleiben für sich
+function trackPairs(TL, c) {
+  const sw = c.trackWidth, used = new Set(), out = [], B = TL.map(bbox);
+  const med = (P, Q) => { const st = Math.max(1, Math.floor(P.length / 15)), s = P.filter((_, i) => i % st === 0).map(p => Math.sqrt(dSq(p, nearestOn(p, Q)))).sort((x, y) => x - y); return s[s.length >> 1]; };
+  const near = (i, j) => B[i][0] - 1 - sw <= B[j][1] && B[j][0] - 1 - sw <= B[i][1] && B[i][2] - 1 - sw <= B[j][3] && B[j][2] - 1 - sw <= B[i][3];
+  TL.forEach((P, i) => {
+    if (used.has(i) || P.length < 2) return;
+    used.add(i);
+    let best = -1, bd = 0.35;
+    TL.forEach((Q, j) => { if (used.has(j) || Q.length < 2 || !near(i, j)) return; const d = Math.abs(med(P, Q) - sw); if (d < bd) { bd = d; best = j; } });
+    if (best < 0) { out.push({ center: P, tracks: [i] }); return; }
+    used.add(best);
+    const Q = TL[best], D = minSpacing(P.map(p => ({ ...p, h: 0 })), 2);
+    out.push({ center: D.map(p => { const q = nearestOn(p, Q); return { e: (p.e + q.e) / 2, n: (p.n + q.n) / 2 }; }), tracks: [i, best] });
+  });
+  return out;
+}
+// Arbeitsbreite als Fläche: je Fahrgasse ein Band der Breite „Abstand“ um die Mitte, Randfahrgasse als Ring
+function bandPolys(TL, ring, c) {
+  const half = c.tramWidth / 2, polys = [];
+  trackPairs(TL, c).forEach(({ center }) => {
+    if (center.length < 2) return;
+    if (center.length > 3 && dSq(center[0], center[center.length - 1]) < 4 && pathLen(center) > 50) {   // geschlossener Ring
+      const o = offsetRing(center, half, -1), i = offsetRing(center, half, 1);
+      if (o.length > 3) polys.push(i.length > 3 ? [o, i] : [o]);
+      return;
+    }
+    const R = openHeadings(minSpacing(center.map(p => ({ e: p.e, n: p.n, h: 0 })), 2)), l = offsetLine(R, -half), r = offsetLine(R, half);
+    if (l.length > 1 && r.length > 1) polys.push([l.concat(r.reverse())]);
+  });
+  if (ring && ring.outer.length > 3) {
+    const d = half - c.trackWidth / 2, o = d > 0 ? offsetRing(ring.outer, d, -1) : ring.outer, i = d > 0 ? offsetRing(ring.inner, d, 1) : ring.inner;
+    if (o.length > 3) polys.push([o, i]);
+  }
+  return polys;
+}
+const drawBands = (g, polys) => polys.forEach(rs => L.polygon(rs.map(r => r.map(ll)), { renderer: cv, stroke: false, fillColor: '#29b6f6', fillOpacity: .32, interactive: false }).addTo(g));
 // count Fahrgassen nebeneinander (Infinity = bis das Feld zu Ende ist)
 function tramAlong(R, side, count, c, ctx) {
   const out = [];
@@ -2474,7 +2616,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 1, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, withRing: 0, nA: 1, nB: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, withRing: 0, ringCount: 1, merge: 1, nA: 1, nB: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2544,6 +2686,8 @@ const PARAMS = {
   nA: { label: 'fCountA', num: [1, 0] },
   nB: { label: 'fCountB', num: [1, 0] },
   withRing: { label: 'fWithRing', opts: () => [[0, t('ringNo')], [1, t('ringYes')]] },
+  ringCount: { label: 'fRingCount', num: [1, 1] },
+  merge: { label: 'fMerge', opts: () => [[1, t('mergeYes')], [0, t('mergeNo')]] },
 };
 function renderParams(keys) {
   const box = $('toolParams');
@@ -2589,11 +2733,12 @@ function renderCfg() {
   ['btnHdAround', 'btnHdSlice', 'btnTramRing'].forEach(id => { $(id).disabled = !bnds[0]; });
   ['btnTram', 'btnTramFill'].forEach(id => { $(id).disabled = !list.length; $(id).title = plane && !list.length ? t('needTrack') : ''; });
   $('btnTramTwo').disabled = list.length < 2;
+  $('btnTramMid').disabled = !(ex.tram && ex.tram.lines.length >= 2);
   $('btnTramTwo').title = plane && list.length < 2 ? t('needTwo') : '';
   const T = ex.tram;
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
-const INT_KEYS = new Set(['passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'tramTrack', 'tramTrack2']);
+const INT_KEYS = new Set(['passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'merge', 'tramTrack', 'tramTrack2']);
 function onCfg(el) {
   const k = el.dataset.cfg, v = el.value;
   if (k === 'vehicle') pickVehicle(v);
@@ -2612,6 +2757,7 @@ function onCfg(el) {
   }
   saveCfg(); renderCfg();
   if (k === 'tramTrack' || k === 'tramTrack2') markRef();
+  if (k === 'tramWidth' || k === 'trackWidth' || k === 'sprayer' || k === 'vehicle') drawLayer('tramw');   // Arbeitsbreite neu zeichnen
   if (tool && tool.recalc) tool.recalc();
 }
 document.addEventListener('input', e => { const el = e.target; if (el.dataset && el.dataset.cfg && el.tagName === 'INPUT') onCfg(el); });
@@ -2629,8 +2775,12 @@ function setHeadland(L) {
 // Fahrgassen übernehmen: lines = neue Fahrgassen (add: zu den vorhandenen, sonst ersetzen), ring = neue Randfahrgasse
 function setTram({ lines, add, ring }) {
   const W = a => a.map(p => plane.inv(p.e, p.n)), old = ex.tram || { outer: [], inner: [], lines: [] };
-  const T = { outer: ring ? W(ring.outer) : old.outer, inner: ring ? W(ring.inner) : old.inner, lines: old.lines };
-  if (lines) T.lines = (add ? old.lines : []).concat(lines.map(W));
+  // eine neue Randfahrgasse ersetzt auch die alten weiteren Ringe (geschlossene Fahrgassen)
+  const loop = l => { if (l.length < 4) return false; const a = plane.fwd(...l[0]), b = plane.fwd(...l[l.length - 1]); return dSq(a, b) < 4; };
+  const base = ring ? old.lines.filter(l => !loop(l)) : old.lines;
+  const T = { outer: ring ? W(ring.outer) : old.outer, inner: ring ? W(ring.inner) : old.inner, lines: base };
+  if (lines) T.lines = (add ? base : []).concat(lines.map(W));
+  if (ring && ring.extra) T.lines = T.lines.concat(ring.extra.map(W));
   ex.tram = T;
   generated['Tram.txt'] = () => {
     const P = a => a.map(([la, lo]) => { const p = plane.fwd(la, lo); return r3(p.e) + ',' + r3(p.n); });
@@ -2639,7 +2789,7 @@ function setTram({ lines, add, ring }) {
     return out.join('\r\n') + '\r\n';
   };
   delete clearedFiles['Tram.txt'];
-  unsaved = true; setLayer('tram', true); drawLayer('tram'); renderLayerList(); renderCfg();
+  unsaved = true; setLayer('tram', true); drawLayer('tram'); drawLayer('tramw'); renderLayerList(); renderCfg();
 }
 
 // --- Werkzeuge: Vorgewende rundum, Teilstück, Fahrgassen. Die Einstellungen stehen in der Seitenleiste, Änderungen zeigt die Vorschau sofort ---
@@ -2683,8 +2833,9 @@ function startHdSlice() {
     ok() { setHeadland(hdExit(this.res.hd, true)); setStatus(t('hdDone'), 'ok'); }
   });
 }
-// Fahrgassen: an einer Linie (Anzahl), Feld füllen (bis zur Grenze/Randfahrgasse), zwischen zwei Linien (Anzahl je Seite).
+// Fahrgassen: an einer Linie (Anzahl), Feld füllen (bis zur Grenze/Randfahrgasse), zwischen zwei Linien (Anzahl je Seite, auf Wunsch zusammengeführt).
 // Gibt es schon Fahrgassen, heißt es vor dem Übernehmen „Ersetzen“ oder „Ergänzen“.
+const drawRing = (g, ring, dash) => { if (!ring) return; prevLine(g, ring.outer, '#ffd400', true, dash); prevLine(g, ring.inner, '#ffd400', true, dash); (ring.extra || []).forEach(l => prevLine(g, l, '#ffd400', true, dash)); };
 function startTramTool(kind) {
   const list = smallTracks();
   if (!list.length) { setStatus(t('needTrack'), 'err'); return; }
@@ -2693,14 +2844,15 @@ function startTramTool(kind) {
   const apply = (res, add) => { setTram({ lines: res.lines, add, ring: res.ring || undefined }); setStatus(t('tramDone'), 'ok'); };
   startTool({
     title: { line: 'btnTram', fill: 'btnTramFill', two: 'btnTramTwo' }[kind],
-    params: { line: ['tramTrack', 'side', 'passes', 'withRing', 'radius'], fill: ['tramTrack', 'fillSide', 'withRing', 'radius'],
-      two: ['tramTrack', 'nA', 'tramTrack2', 'nB', 'withRing', 'radius'] }[kind],
+    params: { line: ['tramTrack', 'side', 'passes', 'withRing', 'ringCount', 'radius'], fill: ['tramTrack', 'fillSide', 'withRing', 'ringCount', 'radius'],
+      two: ['tramTrack', 'nA', 'tramTrack2', 'nB', 'merge', 'withRing', 'ringCount', 'radius'] }[kind],
     two: kind === 'two', res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
       t('tramMsg', tool.res.lines.length) + (tool.res.ring ? t('tramWithRing') : '') + '.' + (have ? ' ' + t('tramAsk') : ''),
     recalc() {
       const c = cfg, trA = ex.tracks[c.tramTrack];
       let lines = [];
+      this.ring = null;
       if (trA && !trA.deleted) {
         const ctx = tramContext(c, c.withRing), RA = refLine(trA);
         if (kind === 'line') lines = tramAlong(RA, c.side ? Math.sign(c.side) : trA.mode === 2 ? 1 : -1, c.passes, c, ctx);   // automatisch wie AOG: AB rechts, Kurve links
@@ -2714,7 +2866,10 @@ function startTramTool(kind) {
               const n = Math.max(0, Math.round(this.geo.D / c.tramWidth));
               cfg.nA = Math.ceil(n / 2); cfg.nB = n - cfg.nA; renderCfg();
             }
-            lines = tramAlong(RA, this.geo.sA, c.nA, c, ctx).concat(tramAlong(RB, this.geo.sB, c.nB, c, ctx));
+            if (c.merge) {                             // an den Schnittpunkten zusammenführen
+              const CA = tramCenters(RA, this.geo.sA, c.nA, c, ctx), CB = tramCenters(RB, this.geo.sB, c.nB, c, ctx);
+              mergeCenters(CA, CB, RA, RB).forEach(C => lines.push(...tracksFromCenter(C, c, ctx)));
+            } else lines = tramAlong(RA, this.geo.sA, c.nA, c, ctx).concat(tramAlong(RB, this.geo.sB, c.nB, c, ctx));
           }
         }
         this.ring = ctx.ring;
@@ -2724,8 +2879,9 @@ function startTramTool(kind) {
     },
     draw: g => {
       const r = tool.res;
+      if (layerOn.tramw) drawBands(g, bandPolys(r.lines, r.ring, cfg));
       r.lines.forEach(l => prevLine(g, l, '#ffd400', false));
-      if (r.ring) { prevLine(g, r.ring.outer, '#ffd400', true, '8 6'); prevLine(g, r.ring.inner, '#ffd400', true, '8 6'); }
+      drawRing(g, r.ring, '8 6');
     },
     okEnabled: () => tool.res.lines.length > 0 || !!tool.res.ring,
     actions: () => have && (tool.res.lines.length || tool.res.ring) ? [
@@ -2739,15 +2895,49 @@ function startTramTool(kind) {
 function startTramRing() {
   if (!bnds[0]) return;
   startTool({
-    title: 'btnTramRing', params: ['radius'], res: { outer: [], inner: [] },
+    title: 'btnTramRing', params: ['ringCount', 'radius'], res: { outer: [], inner: [] },
     msg: () => !tool.res.outer.length ? t('hdFail') : tool.res.rFail ? t('hdRoundTooBig') :
-      t('tramRingMsg', fmtNum(cfg.tramWidth / 2, 2), cfg.radius > 0 ? t('hdRound', fmtNum(cfg.radius, 1)) : t('hdSharp')),
+      t('tramRingMsg', fmtNum(cfg.tramWidth / 2, 2), cfg.radius > 0 ? t('hdRound', fmtNum(cfg.radius, 1)) : t('hdSharp')) +
+      (tool.res.count > 1 ? ' ' + t('ringMany', tool.res.count) : '') + (tool.res.count < cfg.ringCount ? ' ' + t('ringFewer') : ''),
     recalc() { this.res = buildTramRing(cfg); redrawTool(); },
-    draw: g => { prevLine(g, tool.res.outer, '#ffd400', true); prevLine(g, tool.res.inner, '#ffd400', true); },
+    draw: g => { if (layerOn.tramw) drawBands(g, bandPolys(tool.res.extra || [], tool.res, cfg)); drawRing(g, tool.res); },
     okEnabled: () => tool.res.outer.length > 3,
     ok() { setTram({ ring: this.res }); setStatus(t('tramDone'), 'ok'); }
   });
   tool.recalc();
+}
+// Gasse dazwischen: zwei vorhandene Fahrgassen anklicken, eine neue kommt genau in die Mitte
+function startTramMid() {
+  if (!ex.tram || ex.tram.lines.length < 2) { setStatus(t('needTwoTram'), 'err'); return; }
+  const TL = ex.tram.lines.map(l => l.map(([a, b]) => plane.fwd(a, b))), pairs = trackPairs(TL, cfg);
+  const pick = q => { let bi = -1, bd = Infinity; pairs.forEach((p, i) => p.tracks.forEach(k => { const d = dSq(q, nearestOn(q, TL[k])); if (d < bd) { bd = d; bi = i; } })); return bi; };
+  const T = ex.tram, P = a => a.map(([la, lo]) => plane.fwd(la, lo));
+  const F = bnds[0] ? aogFence(0) : null;
+  const X = T.inner.length > 3 ? polyIndex(P(T.inner)) : F ? polyIndex(F) : null;      // mit Randfahrgasse: endet an ihr
+  startTool({
+    title: 'btnTramMid', params: [], picks: [], res: { lines: [] },
+    msg: () => tool.picks.length < 2 ? t(tool.picks.length ? 'midPick2' : 'midPick1') : tool.res.lines.length ? t('midMsg', fmtNum(tool.gap, 1), fmtNum(tool.gap / 2, 1)) : t('midFail'),
+    onClick: p => { const i = pick(plane.fwd(p.lat, p.lng)); if (i < 0) return; if (tool.picks.length >= 2) tool.picks = []; tool.picks.push(i); tool.recalc(); },
+    onUndo: () => { tool.picks.pop(); tool.recalc(); },
+    recalc() {
+      this.res = { lines: [] };
+      if (this.picks.length === 2 && this.picks[0] !== this.picks[1]) {
+        const C1 = minSpacing(pairs[this.picks[0]].center.map(p => ({ ...p, h: 0 })), 2), C2 = pairs[this.picks[1]].center, M = [], D = [];
+        C1.forEach(p => { const q = nearestOn(p, C2), d = Math.sqrt(dSq(p, q)); if (d < 3 * cfg.tramWidth) { M.push({ e: (p.e + q.e) / 2, n: (p.n + q.n) / 2 }); D.push(d); } });
+        D.sort((a, b) => a - b);
+        this.gap = D[D.length >> 1] || 0;
+        if (M.length > 1 && this.gap > cfg.trackWidth * 2) this.res = { lines: tracksFromCenter(M, cfg, { X }) };
+      }
+      redrawTool();
+    },
+    draw: g => {
+      tool.picks.forEach(i => pairs[i].tracks.forEach(k => L.polyline(TL[k].map(ll), { renderer: cv, color: '#fff', weight: 4, interactive: false }).addTo(g)));
+      if (layerOn.tramw) drawBands(g, bandPolys(tool.res.lines, null, cfg));
+      tool.res.lines.forEach(l => prevLine(g, l, '#ffd400', false));
+    },
+    okEnabled: () => tool.res.lines.length > 0,
+    ok() { setTram({ lines: this.res.lines, add: true }); setStatus(t('tramDone'), 'ok'); }
+  });
 }
 renderCfg();
 $('btnHdAround').onclick = startHdAround;
@@ -2756,6 +2946,7 @@ $('btnTram').onclick = () => startTramTool('line');
 $('btnTramFill').onclick = () => startTramTool('fill');
 $('btnTramTwo').onclick = () => startTramTool('two');
 $('btnTramRing').onclick = startTramRing;
+$('btnTramMid').onclick = startTramMid;
 
 // --- Messen: Strecke oder Fläche (geht auch ohne geöffnetes Feld) ---
 function startMeasure(isArea) {
@@ -2822,7 +3013,8 @@ function showTab(tab) {
   }
   if (!plane) return;
   let ch = false;
-  for (const id in LAYER_TAB) if (LAYER_TAB[id] === tab && !layerOn[id] && (exCount(id) || id === 'flags')) { setLayer(id, true); ch = true; }
+  // (die Arbeitsbreite bleibt, wie man sie eingestellt hat)
+  for (const id in LAYER_TAB) if (LAYER_TAB[id] === tab && id !== 'tramw' && !layerOn[id] && (exCount(id) || id === 'flags')) { setLayer(id, true); ch = true; }
   if (ch) renderLayerList();
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
