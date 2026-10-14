@@ -20,6 +20,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion.
 - Neue Außen- oder Innengrenze zeichnen: Punkte auf die Karte klicken.
 - Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), das Auge blendet ein oder aus, der Papierkorb löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
+- „Aus Fahrspur“ legt eine Außengrenze um die bearbeitete Fläche, praktisch für Felder, die ohne Grenze gefahren wurden. Der Regler „Genauigkeit“ bestimmt, ab welcher Richtungsänderung ein Punkt gesetzt wird: links grob mit wenigen Punkten, rechts genau nachgezeichnet. Ausgegraut, wenn das Feld keine bearbeitete Fläche hat.
 - „Ausdünnen“ entfernt überflüssige Punkte. Die Toleranz wird in der Seitenleiste eingestellt, die ausgedünnte Grenze ist vorher als Vorschau zu sehen.
 - Beim Speichern wird die Grenze so aufbereitet, wie AgOpenGPS sie selbst speichert: Punktabstand, Umlaufrichtung und Richtung jedes Punkts. Nur dann berechnet AgOpenGPS daraus eine korrekte Wendelinie.
 - Grenzen mit zu wenigen Punkten erkennt der Editor beim Öffnen und repariert sie beim Speichern.

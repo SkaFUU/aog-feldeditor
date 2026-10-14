@@ -20,7 +20,8 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - While you drag a point, a dashed ghost of the old point and the old boundary stays visible until your next action.
 - Draw a new outer or inner boundary by clicking points on the map.
 - All boundaries are listed: click a name to edit it (click again to stop editing), the eye shows or hides it, the bin deletes it. Inner boundaries can be marked as **drive-through** (e.g. a ditch or path), and AgOpenGPS builds no U-turn line there.
-- "Reduce" removes unnecessary points.
+- "From coverage" puts an outer boundary around the worked area – handy for fields that were driven without a boundary. The "Precision" slider sets from which change of direction a point is placed: left rough with few points, right traced closely. Greyed out if the field has no coverage.
+- "Reduce" removes unnecessary points. The tolerance is set in the side panel, the reduced boundary is previewed first.
 - When saving, the boundary is prepared the same way AgOpenGPS stores it: point spacing, winding direction and the heading of every point. Only then does AgOpenGPS build a correct U-turn line from it.
 - Boundaries with too few points are detected when a field is opened and repaired when it is saved.
 

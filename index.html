@@ -219,6 +219,7 @@
   <symbol id="i-outer" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><circle cx="4" cy="17" r="1.4" fill="currentColor"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="3" r="1.4" fill="currentColor"/><circle cx="21" cy="11" r="1.4" fill="currentColor"/><circle cx="15" cy="20" r="1.4" fill="currentColor"/></symbol>
   <symbol id="i-inner" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><path d="M10 11l4-1.5 1.5 4-4 1.5z" stroke-dasharray="2 1.6"/></symbol>
   <symbol id="i-delpt" viewBox="0 0 24 24"><path d="M3 19l6-10 5 5"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><path d="M15 3l6 6M21 3l-6 6"/></symbol>
+  <symbol id="i-bndcov" viewBox="0 0 24 24"><path d="M5 5h14v14H5z" stroke-dasharray="2.5 2"/><path d="M8 8v8M12 8v8M16 8v8" stroke-width="2.6" opacity=".55"/></symbol>
   <symbol id="i-simp" viewBox="0 0 24 24"><path d="M3 9l2.5-3 2.5 4 2.5-4 2.5 4 2.5-4 2.5 4 2.5-3"/><path d="M3 18l18-3"/></symbol>
   <symbol id="i-ab" viewBox="0 0 24 24"><path d="M4 20L20 4"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></symbol>
   <symbol id="i-bndtrack" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z"/><path d="M8 15l1.5-7 5-1.8 3.5 4.8-4 6z" stroke-dasharray="2 2"/></symbol>
@@ -289,6 +290,7 @@
         <div class="grp"><div class="gbody">
           <button class="big c-bnd" id="btnNewOuter" disabled><svg class="ic"><use href="#i-outer"/></svg><span data-i18n="btnNewOuter">Außengrenze</span></button>
           <button class="big c-bnd" id="btnNewInner" disabled><svg class="ic"><use href="#i-inner"/></svg><span data-i18n="btnNewInner">Innengrenze</span></button>
+          <button class="big c-bnd" id="btnBndCov" disabled><svg class="ic"><use href="#i-bndcov"/></svg><span data-i18n="btnBndCov">Aus Fahrspur</span></button>
         </div><div class="gcap" data-i18n="gNew">Neu zeichnen</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-bnd" id="btnDel" disabled><svg class="ic"><use href="#i-delpt"/></svg><span data-i18n="btnDel">Punkt löschen</span></button>
@@ -445,6 +447,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
     confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
     measSeg: 'Strecke', measLen: 'Länge', measAngleAt: 'Winkel bei {0}',
     segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
@@ -563,6 +566,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
     confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
     measSeg: 'Segment', measLen: 'Length', measAngleAt: 'Angle at {0}',
     segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
@@ -1843,6 +1847,114 @@ function startDrawBoundary(inner) {
   });
 }
 
+// --- Grenze aus der bearbeiteten Fläche ---
+// Alle Fahrten auf ein Raster zeichnen, Löcher füllen, größte Fläche nehmen, Rand nachfahren und glätten.
+// Danach nur dort Punkte setzen, wo sich die Richtung um mehr als den eingestellten Winkel ändert.
+function coverageOutline() {
+  const rings = ex.sections.patches.map(p => p.ring.map(q => plane.fwd(q[0], q[1])));
+  let e0 = Infinity, e1 = -Infinity, n0 = Infinity, n1 = -Infinity;
+  rings.forEach(r => r.forEach(p => { e0 = Math.min(e0, p.e); e1 = Math.max(e1, p.e); n0 = Math.min(n0, p.n); n1 = Math.max(n1, p.n); }));
+  e0 -= 3; n0 -= 3; e1 += 3; n1 += 3;
+  const c = Math.max(0.2, Math.sqrt((e1 - e0) * (n1 - n0) / 4e6));      // Rastergröße: höchstens ~4 Mio. Zellen
+  const W = Math.ceil((e1 - e0) / c), H = Math.ceil((n1 - n0) / c);
+  const cvs = document.createElement('canvas'); cvs.width = W; cvs.height = H;
+  const ctx = cvs.getContext('2d');
+  ctx.fillStyle = '#000';
+  rings.forEach(r => { ctx.beginPath(); r.forEach((p, i) => ctx[i ? 'lineTo' : 'moveTo']((p.e - e0) / c, (n1 - p.n) / c)); ctx.closePath(); ctx.fill(); });
+  const px = ctx.getImageData(0, 0, W, H).data, N = W * H, m = new Uint8Array(N);   // 1 = bearbeitet
+  for (let i = 0; i < N; i++) m[i] = px[i * 4 + 3] > 127 ? 1 : 0;
+  // von außen fluten: was nicht erreicht wird, liegt innen (Löcher werden gefüllt)
+  const fill = (start, ok, mark) => {
+    const st = [start], seen = []; mark(start); seen.push(start);
+    while (st.length) {
+      const i = st.pop(), x = i % W, y = (i / W) | 0;
+      for (const j of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1]) if (j >= 0 && ok(j)) { mark(j); st.push(j); seen.push(j); }
+    }
+    return seen;
+  };
+  const out = new Uint8Array(N);
+  for (let x = 0; x < W; x++) for (const y of [0, H - 1]) { const i = y * W + x; if (!m[i] && !out[i]) fill(i, j => !m[j] && !out[j], j => out[j] = 1); }
+  for (let y = 0; y < H; y++) for (const x of [0, W - 1]) { const i = y * W + x; if (!m[i] && !out[i]) fill(i, j => !m[j] && !out[j], j => out[j] = 1); }
+  // größte zusammenhängende Fläche
+  const lab = new Int32Array(N); let best = null, nl = 0;
+  for (let i = 0; i < N; i++) if (!out[i] && !lab[i]) { nl++; const cells = fill(i, j => !out[j] && !lab[j], j => lab[j] = nl); if (!best || cells.length > best.n) best = { id: nl, n: cells.length }; }
+  if (!best) return null;
+  const inC = (x, y) => x >= 0 && y >= 0 && x < W && y < H && lab[y * W + x] === best.id;
+  // Randkanten (Fläche rechts, im Uhrzeigersinn auf dem Bildschirm) und zu Schleifen verbinden
+  const next = new Map(), key = (x, y) => y * (W + 1) + x, add = (a, b) => { const k = key(a[0], a[1]); (next.get(k) || next.set(k, []).get(k)).push(b); };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (inC(x, y)) {
+    if (!inC(x, y - 1)) add([x, y], [x + 1, y]);
+    if (!inC(x + 1, y)) add([x + 1, y], [x + 1, y + 1]);
+    if (!inC(x, y + 1)) add([x + 1, y + 1], [x, y + 1]);
+    if (!inC(x - 1, y)) add([x, y + 1], [x, y]);
+  }
+  let loop = null;
+  for (const [k0] of next) {
+    if (!next.get(k0).length) continue;
+    const L0 = []; let k = k0;
+    while (next.has(k) && next.get(k).length) { const v = next.get(k).pop(); L0.push(v); k = key(v[0], v[1]); }
+    if (!loop || L0.length > loop.length) loop = L0;
+  }
+  if (!loop || loop.length < 8) return null;
+  // Treppen entfernen: gleitender Mittelwert über ~1,5 m, dann gleichmäßig alle 0,5 m
+  let P = loop.map(([x, y]) => ({ e: e0 + x * c, n: n1 - y * c }));
+  const k = Math.max(1, Math.round(0.75 / c)), n = P.length;
+  P = P.map((_, i) => { let e = 0, nn = 0; for (let j = -k; j <= k; j++) { const q = P[(i + j + n) % n]; e += q.e; nn += q.n; } return { e: e / (2 * k + 1), n: nn / (2 * k + 1) }; });
+  const R = [P[0]]; let acc = 0;
+  for (let i = 1; i <= P.length; i++) { const a = P[i - 1], b = P[i % P.length], d = dist(a, b); acc += d; if (acc >= 0.5) { R.push(b); acc = 0; } }
+  if (dist(R[0], R[R.length - 1]) < 0.25) R.pop();
+  return R;
+}
+// R: Randpunkte alle 0,5 m; thr: Winkel (°), ab dem ein Punkt gesetzt wird; sm: Glättung (m), grob = mehr
+function thinByAngle(R0, thr, sm) {
+  const n = R0.length, at = i => R[((i % n) + n) % n], k = Math.max(1, Math.round(sm));
+  const R = R0.map((_, i) => { let e = 0, nn = 0; for (let j = -k; j <= k; j++) { const q = R0[(i + j + n) % n]; e += q.e; nn += q.n; } return { e: e / (2 * k + 1), n: nn / (2 * k + 1) }; });
+  const turn = (a, b) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; };
+  const dir = (a, b) => Math.atan2(b.e - a.e, b.n - a.n), K = 4;          // Richtungen über ±2 m
+  const H = i => dir(at(i - K), at(i + K)), cr = R.map((_, i) => Math.abs(turn(dir(at(i - K), at(i)), dir(at(i), at(i + K)))));
+  // echte Ecken (über 20° bzw. über dem Winkel) genau am stärksten Punkt
+  const th = thr * D, cTh = Math.max(th, 20 * D), peak = cr.map((v, i) => { if (v <= cTh) return false; for (let q = -K; q <= K; q++) if (q && cr[(i + q + n) % n] > v) return false; return true; });
+  let s0 = 0; cr.forEach((v, i) => { if (v > cr[s0]) s0 = i; });
+  const keep = [R[s0]];
+  let h0 = dir(R[s0], at(s0 + K));
+  for (let j = 1; j < n; j++) {
+    const i = (s0 + j) % n;
+    if (peak[i]) { keep.push(R[i]); h0 = dir(R[i], at(i + K)); continue; }
+    let soon = false; for (let q = 1; q <= K; q++) if (peak[(i + q) % n]) soon = true;   // kurz vor einer Ecke nichts extra
+    if (!soon && Math.abs(turn(h0, H(i))) >= th) { keep.push(R[i]); h0 = H(i); }      // sanfte Kurve: Punkt alle „thr“ Grad
+  }
+  return keep;
+}
+function startBndFromCoverage() {
+  if (!ex.sections || !ex.sections.patches.length) { setStatus(t('needCoverage'), 'err'); return; }
+  setStatus(t('covBusy'));
+  const R = coverageOutline();
+  if (!R) { setStatus(t('covFail'), 'err'); return; }
+  const thr = () => 0.5 + 30 * Math.pow(1 - Math.min(100, Math.max(0, cfg.covPrec)) / 100, 1.5);
+  if (!layerOn.sections) setLayer('sections', true);
+  startTool({
+    title: 'btnBndCov', params: ['covPrec'], res: null, msgHtml: true,
+    msg: () => t('covMsg', fmtNum(thr(), 1), tool.res ? tool.res.length : 0, fmtNum(tool.res ? area(tool.res) / 10000 : 0, 2)) + (bnds[0] ? '<br>' + esc(t('covReplace')) : ''),
+    recalc() { this.res = thinByAngle(R, thr(), 1 + 7 * Math.pow(1 - Math.min(100, Math.max(0, cfg.covPrec)) / 100, 1.5)); redrawTool(); },
+    draw: g => {
+      if (!tool.res) return;
+      prevLine(g, tool.res, '#ffd400', true);
+      if (tool.res.length < 3000) tool.res.forEach(p => L.circleMarker(ll(p), { renderer: cv, radius: 3, color: '#000', weight: 1, fillColor: '#ffd400', fillOpacity: 1, interactive: false }).addTo(g));
+    },
+    okEnabled: () => !!tool.res && tool.res.length >= 3,
+    ok() {
+      const nb = { flagLines: ['False'], pts: this.res, orig: [], dirty: true };
+      if (bnds[0]) { pushUndo(); bnds[0] = Object.assign(bnds[0], { pts: nb.pts, dirty: true }); } else bnds.unshift(nb);
+      active = 0; bndListDirty = true; unsaved = true; sel = -1;
+      renderBndList(); drawAll(); updateInfo();
+      setStatus(t('bndCreated'), 'ok');
+    }
+  });
+  tool.recalc();
+  setStatus('');
+}
+$('btnBndCov').onclick = startBndFromCoverage;
+
 function deleteBoundary() {
   if (!bnds[active]) return;
   if (active === 0 && bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
@@ -2796,7 +2908,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2857,6 +2969,7 @@ const trackOpts = () => smallTracks().map(({ tr, i }) => [i, tr.name]);
 const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
   simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
+  covPrec: { label: 'fCovPrec', num: [1, 0], range: [0, 100] },
   smoothW: { label: 'fSmoothW', num: [1, 0], range: [0, 50] },
   smoothRound: { label: 'fSmoothRound', num: [1, 10], range: [10, 60] },
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
@@ -3635,6 +3748,8 @@ function updateInfo() {
   ['btnNewOuter', 'btnNewAB'].forEach(id => { document.getElementById(id).disabled = !plane; });
   document.getElementById('btnBndCurve').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
+  document.getElementById('btnBndCov').disabled = !(plane && ex.sections && ex.sections.patches.length);
+  document.getElementById('btnBndCov').title = plane && !(ex.sections && ex.sections.patches.length) ? t('needCoverage') : '';
   document.getElementById('btnSimp').disabled = !bnds[active];
   document.getElementById('btnOriginCenter').disabled = !bnds[0];
   ['btnHdAround', 'btnHdSlice'].forEach(id => { document.getElementById(id).disabled = !bnds[0]; });
