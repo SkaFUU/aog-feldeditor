@@ -101,6 +101,10 @@
   #nav, #props { flex:none; background:var(--panel); overflow-y:auto; padding:12px; }
   #nav { width:250px; border-right:1px solid #000; }
   #props { width:310px; border-left:1px solid #000; }
+  /* Griff zwischen Karte und Seitenleiste: ziehen ändert die Breite (wird gemerkt) */
+  #propsGrip { flex:none; width:6px; cursor:col-resize; background:#1d2024; border-left:1px solid #000; }
+  #propsGrip:hover, #propsGrip.drag { background:var(--tab); }
+  #propsGrip.hide { display:none; }
   #nav.hide, #props.hide { display:none; }
   .pp { display:none; } .pp.on { display:block; }
   #mapwrap { flex:1; position:relative; display:flex; min-width:0; }
@@ -169,8 +173,11 @@
   .seg button:last-child { border-radius:0 4px 4px 0; border-right:0; }
   .seg button:hover { background:#3a3f46; }
   .seg button.on { background:var(--tab); color:#000; font-weight:600; }
-  .form { grid-template-columns:1fr 168px; gap:5px 8px; align-items:center; font-size:12.5px; }
-  .form input, .form select { padding:3px 6px; }
+  .form { grid-template-columns:minmax(70px, 38%) minmax(0, 1fr); gap:5px 8px; align-items:center; font-size:12.5px; }
+  .form input, .form select { padding:3px 6px; min-width:0; width:100%; }
+  .form > * { min-width:0; }
+  .seg button { min-width:0; white-space:normal; line-height:1.15; }
+  .form label { overflow-wrap:anywhere; hyphens:auto; }
   .form .hint { grid-column:1/3; color:var(--muted); font-size:11.5px; margin-top:-3px; }
   #toolActions { display:flex; gap:8px; }
   #toolActions:empty { display:none; }
@@ -178,6 +185,8 @@
   @media (max-width:800px) {
     #main { flex-direction:column; }
     #nav, #props { width:100%; max-height:34%; border:0; border-top:1px solid #000; }
+    #props { width:100% !important; }
+    #propsGrip { display:none; }
     #nav { order:2; } #mapwrap { order:1; min-height:50%; } #props { order:3; }
     #qat .qtxt { display:none; }
   }
@@ -238,7 +247,6 @@
       <button data-tab="vorgewende" data-i18n="tabVorgewende">Vorgewende</button>
       <button data-tab="fahrgassen" data-i18n="tabFahrgassen">Fahrgassen</button>
       <button data-tab="fahnen" data-i18n="tabFahnen">Fahnen</button>
-      <button data-tab="messen" data-i18n="tabMessen">Messen</button>
     </nav>
     <div id="ribbon">
       <div class="rpanel" data-tab="feld">
@@ -320,8 +328,6 @@
           <button class="big c-flag" id="btnAddFlag" disabled><svg class="ic"><use href="#i-flag"/></svg><span data-i18n="btnAddFlag">Fahne setzen</span></button>
         </div><div class="gcap" data-i18n="gNew">Neu</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahnen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
-      </div>
-      <div class="rpanel" data-tab="messen">
         <div class="grp"><div class="gbody">
           <button class="big c-meas" id="btnMeasDist"><svg class="ic"><use href="#i-ruler"/></svg><span data-i18n="btnMeasDist">Strecke</span></button>
           <button class="big c-meas" id="btnMeasArea"><svg class="ic"><use href="#i-area"/></svg><span data-i18n="btnMeasArea">Fläche</span></button>
@@ -360,6 +366,7 @@
       </div>
     </div>
 
+    <div id="propsGrip" data-i18n-title="gripTitle"></div>
     <aside id="props">
       <div class="pp" data-tab="feld">
         <h2 data-i18n="hSave">Speichern</h2>
@@ -414,6 +421,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    gripTitle: 'Ziehen: Seitenleiste breiter oder schmaler',
     fSmoothW: 'Glättung (m)', fSmoothRound: 'Rundung (%)', trackPickTitle: 'Anklicken zum Auswählen',
     togNav: 'Feldliste ein-/ausblenden', togProps: 'Seitenleiste ein-/ausblenden', fMerge: 'Zusammenführen', passes0: '0 = bis zum Feldrand',
     btnTramDel: 'Löschen', fFillLines: 'Referenz', segOneLine: '1 Linie', segTwoLines: '2 Linien', segOff: 'Aus', segLine1: 'Linie 1', segLine2: 'Linie 2',
@@ -426,7 +434,7 @@ const I18N = {
     midMsg: 'Abstand der beiden Fahrgassen {0} m – die neue liegt genau in der Mitte, {1} m zu jeder.', midFail: 'Die zwei Fahrgassen liegen nicht nebeneinander – zwei benachbarte anklicken.',
     title: 'AOG Feldeditor',
     tabFeld: 'Feld', tabGrenze: 'Grenze', tabSpuren: 'Spuren', tabVorgewende: 'Vorgewende', tabFahrgassen: 'Fahrgassen',
-    tabFahnen: 'Fahnen', tabMessen: 'Messen',
+    tabFahnen: 'Fahnen & Messen',
     gFields: 'Felder', gNew: 'Neu', gEdit: 'Bearbeiten', gReduce: 'Punkte ausdünnen', gShow: 'Anzeigen',
     gOrigin: 'Feld-Ursprung (StartFix)', gMap: 'Kartenhintergrund', gLayers: 'Ebenen', gMeasure: 'Messen',
     btnSmooth: 'Glätten', btnFit: 'Ganzes Feld',
@@ -524,6 +532,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    gripTitle: 'Drag: make the side panel wider or narrower',
     fSmoothW: 'Smoothing (m)', fSmoothRound: 'Rounding (%)', trackPickTitle: 'Click to select',
     togNav: 'Show/hide field list', togProps: 'Show/hide side panel', fMerge: 'Merge', passes0: '0 = up to the field edge',
     btnTramDel: 'Delete', fFillLines: 'Reference', segOneLine: '1 line', segTwoLines: '2 lines', segOff: 'Off', segLine1: 'Line 1', segLine2: 'Line 2',
@@ -536,7 +545,7 @@ const I18N = {
     midMsg: 'The two tramlines are {0} m apart – the new one goes exactly in the middle, {1} m from each.', midFail: 'The two tramlines are not next to each other – click two neighbouring ones.',
     title: 'AOG Field Editor',
     tabFeld: 'Field', tabGrenze: 'Boundary', tabSpuren: 'Tracks', tabVorgewende: 'Headland', tabFahrgassen: 'Tramlines',
-    tabFahnen: 'Flags', tabMessen: 'Measure',
+    tabFahnen: 'Flags & Measure',
     gFields: 'Fields', gNew: 'New', gEdit: 'Edit', gReduce: 'Reduce points', gShow: 'Show',
     gOrigin: 'Field origin (StartFix)', gMap: 'Map background', gLayers: 'Layers', gMeasure: 'Measure',
     btnSmooth: 'Smooth', btnFit: 'Whole field',
@@ -3111,6 +3120,8 @@ function applyUi() {
   const hasProps = !!document.querySelector(`.pp[data-tab="${ui.tab}"]`);
   $('nav').classList.toggle('hide', !ui.nav);
   $('props').classList.toggle('hide', !ui.props || !hasProps);
+  $('propsGrip').classList.toggle('hide', !ui.props || !hasProps);
+  if (ui.propsW) $('props').style.width = ui.propsW + 'px';
   $('togNav').textContent = ui.nav ? '‹' : '›';             // Pfeile an den Kartenrändern
   $('togProps').textContent = ui.props ? '›' : '‹';
   $('togProps').style.display = hasProps ? '' : 'none';
@@ -3138,6 +3149,14 @@ function showTab(tab) {
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
 $('togNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
+// Seitenleiste breiter/schmaler ziehen (280–560 px)
+$('propsGrip').addEventListener('pointerdown', e => {
+  const grip = $('propsGrip'), right = $('main').getBoundingClientRect().right;
+  grip.setPointerCapture(e.pointerId); grip.classList.add('drag');
+  const move = ev => { ui.propsW = Math.round(Math.max(280, Math.min(560, right - ev.clientX))); $('props').style.width = ui.propsW + 'px'; map.invalidateSize(); };
+  const up = () => { grip.classList.remove('drag'); grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); applyUi(); };
+  grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+});
 $('togProps').onclick = () => { ui.props = !ui.props; applyUi(); };
 applyUi();
 

@@ -10,7 +10,7 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 
 ## Features
 
-The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags and Measure** (in the order you usually work), with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be collapsed with the arrows at the map edges. Only what belongs to the selected tab can be edited (e.g. boundary points only under "Boundary", flags only under "Flags"); everything else is only shown. **Save** and **Undo** are always at the top left.
+The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags & Measure** (in the order you usually work), with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be collapsed with the arrows at the map edges, and the side panel can be dragged wider or narrower. Only what belongs to the selected tab can be edited (e.g. boundary points only under "Boundary", flags only under "Flags"); everything else is only shown. **Save** and **Undo** are always at the top left.
 
 **New field**
 - Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.

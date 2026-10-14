@@ -10,7 +10,7 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 
 ## Funktionen
 
-Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen und Messen** (in der Reihenfolge, in der man meist arbeitet), darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich mit den Pfeilen an den Kartenrändern ein- und ausklappen. Bearbeiten lässt sich nur, was zum gewählten Register gehört (z. B. Grenzpunkte nur unter „Grenze“, Fahnen nur unter „Fahnen“), alles andere wird nur angezeigt. **Speichern** und **Rückgängig** sind immer oben links.
+Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen & Messen** (in der Reihenfolge, in der man meist arbeitet), darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich mit den Pfeilen an den Kartenrändern ein- und ausklappen, die Seitenleiste am Rand breiter oder schmaler ziehen. Bearbeiten lässt sich nur, was zum gewählten Register gehört (z. B. Grenzpunkte nur unter „Grenze“, Fahnen nur unter „Fahnen“), alles andere wird nur angezeigt. **Speichern** und **Rückgängig** sind immer oben links.
 
 **Neues Feld**
 - Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
