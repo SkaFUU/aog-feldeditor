@@ -176,6 +176,8 @@
   .rng { display:flex; gap:6px; align-items:center; }
   .rng input[type=range] { flex:1; min-width:0; padding:0; accent-color:var(--tab); }
   .rng input[type=number] { width:58px; flex:none; }
+  .numbadge { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; transform:translate(-50%,-50%);
+              border-radius:50%; background:var(--warn); color:#000; border:2px solid #000; font:700 13px system-ui,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,.6); }
   .seg { display:flex; }
   .seg button { flex:1; width:auto; margin:0; padding:4px 4px; font-size:12px; border-radius:0; background:#2b2f35; border-right:1px solid #1d2024; white-space:nowrap; }
   .seg button:first-child { border-radius:4px 0 0 4px; }
@@ -435,7 +437,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    segTrack: 'Spur', hdAddTrack: 'Spur (magenta) anklicken – sie kommt als Linie dazu.', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
+    segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
     hdLineNo: 'Daraus lässt sich keine Linie machen – andere Punkte wählen.', hdNoLines: 'Noch keine Linien. Art wählen und Linie setzen.', hdBuildOk: 'Vorgewende aus {0} Linie(n) – gelb die Vorschau.',
     hdNextSide: 'Übernehmen + nächste Seite',
     hdSliceNoBase: 'Noch kein Vorgewende – an den anderen Seiten bleibt die Grenze.',
@@ -476,7 +478,7 @@ const I18N = {
     fSide: 'Seite', fWithRing: 'Randfahrgasse',
     tramReplace: 'Ersetzen', tramAdd: 'Ergänzen', tramAsk: 'Es gibt schon Fahrgassen – ersetzen oder ergänzen?', yes: 'ja', no: 'nein', tramHave: 'Vorhanden: <b>{0}</b> Fahrgassen-Spuren · Randfahrgasse: <b>{1}</b>',
     noProfiles: 'Fahrzeuge und Geräte aus AgOpenGPS gibt es, wenn im Register „Feld“ der Ordner AgOpenGPS (statt Fields) gewählt ist.',
-    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: von einer Referenzlinie aus (eine oder beide Seiten, bestimmte Anzahl oder bis zum Feldrand) – oder von zwei Linien aufeinander zu; wo sie sich kreuzen, kann eine Seite am Schnittpunkt enden („Zusammenführen“). „Randfahrgasse“: auch mehrere Ringe. „Gasse dazwischen“: zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. „Löschen“: einzelne Fahrgassen anklicken. Die blaue Fläche zeigt die Arbeitsbreite – ausblenden mit dem Auge bei „Arbeitsbreite“. Die Pfeile am Kartenrand klappen die Seitenleisten ein und aus.',
+    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: von einer Referenzlinie aus (eine oder beide Seiten, bestimmte Anzahl oder bis zum Feldrand) – oder von zwei Linien aufeinander zu; wo sie sich kreuzen, kann eine Seite am Schnittpunkt enden („Zusammenführen“). „Randfahrgasse“: auch mehrere Ringe. „Gasse dazwischen“: zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. Referenzlinien wählst du auch auf der Karte: bei „2 Linien“ erster Klick = Linie 1, zweiter Klick = Linie 2 (Nummern auf der Karte). „Löschen“: einzelne Fahrgassen anklicken. Die blaue Fläche zeigt die Arbeitsbreite – ausblenden mit dem Auge bei „Arbeitsbreite“. Die Pfeile am Kartenrand klappen die Seitenleisten ein und aus.',
     tramMsg: 'Vorschau: {0} Fahrgassen-Spuren', tramWithRing: ' + Randfahrgasse', tramOnlyRing: 'Nur die Randfahrgasse – dazwischen ist kein Platz für weitere Fahrgassen.', tramRingMsg: 'Randfahrgasse: Mitte {0} m von der Grenze{1}.',
     tramNone: 'Keine Fahrgasse im Feld – andere Seite oder Linie wählen.', tramDone: 'Fahrgassen übernommen – werden beim Speichern gespeichert.',
     needTrack: 'Für Fahrgassen zuerst eine AB-Linie oder Kurve anlegen (Register „Spuren“).',
@@ -551,7 +553,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    segTrack: 'Track', hdAddTrack: 'Click a track (magenta) – it is added as a line.', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
+    segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
     hdLineNo: 'No line possible from this – choose other points.', hdNoLines: 'No lines yet. Choose a type and set a line.', hdBuildOk: 'Headland from {0} line(s) – yellow is the preview.',
     hdNextSide: 'Apply + next side',
     hdSliceNoBase: 'No headland yet – the boundary stays on the other sides.',
@@ -592,7 +594,7 @@ const I18N = {
     fSide: 'Side', fWithRing: 'Boundary tram',
     tramReplace: 'Replace', tramAdd: 'Add', tramAsk: 'There are tramlines already – replace or add?', yes: 'yes', no: 'no', tramHave: 'Existing: <b>{0}</b> tram tracks · boundary tram: <b>{1}</b>',
     noProfiles: 'Vehicles and tools from AgOpenGPS are available when the AgOpenGPS folder (instead of Fields) is chosen in the “Field” tab.',
-    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: from one reference line (one or both sides, a given number or up to the field edge) – or from two lines towards each other; where they cross, one side can end at the crossing (“Merge”). “Boundary tram”: several rings possible. “Tramline between”: click two tramlines, a new one goes exactly in the middle. “Delete”: click single tramlines. The blue area shows the working width – hide it with the eye at “Working width”. The arrows at the map edges collapse and expand the side panels.',
+    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: from one reference line (one or both sides, a given number or up to the field edge) – or from two lines towards each other; where they cross, one side can end at the crossing (“Merge”). “Boundary tram”: several rings possible. “Tramline between”: click two tramlines, a new one goes exactly in the middle. Reference lines can also be picked on the map: with “2 lines” the first click = line 1, the second = line 2 (numbers on the map). “Delete”: click single tramlines. The blue area shows the working width – hide it with the eye at “Working width”. The arrows at the map edges collapse and expand the side panels.',
     tramMsg: 'Preview: {0} tram tracks', tramWithRing: ' + boundary tram', tramOnlyRing: 'Only the boundary tram – there is no room for further tramlines inside it.', tramRingMsg: 'Boundary tram: centre {0} m from the boundary{1}.',
     tramNone: 'No tramline inside the field – choose the other side or another line.', tramDone: 'Tramlines applied – stored when you save.',
     needTrack: 'For tramlines, create an AB line or curve first (tab “Tracks”).',
@@ -1359,6 +1361,29 @@ function refreshTrackHits() {
     pl.on('mouseout', () => pl.setStyle({ opacity: 0 }));
     pl.on('click', () => selectTrack(i));
   });
+}
+// Dasselbe in Werkzeugen (Fahrgassen, Vorgewende): die Spuren sehen aus wie im Register Spuren und sind anklickbar
+function trackPickHits(g, onPick, allow) {
+  trackGeo.forEach(({ i, pts }) => {
+    if (allow && !allow(i)) return;
+    const hit = L.polyline(pts, { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
+    hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
+    hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
+    hit.on('click', () => onPick(i));
+  });
+}
+// Nummer (1, 2, …) als runde Marke auf der Karte
+const numBadge = (g, latlng, n) => L.marker(latlng, { interactive: false, zIndexOffset: 2000,
+  icon: L.divIcon({ className: '', html: `<span class="numbadge">${n}</span>`, iconSize: [0, 0] }) }).addTo(g);
+// Mitte des Stücks einer Spur, das im Feld liegt (dort steht die Nummer)
+function trackMidInField(i, cache) {
+  if (cache && cache[i]) return cache[i];
+  const tr = ex.tracks[i]; if (!tr) return null;
+  let P = refLine(tr);
+  if (bnds[0]) { const pcs = clipToPoly(P, polyIndex(aogFence(0))); if (pcs.length) P = pcs.reduce((a, b) => pathLen(b) > pathLen(a) ? b : a); }
+  const m = ll(P[P.length >> 1]);
+  if (cache) cache[i] = m;
+  return m;
 }
 function selectTrack(i) {
   hiTrack = hiTrack === i ? -1 : i;
@@ -3093,17 +3118,12 @@ function startHdSlice() {
         const vb = map.getBounds().pad(0.2), vis = F.map(ll).filter(q => vb.contains(q));
         if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff9500', fillOpacity: 1, interactive: false }).addTo(g));
         tool.picks.forEach(i => dot(ll(F[i]), '#ffd400').addTo(g));
-      } else tracks.forEach(x => {
-        // Spuren zum Hinzufügen (magenta): Hand-Cursor, beim Darüberfahren hell, Klick fügt sie als Linie hinzu
-        if (lines.some(ln => ln.track === x.i)) return;
-        x.show.forEach(P => {
-          L.polyline(P.map(ll), { renderer: cv, color: '#ff4fd8', weight: 2.5, interactive: false }).addTo(g);
-          const hit = L.polyline(P.map(ll), { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
-          hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
-          hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
-          hit.on('click', () => addLine(fromTrack(x), 'track'));
-        });
-      });
+      } else {
+        // Spuren wählen wie im Register Spuren: Hand-Cursor, beim Darüberfahren hell, Klick fügt sie als Linie hinzu
+        if (!layerOn.tracks) setLayer('tracks', true);
+        trackPickHits(g, i => { const x = tracks.find(y => y.i === i); if (x) addLine(fromTrack(x), 'track'); },
+          i => tracks.some(x => x.i === i) && !lines.some(ln => ln.track === i));
+      }
       // die Linien (gewählte weiß) und ihre verschobene Lage (orange) – anklickbar: Hand-Cursor, beim Darüberfahren hell
       lines.forEach((ln, i) => {
         const on = i === tool.sel, show = [ln.P.map(ll)].concat(ln.seg ? [ln.seg.map(ll)] : []);
@@ -3117,6 +3137,7 @@ function startHdSlice() {
         });
       });
       if (tool.res) offFence(tool.res.hd, true).forEach(run => prevLine(g, run, '#ffd400', false));   // auf der Grenze nichts zeichnen
+      lines.forEach((ln, i) => numBadge(g, ll(ln.P[ln.P.length >> 1]), i + 1));                        // Nummern wie in der Liste
     },
     okEnabled: () => !!tool.res,
     ok() { setHeadland(this.res.hd); setStatus(t('hdDone'), 'ok'); }
@@ -3199,6 +3220,17 @@ function startTramTool() {
       if (layerOn.tramw) drawBands(g, bandPolys(r.lines, r.ring, cfg));
       r.lines.forEach(l => prevLine(g, l, '#ffd400', false));
       drawRing(g, r.ring, '8 6');
+      // Referenzlinien auf der Karte wählen wie im Register Spuren; Nummer 1 (und 2) an der gewählten Linie
+      trackPickHits(g, i => tool.pickTrack(i), i => list.some(x => x.i === i));
+      const m1 = trackMidInField(cfg.tramTrack, tool.mids); if (m1) numBadge(g, m1, 1);
+      if (tool.two) { const m2 = trackMidInField(cfg.tramTrack2, tool.mids); if (m2) numBadge(g, m2, 2); }
+    },
+    mids: {}, nextPick: 1,
+    // 1 Linie: Klick wählt die Referenzlinie. 2 Linien: erster Klick Linie 1, zweiter Klick Linie 2, dann wieder von vorn
+    pickTrack(i) {
+      if (this.two && this.nextPick === 2 && i !== cfg.tramTrack) { cfg.tramTrack2 = i; this.nextPick = 1; }
+      else { cfg.tramTrack = i; this.nextPick = 2; if (cfg.tramTrack2 === i) cfg.tramTrack2 = -1; }
+      saveCfg(); renderCfg(); markRef(); this.recalc();
     },
     okEnabled: () => tool.res.lines.length > 0 || !!tool.res.ring,
     actions: () => have && (tool.res.lines.length || tool.res.ring) ? [
