@@ -2934,8 +2934,8 @@ function startTramTool() {
   const ring = () => cfg.withRing ? ['withRing', 'ringCount', 'radius'] : ['withRing'];
   startTool({
     title: 'btnTram',
-    params: () => cfg.fillLines === 2 && list.length > 1 ? ['fillLines', 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim', ...ring()]
-      : ['fillLines', 'tramTrack', 'fillSide', 'passes', ...ring()],
+    params: () => cfg.fillLines === 2 && list.length > 1 ? ['fillLines', ...ring(), 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim']
+      : ['fillLines', ...ring(), 'tramTrack', 'fillSide', 'passes'],
     get two() { return cfg.fillLines === 2 && list.length > 1; },
     res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
@@ -2951,11 +2951,15 @@ function startTramTool() {
         else {
           const trB = ex.tracks[c.tramTrack2];
           if (trB && !trB.deleted && c.tramTrack2 !== c.tramTrack) {
-            const RB = refLine(trB), key = c.tramTrack + '/' + c.tramTrack2 + '/' + c.tramWidth;
-            if (this.key !== key) {                    // neue Linien: Seiten bestimmen und Anzahl je Seite vorschlagen
+            // Anzahl je Seite neu vorschlagen, wenn sich Linien, Abstand oder die Randfahrgasse ändern
+            const RB = refLine(trB), key = [c.tramTrack, c.tramTrack2, c.tramWidth, c.trackWidth, c.withRing, c.ringCount, c.radius].join('/');
+            if (this.key !== key) {
               this.key = key; this.geo = twoGeo(RA, RB, ctx.XF);
-              const n = Math.max(0, Math.round(this.geo.D / c.tramWidth));
-              cfg.nA = Math.ceil(n / 2); cfg.nB = n - cfg.nA; renderCfg();
+              const n = Math.max(0, Math.round(this.geo.D / c.tramWidth)), a0 = Math.ceil(n / 2), b0 = n - a0;
+              // Fahrgassen, die auf eine Randfahrgasse fallen, werden ausgelassen und zählen nicht mit
+              const onRing = (R, s, upto) => { let m = 0; for (let k = 0; k < upto; k++) if (tramPair(R, k, s, c, ctx) === null) m++; return m; };
+              cfg.nA = Math.max(0, a0 - onRing(RA, this.geo.sA, a0)); cfg.nB = Math.max(0, b0 - onRing(RB, this.geo.sB, b0));
+              saveCfg(); renderCfg();
             }
             if (c.trim) {                              // die Fahrgassen einer Seite enden am Schnittpunkt mit ihrer Partnerin
               const CA = tramCenters(RA, this.geo.sA, c.nA, c, ctx), CB = tramCenters(RB, this.geo.sB, c.nB, c, ctx);
