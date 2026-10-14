@@ -447,7 +447,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
+    fCovEdge: 'Gerade Kanten ab (m)', covEdgeHint: 'Gerade Stücke ab dieser Länge werden zu geraden Kanten, die zackigen Wendebereiche dazwischen zu einer scharfen Ecke. 0 = aus.', btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
     confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
     measSeg: 'Strecke', measLen: 'Länge', measAngleAt: 'Winkel bei {0}',
     segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
@@ -566,7 +566,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
+    fCovEdge: 'Straight edges from (m)', covEdgeHint: 'Straight pieces of at least this length become straight edges, the ragged turning areas between them a sharp corner. 0 = off.', btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
     confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
     measSeg: 'Segment', measLen: 'Length', measAngleAt: 'Angle at {0}',
     segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
@@ -1915,27 +1915,94 @@ function thinByAngle(R0, thr, sm) {
   // echte Ecken (über 20° bzw. über dem Winkel) genau am stärksten Punkt
   const th = thr * D, cTh = Math.max(th, 20 * D), peak = cr.map((v, i) => { if (v <= cTh) return false; for (let q = -K; q <= K; q++) if (q && cr[(i + q + n) % n] > v) return false; return true; });
   let s0 = 0; cr.forEach((v, i) => { if (v > cr[s0]) s0 = i; });
-  const keep = [R[s0]];
+  const idx = [s0];
   let h0 = dir(R[s0], at(s0 + K));
   for (let j = 1; j < n; j++) {
     const i = (s0 + j) % n;
-    if (peak[i]) { keep.push(R[i]); h0 = dir(R[i], at(i + K)); continue; }
+    if (peak[i]) { idx.push(i); h0 = dir(R[i], at(i + K)); continue; }
     let soon = false; for (let q = 1; q <= K; q++) if (peak[(i + q) % n]) soon = true;   // kurz vor einer Ecke nichts extra
-    if (!soon && Math.abs(turn(h0, H(i))) >= th) { keep.push(R[i]); h0 = H(i); }      // sanfte Kurve: Punkt alle „thr“ Grad
+    if (!soon && Math.abs(turn(h0, H(i))) >= th) { idx.push(i); h0 = H(i); }      // sanfte Kurve: Punkt alle „thr“ Grad
   }
-  return keep;
+  // ab der schärfsten Ecke durchnummeriert, damit keine Gerade über den Anfang läuft
+  return { R: R.slice(s0).concat(R.slice(0, s0)), idx: idx.map(i => (i - s0 + n) % n) };
+}
+// Gerade Kanten: Stücke ab minLen, die höchstens tol von einer Geraden abweichen, werden gerade.
+// Das zackige Stück zwischen zwei Kanten (Wendebereich am Ende) wird durch den Schnittpunkt ersetzt;
+// liegen die Kanten fast parallel, kommt eine Gerade durch das Endstück dazu und es gibt zwei Ecken.
+function straightEdges({ R, idx }, tol, minLen) {
+  const n = R.length, plain = () => idx.map(i => R[i]);
+  if (!(minLen > 0) || n < 10) return plain();
+  const s = [0]; for (let i = 1; i < n; i++) s.push(s[i - 1] + dist(R[i - 1], R[i]));
+  const perim = s[n - 1] + dist(R[n - 1], R[0]);
+  const runs = [];
+  for (let i = 0; i < n - 1;) {
+    let ok = i;
+    for (let j = i + 1; j < n; j++) {
+      const a = R[i], b = R[j], L = dist(a, b);
+      let good = true;
+      if (L > 0.01) for (let k = i + 1; k < j; k++) if (Math.abs((R[k].e - a.e) * (b.n - a.n) - (R[k].n - a.n) * (b.e - a.e)) / L > tol) { good = false; break; }
+      if (!good) break;
+      ok = j;
+    }
+    if (s[ok] - s[i] >= minLen) { runs.push({ i0: i, i1: ok }); i = ok + 1; } else i++;
+  }
+  if (runs.length < 2) return plain();
+  // Gerade durch Punkte (Hauptachse), Schnittpunkt zweier Geraden
+  const range = (i0, i1) => { const P = []; for (let i = i0; i <= i1; i++) P.push(R[(i + n) % n]); return P; };
+  const fit = (i0, i1) => fitPts(range(i0, i1));
+  const off = (Ln, p) => Math.abs((p.e - Ln.c.e) * Ln.d.n - (p.n - Ln.c.n) * Ln.d.e);   // Abstand Punkt–Gerade
+  const fitPts = P => {
+    const c = P.reduce((m, p) => ({ e: m.e + p.e / P.length, n: m.n + p.n / P.length }), { e: 0, n: 0 });
+    let xx = 0, xy = 0, yy = 0; P.forEach(p => { const x = p.e - c.e, y = p.n - c.n; xx += x * x; xy += x * y; yy += y * y; });
+    const a = 0.5 * Math.atan2(2 * xy, xx - yy);
+    return { c, d: { e: Math.cos(a), n: Math.sin(a) } };
+  };
+  const cross = (A, B) => {
+    const den = A.d.e * B.d.n - A.d.n * B.d.e;
+    if (Math.abs(den) < Math.sin(20 * D)) return null;              // fast parallel: keine Ecke
+    const u = ((B.c.e - A.c.e) * B.d.n - (B.c.n - A.c.n) * B.d.e) / den;
+    return { e: A.c.e + A.d.e * u, n: A.c.n + A.d.n * u };
+  };
+  runs.forEach(r => { r.line = fit(r.i0, r.i1); });
+  const out = [];
+  runs.forEach((A, k) => {
+    const B = runs[(k + 1) % runs.length], b0 = k + 1 < runs.length ? B.i0 : B.i0 + n;
+    const gapLen = (k + 1 < runs.length ? s[B.i0] : s[B.i0] + perim) - s[A.i1], near = X => X && dist(X, R[A.i1]) <= gapLen + minLen && dist(X, R[B.i0]) <= gapLen + minLen;
+    // zwei Stücke derselben Kante: einfach weiter, kein Punkt
+    const par = Math.abs(A.line.d.e * B.line.d.n - A.line.d.n * B.line.d.e) < Math.sin(5 * D);
+    if (par && gapLen < minLen) {
+      if (off(A.line, B.line.c) < 2 * tol + 0.5) return;
+      // Stufe zwischen zwei parallelen Stücken: Ende der einen und Anfang der anderen Geraden
+      const pr = (Ln, p) => { const u = (p.e - Ln.c.e) * Ln.d.e + (p.n - Ln.c.n) * Ln.d.n; return { e: Ln.c.e + Ln.d.e * u, n: Ln.c.n + Ln.d.n * u }; };
+      out.push(pr(A.line, R[A.i1]), pr(B.line, R[B.i0])); return;
+    }
+    const X = cross(A.line, B.line);
+    if (near(X)) { out.push(X); return; }
+    // Endstück als eigene Gerade – nur die Punkte, die nicht auf den verlängerten Seiten liegen
+    const G = range(A.i1, b0).filter(p => off(A.line, p) > 1.5 * tol && off(B.line, p) > 1.5 * tol);
+    if (G.length >= 6) {
+      const M = fitPts(G), X1 = cross(A.line, M), X2 = cross(M, B.line);
+      if (near(X1) && near(X2)) { out.push(X1, X2); return; }
+    }
+    // sonst bleibt der Bogen wie er ist: Ende der Kante, Punkte dazwischen, Anfang der nächsten Kante
+    out.push(R[A.i1]);
+    idx.map(i => i <= A.i1 ? i + n : i).filter(j => j > A.i1 && j < b0).sort((a, b) => a - b).forEach(j => out.push(R[j % n]));
+    out.push(R[B.i0]);
+  });
+  return out.length >= 3 ? out : plain();
 }
 function startBndFromCoverage() {
   if (!ex.sections || !ex.sections.patches.length) { setStatus(t('needCoverage'), 'err'); return; }
   setStatus(t('covBusy'));
   const R = coverageOutline();
   if (!R) { setStatus(t('covFail'), 'err'); return; }
-  const thr = () => 0.5 + 30 * Math.pow(1 - Math.min(100, Math.max(0, cfg.covPrec)) / 100, 1.5);
+  const rough = () => Math.pow(1 - Math.min(100, Math.max(0, cfg.covPrec)) / 100, 1.5);   // 0 = genau, 1 = grob
+  const thr = () => 0.5 + 30 * rough();
   if (!layerOn.sections) setLayer('sections', true);
   startTool({
-    title: 'btnBndCov', params: ['covPrec'], res: null, msgHtml: true,
+    title: 'btnBndCov', params: ['covPrec', 'covEdge'], res: null, msgHtml: true,
     msg: () => t('covMsg', fmtNum(thr(), 1), tool.res ? tool.res.length : 0, fmtNum(tool.res ? area(tool.res) / 10000 : 0, 2)) + (bnds[0] ? '<br>' + esc(t('covReplace')) : ''),
-    recalc() { this.res = thinByAngle(R, thr(), 1 + 7 * Math.pow(1 - Math.min(100, Math.max(0, cfg.covPrec)) / 100, 1.5)); redrawTool(); },
+    recalc() { this.res = straightEdges(thinByAngle(R, thr(), 1 + 7 * rough()), 0.3 + 2.7 * rough(), cfg.covEdge); redrawTool(); },
     draw: g => {
       if (!tool.res) return;
       prevLine(g, tool.res, '#ffd400', true);
@@ -2908,7 +2975,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2970,6 +3037,7 @@ const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
   simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
   covPrec: { label: 'fCovPrec', num: [1, 0], range: [0, 100] },
+  covEdge: { label: 'fCovEdge', num: [1, 0], range: [0, 100], hint: () => t('covEdgeHint') },
   smoothW: { label: 'fSmoothW', num: [1, 0], range: [0, 50] },
   smoothRound: { label: 'fSmoothRound', num: [1, 10], range: [10, 60] },
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
