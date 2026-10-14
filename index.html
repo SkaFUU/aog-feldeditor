@@ -94,7 +94,8 @@
   .c-meas .ic { color:var(--warn); } .c-hl .ic { color:#ff9500; } .c-tram .ic { color:#ff8c00; }
   .rf { display:grid; grid-template-columns:auto 118px; gap:3px 8px; align-items:center; align-content:center; height:74px; font-size:12px; }
   .rf input, .rf select { padding:2px 5px; font-size:12px; height:22px; border-radius:4px; }
-  .rf label { color:var(--muted); white-space:nowrap; } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
+  .rf label { color:var(--muted); white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .ic.sm { width:16px; height:16px; color:var(--tab); } .c-file .ic { color:#f0c674; } .c-view .ic { color:#8ab4f8; }
 
   /* Hauptbereich: Feldliste | Karte | Eigenschaften */
   #main { flex:1; display:flex; min-height:0; }
@@ -228,6 +229,10 @@
   <symbol id="i-tramfill" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M6.6 19.5l1-15.6M10.6 19l.6-15.6M14.6 18.6l.2-15.4M18.6 18.2l-.4-15"/></symbol>
   <symbol id="i-tramtwo" viewBox="0 0 24 24"><path d="M3 21L5 3M21 21L19 3" stroke-width="2.4"/><path d="M8.5 21l1-18M11 21l.5-18M13 21l-.5-18M15.5 21l-1-18"/></symbol>
   <symbol id="i-trammid" viewBox="0 0 24 24"><path d="M3 21L4 3M6 21L7 3M17 21L18 3M20 21L21 3"/><path d="M10.5 21l.5-18M13 21l.5-18" stroke-dasharray="2.2 1.8"/></symbol>
+  <symbol id="i-tractor" viewBox="0 0 24 24"><circle cx="7" cy="16" r="4"/><circle cx="7" cy="16" r="1.2"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M4 12V7h7l1.6 5H19l1.5 3.2"/><path d="M11 16h5"/><path d="M8 7V4h3"/></symbol>
+  <symbol id="i-trackw" viewBox="0 0 24 24"><rect x="2.5" y="5" width="4" height="14" rx="1.2"/><rect x="17.5" y="5" width="4" height="14" rx="1.2"/><path d="M8.5 12h7M10.5 10l-2 2 2 2M13.5 10l2 2-2 2"/></symbol>
+  <symbol id="i-implement" viewBox="0 0 24 24"><path d="M2 8h20M12 4v4"/><path d="M4.5 8v7l-1 2M9.5 8v7l-1 2M14.5 8v7l-1 2M19.5 8v7l-1 2"/></symbol>
+  <symbol id="i-spacing" viewBox="0 0 24 24"><path d="M3.5 5v14M20.5 5v14M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/></symbol>
   <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
 </svg>
 <div id="app">
@@ -299,7 +304,7 @@
           <button class="big c-hl" id="btnHdSlice" disabled><svg class="ic"><use href="#i-hdslice"/></svg><span data-i18n="btnHdSlice">Teilstück</span></button>
         </div><div class="gcap" data-i18n="gHdBuild">Vorgewende bauen</div></div>
         <div class="grp"><div class="gbody"><div class="rf">
-          <label for="cfTool" data-i18n="fTool">Gerät</label><select id="cfTool" data-cfg="tool"></select>
+          <label for="cfTool"><svg class="ic sm"><use href="#i-implement"/></svg><span data-i18n="fTool">Gerät</span></label><select id="cfTool" data-cfg="tool"></select>
           <span class="muted" id="cfToolInfo" style="grid-column:1/3"></span>
         </div></div><div class="gcap" data-i18n="fTool">Gerät</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-vorgewende"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
@@ -314,12 +319,12 @@
           <button class="big c-tram" id="btnTramDel" disabled><svg class="ic"><use href="#i-trash"/></svg><span data-i18n="btnTramDel">Löschen</span></button>
         </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
         <div class="grp"><div class="gbody"><div class="rf">
-          <label for="cfVehicle" data-i18n="fVehicle">Fahrzeug</label><select id="cfVehicle" data-cfg="vehicle"></select>
-          <label for="cfTrackW" data-i18n="fTrackW">Spurweite (m)</label><input id="cfTrackW" data-cfg="trackWidth" type="number" step="0.01" min="0">
+          <label for="cfVehicle"><svg class="ic sm"><use href="#i-tractor"/></svg><span data-i18n="fVehicle">Fahrzeug</span></label><select id="cfVehicle" data-cfg="vehicle"></select>
+          <label for="cfTrackW"><svg class="ic sm"><use href="#i-trackw"/></svg><span data-i18n="fTrackW">Spurweite (m)</span></label><input id="cfTrackW" data-cfg="trackWidth" type="number" step="0.01" min="0">
         </div></div><div class="gcap" data-i18n="hVehicle">Fahrzeug</div></div>
         <div class="grp"><div class="gbody"><div class="rf">
-          <label for="cfSprayer" data-i18n="fSprayer">Gerät</label><select id="cfSprayer" data-cfg="sprayer"></select>
-          <label for="cfTramW" data-i18n="fTramWidth">Abstand (m)</label><input id="cfTramW" data-cfg="tramWidth" type="number" step="0.5" min="1">
+          <label for="cfSprayer"><svg class="ic sm"><use href="#i-implement"/></svg><span data-i18n="fSprayer">Gerät</span></label><select id="cfSprayer" data-cfg="sprayer"></select>
+          <label for="cfTramW"><svg class="ic sm"><use href="#i-spacing"/></svg><span data-i18n="fTramWidth">Abstand (m)</span></label><input id="cfTramW" data-cfg="tramWidth" type="number" step="0.5" min="1">
         </div></div><div class="gcap" data-i18n="gSprayer">Gerät (Fahrgassenabstand)</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahrgassen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
       </div>
