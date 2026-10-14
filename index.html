@@ -1924,12 +1924,12 @@ function thinByAngle(R0, thr, sm) {
     if (!soon && Math.abs(turn(h0, H(i))) >= th) { idx.push(i); h0 = H(i); }      // sanfte Kurve: Punkt alle „thr“ Grad
   }
   // ab der schärfsten Ecke durchnummeriert, damit keine Gerade über den Anfang läuft
-  return { R: R.slice(s0).concat(R.slice(0, s0)), idx: idx.map(i => (i - s0 + n) % n) };
+  return { R: R.slice(s0).concat(R.slice(0, s0)), idx: idx.map(i => (i - s0 + n) % n), peak: peak.slice(s0).concat(peak.slice(0, s0)) };
 }
 // Gerade Kanten: Stücke ab minLen, die höchstens tol von einer Geraden abweichen, werden gerade.
 // Das zackige Stück zwischen zwei Kanten (Wendebereich am Ende) wird durch den Schnittpunkt ersetzt;
 // liegen die Kanten fast parallel, kommt eine Gerade durch das Endstück dazu und es gibt zwei Ecken.
-function straightEdges({ R, idx }, tol, minLen) {
+function straightEdges({ R, idx, peak }, tol, minLen) {
   const n = R.length, plain = () => idx.map(i => R[i]);
   if (!(minLen > 0) || n < 10) return plain();
   const s = [0]; for (let i = 1; i < n; i++) s.push(s[i - 1] + dist(R[i - 1], R[i]));
@@ -1965,13 +1965,17 @@ function straightEdges({ R, idx }, tol, minLen) {
   };
   runs.forEach(r => { r.line = fit(r.i0, r.i1); });
   const out = [];
+  // Zwischenpunkte der Genauigkeit bleiben auf den Kanten erhalten, nur nicht in den letzten 3 m vor einer Ecke
+  // und keine Zacken (scharfe Knicke) mitten in einer geraden Kante
+  const inner = (j0, j1, m) => idx.map(i => i <= j0 ? i + n : i).filter(j => j > j0 && j < j1 && !peak[j % n] && (j >= n ? s[j - n] + perim : s[j]) - s[j0] > m && (j1 >= n ? s[j1 - n] + perim : s[j1]) - (j >= n ? s[j - n] + perim : s[j]) > m).sort((a, b) => a - b).map(j => R[j % n]);
   runs.forEach((A, k) => {
+    if (s[A.i1] - s[A.i0] >= 2 * minLen) out.push(...inner(A.i0, A.i1, 3));   // kurze Kanten (Stirnseiten) bleiben eine reine Gerade
     const B = runs[(k + 1) % runs.length], b0 = k + 1 < runs.length ? B.i0 : B.i0 + n;
     const gapLen = (k + 1 < runs.length ? s[B.i0] : s[B.i0] + perim) - s[A.i1], near = X => X && dist(X, R[A.i1]) <= gapLen + minLen && dist(X, R[B.i0]) <= gapLen + minLen;
     // zwei Stücke derselben Kante: einfach weiter, kein Punkt
     const par = Math.abs(A.line.d.e * B.line.d.n - A.line.d.n * B.line.d.e) < Math.sin(5 * D);
     if (par && gapLen < minLen) {
-      if (off(A.line, B.line.c) < 2 * tol + 0.5) return;
+      if (off(A.line, B.line.c) < 2 * tol + 0.5) { out.push(...inner(A.i1, b0, 0)); return; }   // dieselbe Kante läuft weiter
       // Stufe zwischen zwei parallelen Stücken: Ende der einen und Anfang der anderen Geraden
       const pr = (Ln, p) => { const u = (p.e - Ln.c.e) * Ln.d.e + (p.n - Ln.c.n) * Ln.d.n; return { e: Ln.c.e + Ln.d.e * u, n: Ln.c.n + Ln.d.n * u }; };
       out.push(pr(A.line, R[A.i1]), pr(B.line, R[B.i0])); return;
