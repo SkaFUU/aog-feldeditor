@@ -134,6 +134,10 @@
   .check .mini { width:auto; margin:0 0 0 auto; padding:2px 7px; font-size:12px; }
   .gchecks .check .mini { margin-left:2px; padding:0 5px; }
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .alabel { display:inline-block; transform:translate(14px,6px); background:rgba(0,0,0,.8); color:#00e5ff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .mtab { width:100%; border-collapse:collapse; margin-top:6px; font-size:12px; font-variant-numeric:tabular-nums; }
+  .mtab th { text-align:left; color:var(--muted); font-weight:600; border-bottom:1px solid var(--line); padding:2px 4px; }
+  .mtab td { padding:2px 4px; border-bottom:1px solid #2b2f35; }
   .mlabel { display:inline-block; transform:translate(-50%,-140%); background:rgba(0,0,0,.8); color:var(--warn); font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
   .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }
@@ -385,6 +389,7 @@
     <div id="propsGrip" data-i18n-title="gripTitle"></div>
     <aside id="props">
       <div class="pp" data-tab="feld">
+        <div class="toolSlot"></div>
         <h2 data-i18n="hSave">Speichern</h2>
         <ul class="muted" data-i18n-html="saveHelp">
           <li>Vorher das Feld in AgOpenGPS <b>schließen</b>.</li>
@@ -393,6 +398,7 @@
         </ul>
       </div>
       <div class="pp" data-tab="grenze">
+        <div class="toolSlot"></div>
         <h2 data-i18n="hBoundary">Schlaggrenze</h2>
         <div id="bndList" class="muted">–</div>
         <div class="info" id="info">–</div>
@@ -423,6 +429,7 @@
         <div class="muted warn cfNoProf" style="margin-top:6px" data-i18n="noProfiles"></div>
       </div>
       <div class="pp" data-tab="fahnen">
+        <div class="toolSlot"></div>
         <h2 data-i18n="hFlags">Fahnen</h2>
         <div id="flagList" class="muted">–</div>
         <div class="muted" style="margin-top:6px" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
@@ -437,6 +444,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    measSeg: 'Strecke', measLen: 'Länge', measDir: 'Richtung', measAngleAt: 'Winkel bei {0}',
     segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
     hdLineNo: 'Daraus lässt sich keine Linie machen – andere Punkte wählen.', hdNoLines: 'Noch keine Linien. Art wählen und Linie setzen.', hdBuildOk: 'Vorgewende aus {0} Linie(n) – gelb die Vorschau.',
     hdNextSide: 'Übernehmen + nächste Seite',
@@ -553,6 +561,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    measSeg: 'Segment', measLen: 'Length', measDir: 'Direction', measAngleAt: 'Angle at {0}',
     segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
     hdLineNo: 'No line possible from this – choose other points.', hdNoLines: 'No lines yet. Choose a type and set a line.', hdBuildOk: 'Headland from {0} line(s) – yellow is the preview.',
     hdNextSide: 'Apply + next side',
@@ -1700,12 +1709,12 @@ function startTool(def) {
   if (def.hideLayer) map.removeLayer(exLayers[def.hideLayer]);   // während der Vorschau das Alte ausblenden
   drawMarkers();
   map.getContainer().classList.toggle('pick', !!def.onClick);
-  const box = $('toolbox'), slot = def.params && document.querySelector(`.pp[data-tab="${ui.tab}"] .toolSlot`);
+  const box = $('toolbox'), slot = document.querySelector(`.pp[data-tab="${ui.tab}"] .toolSlot`);
   if (slot) {                                     // Werkzeug mit Einstellungen: oben in der Seitenleiste
     slot.append(box); box.classList.add('inpanel');
     $('props').classList.remove('hide');
     $('toolTitle').textContent = t(def.title || '');
-    renderParams(typeof def.params === 'function' ? def.params() : def.params);
+    renderParams(typeof def.params === 'function' ? def.params() : def.params || []);
     map.invalidateSize();
   }
   box.style.display = 'flex';
@@ -1792,7 +1801,7 @@ function dedupeClicks(pts) {
 function startDrawBoundary(inner) {
   if (inner && !bnds[0]) { setStatus(t('needOuter'), 'err'); return; }
   startTool({
-    pts: [],
+    title: inner ? 'btnNewInner' : 'btnNewOuter', pts: [],
     msg: () => t('drawBndMsg', dedupeClicks(tool.pts).length),
     onClick: p => { tool.pts.push(p); redrawTool(); },
     onDbl: () => { tool.pts = dedupeClicks(tool.pts); finishTool(); },
@@ -3389,18 +3398,36 @@ function measureSnap(latlng) {
 function startMeasure(isArea) {
   // Länge in lokalen Metern wie AOG (gleich wie die Summe unten)
   const mdist = (a, b) => { const pl = Plane(a.lat, a.lng); return dist(pl.fwd(a.lat, a.lng), pl.fwd(b.lat, b.lng)); };
+  // Richtung einer Strecke in Grad (0–360°, im Uhrzeigersinn von Nord wie die AB-Linien in AOG) und Winkel an einem Punkt (0–180°)
+  const bearing = (a, b) => { const pl = Plane(a.lat, a.lng), A = pl.fwd(a.lat, a.lng), B = pl.fwd(b.lat, b.lng); return normH(Math.atan2(B.e - A.e, B.n - A.n)) / D; };
+  const angleAt = (a, v, b) => { const d = Math.abs(bearing(v, a) - bearing(v, b)); return d > 180 ? 360 - d : d; };
+  // Winkel an Punkt i (bei der Fläche auch an den Enden, die Fläche ist geschlossen)
+  const angles = () => {
+    const P = tool.pts, n = P.length, out = [];
+    for (let i = 0; i < n; i++) {
+      if (!isArea && (i === 0 || i === n - 1)) continue;
+      if (isArea && n < 3) continue;
+      out.push({ i, a: angleAt(P[(i - 1 + n) % n], P[i], P[(i + 1) % n]) });
+    }
+    return out;
+  };
   const result = () => {
-    const pts = tool.pts, pl = Plane(pts[0].lat, pts[0].lng), q = pts.map(p => pl.fwd(p.lat, p.lng));
+    const pts = tool.pts, pl = Plane(pts[0].lat, pts[0].lng), q = pts.map(p => pl.fwd(p.lat, p.lng)), rows = [];
     let len = 0;
-    for (let i = 1; i < q.length; i++) len += dist(q[i - 1], q[i]);
-    if (!isArea) return t('measDist', fmtNum(len, 2));
-    const a = Math.abs(fenceSignedArea(q) / 2);
-    return t('measArea', fmtNum(a / 10000, 4), fmtNum(a, 0), fmtNum(len + dist(q[q.length - 1], q[0]), 1));
+    const segs = isArea ? pts.length : pts.length - 1;
+    for (let i = 0; i < segs; i++) {
+      const j = (i + 1) % pts.length, d = dist(q[i], q[j]);
+      len += d;
+      rows.push(`<tr><td>${i + 1}–${j + 1}</td><td>${fmtNum(d, 2)} m</td><td>${fmtNum(bearing(pts[i], pts[j]), 1)}°</td></tr>`);
+    }
+    const ang = angles().map(x => `<tr><td>${t('measAngleAt', x.i + 1)}</td><td colspan="2">${fmtNum(x.a, 1)}°</td></tr>`);
+    const head = isArea ? t('measArea', fmtNum(Math.abs(fenceSignedArea(q) / 2) / 10000, 4), fmtNum(Math.abs(fenceSignedArea(q) / 2), 0), fmtNum(len, 1)) : t('measDist', fmtNum(len, 2));
+    return head + `<table class="mtab"><tr><th>${t('measSeg')}</th><th>${t('measLen')}</th><th>${t('measDir')}</th></tr>${rows.join('')}${ang.join('')}</table>`;
   };
   const label = (g, a, b, txt) => L.marker(L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), { interactive: false,
     icon: L.divIcon({ className: '', html: `<span class="mlabel">${txt}</span>`, iconSize: [0, 0] }) }).addTo(g);
   startTool({
-    pts: [], hs: [],
+    title: isArea ? 'btnMeasArea' : 'btnMeasDist', pts: [], hs: [],
     msg: () => tool.pts.length < (isArea ? 3 : 2) ? t(isArea ? 'measAreaMsg' : 'measDistMsg') : result(),
     msgHtml: true,
     onClick: p => { const s = measureSnap(p); tool.pts.push(s.ll); tool.hs.push(s.h); tool.hover = null; redrawTool(); },
@@ -3425,6 +3452,8 @@ function startMeasure(isArea) {
       else if (pts.length > 1) L.polyline(pts, style).addTo(g);
       pts.forEach(p => dot(p, '#ffd400').addTo(g));
       if (!isArea) for (let i = 1; i < pts.length; i++) label(g, pts[i - 1], pts[i], fmtNum(mdist(pts[i - 1], pts[i]), 1) + ' m');   // Teilstrecken
+      pts.forEach((p, i) => numBadge(g, p, i + 1));                     // Punktnummern wie in der Liste
+      angles().forEach(x => L.marker(pts[x.i], { interactive: false, icon: L.divIcon({ className: '', html: `<span class="alabel">${fmtNum(x.a, 1)}°</span>`, iconSize: [0, 0] }) }).addTo(g));
     }
   });
   $('btnMeasDist').classList.toggle('on', !isArea);

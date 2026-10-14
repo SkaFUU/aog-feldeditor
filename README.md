@@ -63,7 +63,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
 **Measure**
-- Distance (with the length of each segment) or area with perimeter: click points on the map. Works without an open field too.
+- Distance or area with perimeter: click points on the map. The side panel lists length and direction (0–360°) of every segment and the angles at the points; the map shows numbers and angles. Clicks snap to boundary points, flags and the boundary, and at right angles to the boundary – e.g. to measure the field width exactly. Works without an open field too.
 
 **Field list**
 - Choose the folder `Documents\AgOpenGPS` once. All fields then appear in a searchable list, and one click opens a field. Vehicles and tools are read from the same folder. The folder is remembered. (If you choose only `Fields`, you can edit fields but have no vehicle/tool profiles.)

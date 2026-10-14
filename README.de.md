@@ -63,7 +63,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
 **Messen**
-- Strecke (mit Länge jeder Teilstrecke) oder Fläche mit Umfang: Punkte auf die Karte klicken. Geht auch ohne geöffnetes Feld.
+- Strecke oder Fläche mit Umfang: Punkte auf die Karte klicken. In der Seitenleiste stehen Länge und Richtung (0–360°) jeder Teilstrecke und die Winkel an den Punkten, auf der Karte Nummern und Winkel. Klicks rasten auf Grenzpunkten, Fahnen und der Grenze ein, und rechtwinklig zur Grenze – so lässt sich z. B. die Feldbreite genau messen. Geht auch ohne geöffnetes Feld.
 
 **Felder-Liste**
 - Einmal den Ordner `Dokumente\AgOpenGPS` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Fahrzeuge und Geräte liest der Editor aus demselben Ordner. Der Ordner wird gemerkt. (Wer nur `Fields` wählt, kann die Felder bearbeiten, hat aber keine Fahrzeug-/Geräteprofile.)
