@@ -137,6 +137,7 @@
   .check .mini { width:auto; margin:0 0 0 auto; padding:2px 7px; font-size:12px; }
   .gchecks .check .mini { margin-left:2px; padding:0 5px; }
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .big.c-del .ic { color:#ff5a5a; }
   .alabel { display:inline-block; transform:translate(14px,6px); background:rgba(0,0,0,.8); color:#00e5ff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .scrollList .lbtn { width:100%; min-width:0; }
   .scrollList .ell { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
@@ -287,6 +288,7 @@
           <button class="big c-file" id="btnRoot"><svg class="ic"><use href="#i-folder"/></svg><span data-i18n="btnRoot">AgOpenGPS-Ordner wählen</span></button>
           <button class="big c-file" id="btnRegrant" style="display:none"><svg class="ic"><use href="#i-key"/></svg><span data-i18n="btnRegrant">Zugriff erlauben</span></button>
           <button class="big c-file" id="btnNewField"><svg class="ic"><use href="#i-newfield"/></svg><span data-i18n="btnNewField">Neues Feld</span></button>
+          <button class="big c-del" id="btnDelField" disabled><svg class="ic"><use href="#i-trash"/></svg><span data-i18n="btnDelField">Feld löschen</span></button>
         </div><div class="gcap" data-i18n="gFields">Felder</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-file" id="btnImport"><svg class="ic"><use href="#i-import"/></svg><span data-i18n="btnImport">Importieren</span></button>
@@ -465,6 +467,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    impTypeAll: 'Alle unterstützten Dateien', impTypeShp: 'Shapefile (.shp mit .dbf und .prj, oder ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML oder ZIP)', btnDelField: 'Feld löschen', confirmDelField: 'Das Feld „{0}“ komplett löschen?\n\nDer ganze Feldordner wird mit allen Dateien gelöscht – auch mit den Sicherungen (Backup_…). Das lässt sich nicht rückgängig machen.\n\nVorher das Feld in AgOpenGPS schließen.', fieldDeleted: 'Feld „{0}“ wurde gelöscht.',
     impNoSections: 'Die bearbeitete Fläche ({0} Teilflächen) wird nicht importiert.', impReplaceLayers: 'Fahrgassen und Vorgewende aus der Datei ersetzen die vorhandenen.',
     btnImport: 'Importieren', gImpExp: 'Import / Export', fImpTarget: 'Ziel', impNewField: 'Neues Feld', impOpenField: 'Ins offene Feld', fImpPolyAs: 'Fläche als', impAsOuter: 'Außengrenze', impAsInner: 'Innengrenze', impPoly: 'Fläche', impLine: 'Linie', impAB: 'AB-Linie', impPoint: 'Punkt', impAll: 'Alle', impNone: 'Keine', impCount: '<b>{0}</b> Flächen, <b>{1}</b> Linien, <b>{2}</b> Punkte gewählt. Auf der Karte oder in der Liste an- und abwählen.', impCrs: 'Koordinaten: {0} – umgerechnet.', impNewHint: 'Größte Fläche = Außengrenze, Löcher und Flächen darin = Innengrenzen, Linien = Spuren, Punkte = Fahnen. Aus einem Export dieses Editors kommen auch Fahrgassen, Vorgewende und Vorgewende-Linien wieder an ihren Platz.', impReplaceOuter: 'Die größte Fläche ersetzt die bestehende Außengrenze.', impSetOuter: 'Die größte Fläche wird die Außengrenze.', impMany: 'Die Liste zeigt nur die ersten 400 von {0} – auf der Karte sind alle wählbar.', impDone: 'Importiert – mit „Speichern“ übernehmen.', impSkipped: '{0} Flächen außerhalb der Außengrenze wurden ausgelassen.', impBusy: 'Datei wird gelesen …', impError: 'Import: {0}', impBadZip: 'ZIP-Datei nicht lesbar', impBadFile: '{0}-Datei nicht lesbar', impBadCrs: 'Koordinatensystem „{0}“ wird nicht unterstützt', impNoPrj: 'Das Shapefile hat keine .prj-Datei – Koordinatensystem unbekannt. Bitte die .prj mit auswählen.', impDatum: 'Unbekanntes Datum „{0}“ – die Lage kann um einige Meter abweichen.', impNothing: 'In der Datei wurde nichts Passendes gefunden.', impNoFiles: 'Keine lesbare Datei (KML, KMZ, GeoJSON, Shapefile, ISOXML).',
     btnExport: 'Exportieren', fExpFmt: 'Format', expDownload: 'Herunterladen', expBnd: 'Feldgrenze', expTramOuter: 'Randfahrgasse außen', expTramInner: 'Randfahrgasse innen', expFlag: 'Fahne {0}', expIsoOnly: 'Bei ISOXML vorerst nur Grenze und Spuren', expUnsaved: 'Exportiert wird der aktuelle Stand im Editor, auch noch nicht Gespeichertes.', expDone: '{0} heruntergeladen.', expKml: 'Eine <b>.kml</b>-Datei – z. B. für Google Earth. Jede Ebene ist ein eigener Ordner.', expGeo: 'Eine <b>.geojson</b>-Datei – z. B. für QGIS.', expShp: 'Ein <b>ZIP</b> mit einem Shapefile je Ebene (.shp, .shx, .dbf, .prj) – z. B. für QGIS, Hof-Programme und Terminals.', expIso: 'Ein <b>ZIP</b> mit TASKDATA/TASKDATA.XML (ISOXML Version 4) für Terminals. <b>Vorerst nur Grenze und Spuren</b> (AB-Linien und Kurven). Noch nicht an Terminals getestet – Rückmeldungen willkommen!',
@@ -587,6 +590,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    impTypeAll: 'All supported files', impTypeShp: 'Shapefile (.shp with .dbf and .prj, or ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML or ZIP)', btnDelField: 'Delete field', confirmDelField: 'Delete the field “{0}” completely?\n\nThe whole field folder is deleted with all files – including the backups (Backup_…). This cannot be undone.\n\nClose the field in AgOpenGPS first.', fieldDeleted: 'Field “{0}” was deleted.',
     impNoSections: 'The coverage ({0} parts) is not imported.', impReplaceLayers: 'Tramlines and headland from the file replace the existing ones.',
     btnImport: 'Import', gImpExp: 'Import / Export', fImpTarget: 'Target', impNewField: 'New field', impOpenField: 'Into open field', fImpPolyAs: 'Area as', impAsOuter: 'Outer boundary', impAsInner: 'Inner boundary', impPoly: 'Area', impLine: 'Line', impAB: 'AB line', impPoint: 'Point', impAll: 'All', impNone: 'None', impCount: '<b>{0}</b> areas, <b>{1}</b> lines, <b>{2}</b> points selected. Select on the map or in the list.', impCrs: 'Coordinates: {0} – converted.', impNewHint: 'Largest area = outer boundary, holes and areas inside = inner boundaries, lines = tracks, points = flags. From an export of this editor, tramlines, headland and headland lines go back to their place too.', impReplaceOuter: 'The largest area replaces the existing outer boundary.', impSetOuter: 'The largest area becomes the outer boundary.', impMany: 'The list only shows the first 400 of {0} – all can be selected on the map.', impDone: 'Imported – press “Save” to keep it.', impSkipped: '{0} areas outside the outer boundary were skipped.', impBusy: 'Reading file …', impError: 'Import: {0}', impBadZip: 'ZIP file not readable', impBadFile: '{0} file not readable', impBadCrs: 'Coordinate system “{0}” is not supported', impNoPrj: 'The shapefile has no .prj file – coordinate system unknown. Please select the .prj as well.', impDatum: 'Unknown datum “{0}” – the position may be off by a few metres.', impNothing: 'Nothing usable found in the file.', impNoFiles: 'No readable file (KML, KMZ, GeoJSON, shapefile, ISOXML).',
     btnExport: 'Export', fExpFmt: 'Format', expDownload: 'Download', expBnd: 'Field boundary', expTramOuter: 'Boundary tram outer', expTramInner: 'Boundary tram inner', expFlag: 'Flag {0}', expIsoOnly: 'ISOXML: only boundary and tracks for now', expUnsaved: 'The current state in the editor is exported, including unsaved changes.', expDone: '{0} downloaded.', expKml: 'One <b>.kml</b> file – e.g. for Google Earth. Each layer is its own folder.', expGeo: 'One <b>.geojson</b> file – e.g. for QGIS.', expShp: 'A <b>ZIP</b> with one shapefile per layer (.shp, .shx, .dbf, .prj) – e.g. for QGIS, farm software and terminals.', expIso: 'A <b>ZIP</b> with TASKDATA/TASKDATA.XML (ISOXML version 4) for terminals. <b>Only boundary and tracks for now</b> (AB lines and curves). Not tested on terminals yet – feedback welcome!',
@@ -1309,12 +1313,27 @@ $('btnRegrant').onclick = async () => {
 
 $('fieldFilter').oninput = renderFieldList;
 
+// Feld komplett löschen: der ganze Feldordner (mit allen Dateien und Sicherungen) – nur nach Rückfrage
+$('btnDelField').onclick = () => {
+  const name = currentField;
+  if (!rootHandle || !dirHandle || !name) return;
+  closeTool(); showTab('feld');
+  askPanel('btnDelField', t('confirmDelField', name), async () => {
+    try {
+      await rootHandle.removeEntry(name, { recursive: true });
+      try { sessionStorage.setItem('aogMsg', t('fieldDeleted', name)); } catch (e) { }
+      unsaved = false; location.reload();                     // Editor leer neu starten, die Feldliste wird neu gelesen
+    } catch (err) { setStatus(t('error', err.message), 'err'); }
+  }, 'btnDelField');
+};
+try { const m = sessionStorage.getItem('aogMsg'); if (m) { sessionStorage.removeItem('aogMsg'); setTimeout(() => setStatus(m, 'ok'), 300); } } catch (e) { }
+
 async function openField(name) {
   try {
     const d = await rootHandle.getDirectoryHandle(name);
     load(await readDir(d));
     dirHandle = d; currentField = name;
-    renderFieldList();
+    renderFieldList(); updateInfo();
     setStatus(t('fieldLoaded', name), 'ok');
   } catch (err) { setStatus(t('error', err.message), 'err'); }
 }
@@ -2631,7 +2650,21 @@ async function importFiles(list) {
   try { setStatus(t('impBusy')); const res = await readImport([...list]); startImport(res, list[0].name); setStatus(''); }
   catch (err) { setStatus(t('impError', err.message), 'err'); }
 }
-$('btnImport').onclick = () => { $('impFile').value = ''; $('impFile').click(); };
+const IMP_TYPES = () => [
+  { description: t('impTypeAll'), accept: { 'application/x-aog-import': ['.kml', '.kmz', '.geojson', '.json', '.zip', '.shp', '.shx', '.dbf', '.prj', '.cpg', '.xml'] } },
+  { description: 'KML / KMZ (Google Earth)', accept: { 'application/vnd.google-earth.kml+xml': ['.kml'], 'application/vnd.google-earth.kmz': ['.kmz'] } },
+  { description: 'GeoJSON', accept: { 'application/geo+json': ['.geojson', '.json'] } },
+  { description: t('impTypeShp'), accept: { 'application/x-shapefile': ['.shp', '.shx', '.dbf', '.prj', '.cpg', '.zip'] } },
+  { description: t('impTypeIso'), accept: { 'application/xml': ['.xml', '.zip'] } }
+];
+$('btnImport').onclick = async () => {
+  if (window.showOpenFilePicker) {
+    try { const hs = await window.showOpenFilePicker({ id: 'aogImport', multiple: true, excludeAcceptAllOption: true, types: IMP_TYPES() }); importFiles(await Promise.all(hs.map(h => h.getFile()))); }
+    catch (e) { if (e.name !== 'AbortError') setStatus(t('impError', e.message), 'err'); }
+    return;
+  }
+  $('impFile').value = ''; $('impFile').click();                // ältere Browser: einfache Dateiauswahl
+};
 $('impFile').onchange = e => importFiles(e.target.files);
 // Dateien einfach auf die Karte ziehen
 $('mapwrap').addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
@@ -4449,6 +4482,7 @@ function updateInfo() {
   document.getElementById('btnBndCurve').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
   document.getElementById('btnExport').disabled = !plane;
+  document.getElementById('btnDelField').disabled = !(rootHandle && dirHandle && currentField);
   document.getElementById('btnBndCov').disabled = !(plane && ex.sections && ex.sections.patches.length);
   document.getElementById('btnBndCov').title = plane && !(ex.sections && ex.sections.patches.length) ? t('needCoverage') : '';
   document.getElementById('btnSimp').disabled = !bnds[active];
