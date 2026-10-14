@@ -138,7 +138,9 @@
   .gchecks .check .mini { margin-left:2px; padding:0 5px; }
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .alabel { display:inline-block; transform:translate(14px,6px); background:rgba(0,0,0,.8); color:#00e5ff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
-  .scrollList { max-height:260px; overflow-y:auto; border:1px solid var(--line); border-radius:5px; padding:2px; margin:4px 0; }
+  .scrollList .lbtn { width:100%; min-width:0; }
+  .scrollList .ell { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+  .scrollList { max-height:260px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--line); border-radius:5px; padding:2px; margin:4px 0; }
   .mtab { width:100%; border-collapse:collapse; margin-top:6px; font-size:12px; font-variant-numeric:tabular-nums; }
   .mtab th { text-align:left; color:var(--muted); font-weight:600; border-bottom:1px solid var(--line); padding:2px 4px; }
   .mtab td { padding:2px 4px; border-bottom:1px solid #2b2f35; }
@@ -2386,8 +2388,10 @@ function impShp(shp, dbf, prj, cpg) {
     const dd = new DataView(dbf.buffer, dbf.byteOffset, dbf.byteLength), n = dd.getUint32(4, true), hl = dd.getUint16(8, true), rl = dd.getUint16(10, true), F = [];
     for (let o = 32, off = 1; o < hl - 1 && dbf[o] !== 0x0d; o += 32) { const nm = impDec(dbf.subarray(o, o + 11)).replace(/\0.*$/, ''); F.push({ nm, type: String.fromCharCode(dbf[o + 11]), len: dbf[o + 16], off }); off += dbf[o + 16]; }
     const fld = F.find(x => x.type === 'C' && /name|bez|title|label/i.test(x.nm)) || F.find(x => x.type === 'C') || F[0];
-    const enc = cpg && /utf-?8/i.test(cpg) ? 'utf-8' : dbf[29] === 0 && cpg === undefined ? 'utf-8' : 'windows-1252';
-    if (fld) for (let i = 0; i < n; i++) { const o = hl + rl * i + fld.off; names.push(impDec(dbf.subarray(o, o + fld.len), enc).trim()); }
+    // Zeichensatz: laut .cpg; ohne .cpg UTF-8 versuchen, sonst Windows (z. B. eAMA-Export)
+    let enc = cpg && /utf-?8/i.test(cpg) ? 'utf-8' : cpg && /1252|8859|latin/i.test(cpg) ? 'windows-1252' : '';
+    if (!enc) try { new TextDecoder('utf-8', { fatal: true }).decode(dbf.subarray(hl)); enc = 'utf-8'; } catch (e) { enc = 'windows-1252'; }
+    if (fld) for (let i = 0; i < n; i++) { const o = hl + rl * i + fld.off; names.push(impDec(dbf.subarray(o, o + fld.len), enc).replace(/\s+/g, ' ').trim()); }
   }
   const out = [], area2 = r => { let s = 0; for (let i = 0; i < r.length - 1; i++) s += r[i][0] * r[i + 1][1] - r[i + 1][0] * r[i][1]; return s; };
   const inside = (q, r) => { let c2 = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) if ((r[i][1] > q[1]) !== (r[j][1] > q[1]) && q[0] < (r[j][0] - r[i][0]) * (q[1] - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) c2 = !c2; return c2; };
@@ -2461,14 +2465,17 @@ function startImport(res, fname) {
   const haOf = it => { const r = it.rings[0].map(v => pl0.fwd(v[0], v[1])); return area(r) / 10000; };
   its.forEach(it => { it.on = its.length <= 20 && !it.off; if (it.kind === 'poly') it.ha = haOf(it); });
   if (!plane) cfg.impTarget = 0;
-  let fieldName = (fname || '').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '').trim();
+  let nameTouched = false, fieldName = (fname || '').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '').trim();
   const KL = { poly: 'impPoly', line: 'impLine', point: 'impPoint' };
   const chosen = k => its.filter(it => it.on && (!k || it.kind === k));
   const list = () => {
     const box = $('toolList'); box.innerHTML = '';
     if (cfg.impTarget === 0) {
+      // Name: solange nichts eingetippt wurde, der Name der größten gewählten Fläche (z. B. aus eAMA)
+      const big = chosen('poly').sort((x, y) => y.ha - x.ha)[0];
+      if (!nameTouched && big && big.name && !/^\d+$/.test(big.name)) fieldName = big.name.replace(/[\\/:*?"<>|]/g, '').trim();
       const inp = document.createElement('input'); inp.placeholder = t('newFieldName'); inp.value = fieldName;
-      inp.oninput = () => { fieldName = inp.value; updateToolbox(); };
+      inp.oninput = () => { fieldName = inp.value; nameTouched = true; updateToolbox(); };
       box.append(inp);
     }
     const sc = document.createElement('div'); sc.className = 'scrollList'; box.append(sc);   // lange Listen scrollen, Hinweis und Knöpfe bleiben sichtbar
@@ -2476,7 +2483,9 @@ function startImport(res, fname) {
       const b = document.createElement('button');
       b.className = 'lbtn' + (it.on ? ' on' : ''); b.type = 'button';
       b.innerHTML = `<svg class="ic"><use href="#i-${it.on ? 'chk' : 'chkoff'}"/></svg>`;
-      b.append(t(it.ab ? 'impAB' : KL[it.kind]) + (it.name ? ' · ' + it.name : '') + (it.kind === 'poly' ? ` (${fmtNum(it.ha, 2)} ha)` : ''));
+      const tx = document.createElement('span'); tx.className = 'ell';
+      tx.textContent = t(it.ab ? 'impAB' : KL[it.kind]) + (it.name ? ' · ' + it.name : '') + (it.kind === 'poly' ? ` (${fmtNum(it.ha, 2)} ha)` : '');
+      b.append(tx); b.title = tx.textContent;
       b.onclick = () => { const y = sc.scrollTop; it.on = !it.on; redrawTool(); const s2 = document.querySelector('#toolList .scrollList'); if (s2) s2.scrollTop = y; };
       sc.append(b);
     });
