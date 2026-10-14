@@ -32,7 +32,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 
 **Vorgewende** (gerechnet wie „Headland“ in AgOpenGPS 6.8)
 - **Rundum bauen** oder **Teilstück** drücken, die Einstellungen erscheinen in der Seitenleiste: Abstand in Metern oder als Anzahl Arbeitsbreiten des oben gewählten Geräts (Breite minus Überlappung), Ecken runden mit Radius (0 = genau wie AgOpenGPS).
-- **Aus Linien bauen** (wie der Headland Builder): Linien setzen – Kurve oder Gerade zwischen zwei Grenzpunkten –, jede mit eigenem Abstand in Metern oder Arbeitsbreiten. Das Vorgewende entsteht aus den Schnittpunkten der verschobenen Linien; wo keine Linie ist, bleibt die Grenze. So geht jede Seite mit eigenem Abstand oder z. B. nur die Stirnseiten.
+- **Aus Linien bauen** (wie der Headland Builder): Linien setzen – Kurve oder Gerade zwischen zwei Grenzpunkten, eine vorhandene Spur, oder mit „Seiten erkennen“ jede Seite automatisch –, jede mit eigenem Abstand in Metern oder Arbeitsbreiten. Das Vorgewende entsteht aus den Schnittpunkten der verschobenen Linien; wo keine Linie ist, bleibt die Grenze. So geht jede Seite mit eigenem Abstand oder z. B. nur die Stirnseiten.
 - Eine gelbe Vorschau zeigt das Ergebnis, jede Änderung ist sofort zu sehen.
 
 **Fahrgassen**
