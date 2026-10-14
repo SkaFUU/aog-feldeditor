@@ -3169,6 +3169,7 @@ document.getElementById('btnSimp').onclick = () => {
   setStatus(t('reduced', before, res.length), 'ok');
 };
 document.getElementById('btnAddFlag').onclick = () => setMode('flag');
+document.getElementById('btnFit').onclick = fitField;          // wie beim Öffnen des Feldes
 document.getElementById('btnOriginClick').onclick = () => setMode('origin');
 document.getElementById('btnOriginCenter').onclick = () => {
   const c = centroid(bnds[0].pts), [la, lo] = plane.inv(c.e, c.n);
