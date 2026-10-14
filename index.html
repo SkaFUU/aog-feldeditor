@@ -3005,7 +3005,14 @@ function startHdSlice() {
         if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff9500', fillOpacity: 1, interactive: false }).addTo(g));
         tool.picks.forEach(i => dot(ll(F[i]), '#ffd400').addTo(g));
       }
-      if (cfg.hdKind === 'track') tracks.forEach(x => x.show.forEach(P => L.polyline(P.map(ll), { renderer: cv, color: x.i === cfg.hdTrack ? '#ffffff' : '#ff4fd8', weight: x.i === cfg.hdTrack ? 4 : 2.5, interactive: false }).addTo(g)));   // alle Spuren zur Auswahl, die gewählte weiß
+      if (cfg.hdKind === 'track') tracks.forEach(x => x.show.forEach(P => {
+        // alle Spuren zur Auswahl (die gewählte weiß), anklickbar: Hand-Cursor, beim Darüberfahren hell
+        L.polyline(P.map(ll), { renderer: cv, color: x.i === cfg.hdTrack ? '#ffffff' : '#ff4fd8', weight: x.i === cfg.hdTrack ? 4 : 2.5, interactive: false }).addTo(g);
+        const hit = L.polyline(P.map(ll), { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
+        hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
+        hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
+        hit.on('click', () => { cfg.hdTrack = x.i; saveCfg(); renderCfg(); tool.recalc(); });
+      }));
       else if (tool.src) L.polyline(tool.src.P.map(ll), { renderer: cv, color: '#ffffff', weight: 4, interactive: false }).addTo(g);
       if (tool.res) offFence(tool.res.hd, true).forEach(run => prevLine(g, run, '#ffd400', false));   // auf der Grenze nichts zeichnen
     },
