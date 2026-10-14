@@ -69,6 +69,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Everything in the file is shown as a preview. Click on the map or in the list what to take over.
 - **New field**: enter a name – the largest area becomes the outer boundary, holes and areas inside become inner boundaries, lines become tracks (AB line or curve), points become flags.
 - **Into open field**: areas as outer boundary (replaces the existing one) or as inner boundaries, plus tracks and flags.
+- Files exported from this editor (KML, GeoJSON, shapefile) are recognised: tramlines including the boundary tram, headland and headland lines go back to their place. Coverage is not imported.
 
 **Export** (in the Field tab)
 - Pick a format and tick what to include: field boundary, tracks, headland, headland lines, tramlines, flags, coverage. The current state in the editor is exported.

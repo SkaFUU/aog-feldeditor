@@ -465,7 +465,8 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    btnImport: 'Importieren', gImpExp: 'Import / Export', fImpTarget: 'Ziel', impNewField: 'Neues Feld', impOpenField: 'Ins offene Feld', fImpPolyAs: 'Fläche als', impAsOuter: 'Außengrenze', impAsInner: 'Innengrenze', impPoly: 'Fläche', impLine: 'Linie', impAB: 'AB-Linie', impPoint: 'Punkt', impAll: 'Alle', impNone: 'Keine', impCount: '<b>{0}</b> Flächen, <b>{1}</b> Linien, <b>{2}</b> Punkte gewählt. Auf der Karte oder in der Liste an- und abwählen.', impCrs: 'Koordinaten: {0} – umgerechnet.', impNewHint: 'Größte Fläche = Außengrenze, Löcher und Flächen darin = Innengrenzen, Linien = Spuren, Punkte = Fahnen.', impReplaceOuter: 'Die größte Fläche ersetzt die bestehende Außengrenze.', impSetOuter: 'Die größte Fläche wird die Außengrenze.', impMany: 'Die Liste zeigt nur die ersten 400 von {0} – auf der Karte sind alle wählbar.', impDone: 'Importiert – mit „Speichern“ übernehmen.', impSkipped: '{0} Flächen außerhalb der Außengrenze wurden ausgelassen.', impBusy: 'Datei wird gelesen …', impError: 'Import: {0}', impBadZip: 'ZIP-Datei nicht lesbar', impBadFile: '{0}-Datei nicht lesbar', impBadCrs: 'Koordinatensystem „{0}“ wird nicht unterstützt', impNoPrj: 'Das Shapefile hat keine .prj-Datei – Koordinatensystem unbekannt. Bitte die .prj mit auswählen.', impDatum: 'Unbekanntes Datum „{0}“ – die Lage kann um einige Meter abweichen.', impNothing: 'In der Datei wurde nichts Passendes gefunden.', impNoFiles: 'Keine lesbare Datei (KML, KMZ, GeoJSON, Shapefile, ISOXML).',
+    impNoSections: 'Die bearbeitete Fläche ({0} Teilflächen) wird nicht importiert.', impReplaceLayers: 'Fahrgassen und Vorgewende aus der Datei ersetzen die vorhandenen.',
+    btnImport: 'Importieren', gImpExp: 'Import / Export', fImpTarget: 'Ziel', impNewField: 'Neues Feld', impOpenField: 'Ins offene Feld', fImpPolyAs: 'Fläche als', impAsOuter: 'Außengrenze', impAsInner: 'Innengrenze', impPoly: 'Fläche', impLine: 'Linie', impAB: 'AB-Linie', impPoint: 'Punkt', impAll: 'Alle', impNone: 'Keine', impCount: '<b>{0}</b> Flächen, <b>{1}</b> Linien, <b>{2}</b> Punkte gewählt. Auf der Karte oder in der Liste an- und abwählen.', impCrs: 'Koordinaten: {0} – umgerechnet.', impNewHint: 'Größte Fläche = Außengrenze, Löcher und Flächen darin = Innengrenzen, Linien = Spuren, Punkte = Fahnen. Aus einem Export dieses Editors kommen auch Fahrgassen, Vorgewende und Vorgewende-Linien wieder an ihren Platz.', impReplaceOuter: 'Die größte Fläche ersetzt die bestehende Außengrenze.', impSetOuter: 'Die größte Fläche wird die Außengrenze.', impMany: 'Die Liste zeigt nur die ersten 400 von {0} – auf der Karte sind alle wählbar.', impDone: 'Importiert – mit „Speichern“ übernehmen.', impSkipped: '{0} Flächen außerhalb der Außengrenze wurden ausgelassen.', impBusy: 'Datei wird gelesen …', impError: 'Import: {0}', impBadZip: 'ZIP-Datei nicht lesbar', impBadFile: '{0}-Datei nicht lesbar', impBadCrs: 'Koordinatensystem „{0}“ wird nicht unterstützt', impNoPrj: 'Das Shapefile hat keine .prj-Datei – Koordinatensystem unbekannt. Bitte die .prj mit auswählen.', impDatum: 'Unbekanntes Datum „{0}“ – die Lage kann um einige Meter abweichen.', impNothing: 'In der Datei wurde nichts Passendes gefunden.', impNoFiles: 'Keine lesbare Datei (KML, KMZ, GeoJSON, Shapefile, ISOXML).',
     btnExport: 'Exportieren', fExpFmt: 'Format', expDownload: 'Herunterladen', expBnd: 'Feldgrenze', expTramOuter: 'Randfahrgasse außen', expTramInner: 'Randfahrgasse innen', expFlag: 'Fahne {0}', expIsoOnly: 'Bei ISOXML vorerst nur Grenze und Spuren', expUnsaved: 'Exportiert wird der aktuelle Stand im Editor, auch noch nicht Gespeichertes.', expDone: '{0} heruntergeladen.', expKml: 'Eine <b>.kml</b>-Datei – z. B. für Google Earth. Jede Ebene ist ein eigener Ordner.', expGeo: 'Eine <b>.geojson</b>-Datei – z. B. für QGIS.', expShp: 'Ein <b>ZIP</b> mit einem Shapefile je Ebene (.shp, .shx, .dbf, .prj) – z. B. für QGIS, Hof-Programme und Terminals.', expIso: 'Ein <b>ZIP</b> mit TASKDATA/TASKDATA.XML (ISOXML Version 4) für Terminals. <b>Vorerst nur Grenze und Spuren</b> (AB-Linien und Kurven). Noch nicht an Terminals getestet – Rückmeldungen willkommen!',
     fCovEdge: 'Gerade Kanten ab (m)', covEdgeHint: 'Gerade Stücke ab dieser Länge werden zu geraden Kanten, die zackigen Wendebereiche dazwischen zu einer scharfen Ecke. 0 = aus.', btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
     confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
@@ -586,7 +587,8 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    btnImport: 'Import', gImpExp: 'Import / Export', fImpTarget: 'Target', impNewField: 'New field', impOpenField: 'Into open field', fImpPolyAs: 'Area as', impAsOuter: 'Outer boundary', impAsInner: 'Inner boundary', impPoly: 'Area', impLine: 'Line', impAB: 'AB line', impPoint: 'Point', impAll: 'All', impNone: 'None', impCount: '<b>{0}</b> areas, <b>{1}</b> lines, <b>{2}</b> points selected. Select on the map or in the list.', impCrs: 'Coordinates: {0} – converted.', impNewHint: 'Largest area = outer boundary, holes and areas inside = inner boundaries, lines = tracks, points = flags.', impReplaceOuter: 'The largest area replaces the existing outer boundary.', impSetOuter: 'The largest area becomes the outer boundary.', impMany: 'The list only shows the first 400 of {0} – all can be selected on the map.', impDone: 'Imported – press “Save” to keep it.', impSkipped: '{0} areas outside the outer boundary were skipped.', impBusy: 'Reading file …', impError: 'Import: {0}', impBadZip: 'ZIP file not readable', impBadFile: '{0} file not readable', impBadCrs: 'Coordinate system “{0}” is not supported', impNoPrj: 'The shapefile has no .prj file – coordinate system unknown. Please select the .prj as well.', impDatum: 'Unknown datum “{0}” – the position may be off by a few metres.', impNothing: 'Nothing usable found in the file.', impNoFiles: 'No readable file (KML, KMZ, GeoJSON, shapefile, ISOXML).',
+    impNoSections: 'The coverage ({0} parts) is not imported.', impReplaceLayers: 'Tramlines and headland from the file replace the existing ones.',
+    btnImport: 'Import', gImpExp: 'Import / Export', fImpTarget: 'Target', impNewField: 'New field', impOpenField: 'Into open field', fImpPolyAs: 'Area as', impAsOuter: 'Outer boundary', impAsInner: 'Inner boundary', impPoly: 'Area', impLine: 'Line', impAB: 'AB line', impPoint: 'Point', impAll: 'All', impNone: 'None', impCount: '<b>{0}</b> areas, <b>{1}</b> lines, <b>{2}</b> points selected. Select on the map or in the list.', impCrs: 'Coordinates: {0} – converted.', impNewHint: 'Largest area = outer boundary, holes and areas inside = inner boundaries, lines = tracks, points = flags. From an export of this editor, tramlines, headland and headland lines go back to their place too.', impReplaceOuter: 'The largest area replaces the existing outer boundary.', impSetOuter: 'The largest area becomes the outer boundary.', impMany: 'The list only shows the first 400 of {0} – all can be selected on the map.', impDone: 'Imported – press “Save” to keep it.', impSkipped: '{0} areas outside the outer boundary were skipped.', impBusy: 'Reading file …', impError: 'Import: {0}', impBadZip: 'ZIP file not readable', impBadFile: '{0} file not readable', impBadCrs: 'Coordinate system “{0}” is not supported', impNoPrj: 'The shapefile has no .prj file – coordinate system unknown. Please select the .prj as well.', impDatum: 'Unknown datum “{0}” – the position may be off by a few metres.', impNothing: 'Nothing usable found in the file.', impNoFiles: 'No readable file (KML, KMZ, GeoJSON, shapefile, ISOXML).',
     btnExport: 'Export', fExpFmt: 'Format', expDownload: 'Download', expBnd: 'Field boundary', expTramOuter: 'Boundary tram outer', expTramInner: 'Boundary tram inner', expFlag: 'Flag {0}', expIsoOnly: 'ISOXML: only boundary and tracks for now', expUnsaved: 'The current state in the editor is exported, including unsaved changes.', expDone: '{0} downloaded.', expKml: 'One <b>.kml</b> file – e.g. for Google Earth. Each layer is its own folder.', expGeo: 'One <b>.geojson</b> file – e.g. for QGIS.', expShp: 'A <b>ZIP</b> with one shapefile per layer (.shp, .shx, .dbf, .prj) – e.g. for QGIS, farm software and terminals.', expIso: 'A <b>ZIP</b> with TASKDATA/TASKDATA.XML (ISOXML version 4) for terminals. <b>Only boundary and tracks for now</b> (AB lines and curves). Not tested on terminals yet – feedback welcome!',
     fCovEdge: 'Straight edges from (m)', covEdgeHint: 'Straight pieces of at least this length become straight edges, the ragged turning areas between them a sharp corner. 0 = off.', btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
     confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
@@ -2330,13 +2332,14 @@ function impKML(txt) {
   const kids = (el, tag) => [...el.getElementsByTagNameNS('*', tag)];
   kids(doc, 'Placemark').forEach(pm => {
     const nm = (pm.getElementsByTagNameNS('*', 'name')[0] || {}).textContent || '';
+    const su = ((pm.getElementsByTagNameNS('*', 'styleUrl')[0] || {}).textContent || '').replace(/^.*#/, ''), role = EXP_LAYERS.includes(su) ? su : '';
     kids(pm, 'Polygon').forEach(pg => {
       const ob = kids(pg, 'outerBoundaryIs')[0], rings = [co(ob && kids(ob, 'coordinates')[0])];
       kids(pg, 'innerBoundaryIs').forEach(ib => rings.push(co(kids(ib, 'coordinates')[0])));
-      out.push({ kind: 'poly', name: nm, rings });
+      out.push({ kind: 'poly', name: nm, rings, role });
     });
-    kids(pm, 'LineString').forEach(ls => out.push({ kind: 'line', name: nm, pts: co(kids(ls, 'coordinates')[0]) }));
-    kids(pm, 'Point').forEach(pt => { const c = co(kids(pt, 'coordinates')[0])[0]; if (c) out.push({ kind: 'point', name: nm, pt: c }); });
+    kids(pm, 'LineString').forEach(ls => out.push({ kind: 'line', name: nm, pts: co(kids(ls, 'coordinates')[0]), role }));
+    kids(pm, 'Point').forEach(pt => { const c = co(kids(pt, 'coordinates')[0])[0]; if (c) out.push({ kind: 'point', name: nm, pt: c, role }); });
   });
   return { items: out };
 }
@@ -2347,9 +2350,10 @@ function impGeoJSON(txt) {
   if (code && +code[1] !== 4326 && !c) throw new Error(t('impBadCrs', 'EPSG:' + code[1]));
   const T = c ? crsFn(Object.assign({}, c)) : v => [v[1], v[0]], conv = r => r.map(v => T(v));
   const nameOf = p => { if (!p) return ''; for (const k of Object.keys(p)) if (/^(name|bez|title|label)/i.test(k) && p[k] != null) return String(p[k]); return ''; };
+  let role = '';
   const geom = (gm, nm) => {
     if (!gm) return;
-    const C = gm.coordinates;
+    const C = gm.coordinates, n0 = out.length;
     if (gm.type === 'Polygon') out.push({ kind: 'poly', name: nm, rings: C.map(conv) });
     else if (gm.type === 'MultiPolygon') C.forEach(p => out.push({ kind: 'poly', name: nm, rings: p.map(conv) }));
     else if (gm.type === 'LineString') out.push({ kind: 'line', name: nm, pts: conv(C) });
@@ -2357,8 +2361,12 @@ function impGeoJSON(txt) {
     else if (gm.type === 'Point') out.push({ kind: 'point', name: nm, pt: T(C) });
     else if (gm.type === 'MultiPoint') C.forEach(p => out.push({ kind: 'point', name: nm, pt: T(p) }));
     else if (gm.type === 'GeometryCollection') gm.geometries.forEach(x => geom(x, nm));
+    out.slice(n0).forEach(it => { if (!it.role) it.role = role; });
   };
-  (g.type === 'FeatureCollection' ? g.features : g.type === 'Feature' ? [g] : [{ geometry: g }]).forEach(ft => geom(ft.geometry, nameOf(ft.properties)));
+  (g.type === 'FeatureCollection' ? g.features : g.type === 'Feature' ? [g] : [{ geometry: g }]).forEach(ft => {
+    const ly = ft.properties && ft.properties.layer; role = EXP_LAYERS.includes(ly) ? ly : '';
+    geom(ft.geometry, nameOf(ft.properties));
+  });
   return { items: out, crs: c ? c.name : '' };
 }
 function impShp(shp, dbf, prj, cpg) {
@@ -2416,7 +2424,7 @@ function impISO(txt, more) {
     const fn2 = pf.getAttribute('C') || '';
     [...pf.getElementsByTagName('PLN')].forEach(pl => {
       const ty = +pl.getAttribute('A'), L2 = [...pl.getElementsByTagName('LSG')], o = L2.filter(l => l.getAttribute('A') === '1'), h = L2.filter(l => l.getAttribute('A') === '2');
-      o.forEach(l => out.push({ kind: 'poly', name: pl.getAttribute('B') || fn2, rings: [pts(l)].concat(h.map(pts)).map(r => r.map(v => [v[0], v[1]])), off: ty !== 1 }));
+      o.forEach(l => out.push({ kind: 'poly', name: pl.getAttribute('B') || fn2, rings: [pts(l)].concat(h.map(pts)).map(r => r.map(v => [v[0], v[1]])), off: ty !== 1, role: ty === 1 ? 'bnd' : ty === 10 ? 'headland' : '' }));
     });
     [...pf.getElementsByTagName('GPN')].forEach(gp => {
       const ty = +gp.getAttribute('C'), nm = gp.getAttribute('B') || '', L2 = [...gp.getElementsByTagName('LSG')][0], Q = L2 ? pts(L2) : [];
@@ -2444,12 +2452,17 @@ async function readImport(fileList) {
   find(/\.shp$/i).forEach(k => {
     const bs = base(k), get = ext => { const m = keys.find(x => x.toLowerCase() === (bs + ext).toLowerCase()); return m ? F[m] : null; };
     const prj = get('.prj'), cpg = get('.cpg');
-    add(impShp(F[k], get('.dbf'), prj ? impDec(prj) : '', cpg ? impDec(cpg) : undefined));
+    const r = impShp(F[k], get('.dbf'), prj ? impDec(prj) : '', cpg ? impDec(cpg) : undefined), m = bs.match(/_(\w+)$/);
+    if (m && EXP_LAYERS.includes(m[1])) r.items.forEach(it => { it.role = m[1]; });
+    add(r);
   });
   find(/(^|\/)TASKDATA\.XML$/i).forEach(k => {
     const dir = k.replace(/[^\/]*$/, '');
     add(impISO(impDec(F[k]), nm => { const m = keys.find(x => x.toLowerCase() === (dir + nm + '.xml').toLowerCase()); return m ? impDec(F[m]) : null; }));
   });
+  // die bearbeitete Fläche wird nicht importiert (die schreibt AOG beim Fahren)
+  const nSec = res.items.filter(it => it.role === 'sections').length;
+  if (nSec) { res.items = res.items.filter(it => it.role !== 'sections'); res.warn.push(t('impNoSections', nSec)); }
   // Ringe säubern: geschlossen-doppelten Endpunkt weg, mindestens 3 Punkte
   res.items = res.items.map(it => {
     if (it.kind !== 'poly') return it;
@@ -2467,12 +2480,12 @@ function startImport(res, fname) {
   if (!plane) cfg.impTarget = 0;
   let nameTouched = false, fieldName = (fname || '').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '').trim();
   const KL = { poly: 'impPoly', line: 'impLine', point: 'impPoint' };
-  const chosen = k => its.filter(it => it.on && (!k || it.kind === k));
+  const chosen = k => its.filter(it => it.on && (!k || (k === 'bnd' ? isBndItem(it) : it.kind === k)));
   const list = () => {
     const box = $('toolList'); box.innerHTML = '';
     if (cfg.impTarget === 0) {
       // Name: solange nichts eingetippt wurde, der Name der größten gewählten Fläche (z. B. aus eAMA)
-      const big = chosen('poly').sort((x, y) => y.ha - x.ha)[0];
+      const big = chosen('bnd').sort((x, y) => y.ha - x.ha)[0];
       if (!nameTouched && big && big.name && !/^\d+$/.test(big.name)) fieldName = big.name.replace(/[\\/:*?"<>|]/g, '').trim();
       const inp = document.createElement('input'); inp.placeholder = t('newFieldName'); inp.value = fieldName;
       inp.oninput = () => { fieldName = inp.value; nameTouched = true; updateToolbox(); };
@@ -2484,7 +2497,7 @@ function startImport(res, fname) {
       b.className = 'lbtn' + (it.on ? ' on' : ''); b.type = 'button';
       b.innerHTML = `<svg class="ic"><use href="#i-${it.on ? 'chk' : 'chkoff'}"/></svg>`;
       const tx = document.createElement('span'); tx.className = 'ell';
-      tx.textContent = t(it.ab ? 'impAB' : KL[it.kind]) + (it.name ? ' · ' + it.name : '') + (it.kind === 'poly' ? ` (${fmtNum(it.ha, 2)} ha)` : '');
+      tx.textContent = (it.role ? expLabel(it.role) : t(it.ab ? 'impAB' : KL[it.kind])) + (it.name && it.name !== expLabel(it.role) ? ' · ' + it.name : '') + (it.kind === 'poly' ? ` (${fmtNum(it.ha, 2)} ha)` : '');
       b.append(tx); b.title = tx.textContent;
       b.onclick = () => { const y = sc.scrollTop; it.on = !it.on; redrawTool(); const s2 = document.querySelector('#toolList .scrollList'); if (s2) s2.scrollTop = y; };
       sc.append(b);
@@ -2501,7 +2514,8 @@ function startImport(res, fname) {
       if (res.crs.length) h.push(esc(t('impCrs', [...new Set(res.crs)].join(', '))));
       res.warn.forEach(w => h.push('<span class="warn">' + esc(w) + '</span>'));
       if (cfg.impTarget === 0) h.push(esc(t('impNewHint')));
-      else if (cfg.impPolyAs === 0 && np) h.push(esc(t(bnds[0] ? 'impReplaceOuter' : 'impSetOuter')));
+      else if (cfg.impPolyAs === 0 && chosen('bnd').length) h.push(esc(t(bnds[0] ? 'impReplaceOuter' : 'impSetOuter')));
+      if (cfg.impTarget === 1 && chosen().some(it => it.role === 'tram' || it.role === 'headland')) h.push(esc(t('impReplaceLayers')));
       if (its.length > 400) h.push(esc(t('impMany', its.length)));
       return h.join('<br>');
     },
@@ -2514,13 +2528,14 @@ function startImport(res, fname) {
       });
     },
     recalc() { redrawTool(); },
-    okEnabled: () => chosen().length > 0 && (cfg.impTarget === 1 || (chosen('poly').length > 0 && !!fieldName.trim())),
+    okEnabled: () => chosen().length > 0 && (cfg.impTarget === 1 || (chosen('bnd').length > 0 && !!fieldName.trim())),
     ok() { cfg.impTarget === 0 ? importNewField(chosen(), fieldName) : importInto(chosen()); }
   });
 }
 // Größte Fläche = Außengrenze, ihre Löcher und Flächen darin = Innengrenzen
+const isBndItem = it => it.kind === 'poly' && (!it.role || it.role === 'bnd');
 function importBoundaries(items, asInner) {
-  const P = items.filter(it => it.kind === 'poly').sort((x, y) => y.ha - x.ha), toB = r => ({ flagLines: ['False'], pts: r.map(v => plane.fwd(v[0], v[1])), orig: [], dirty: true });
+  const P = items.filter(isBndItem).sort((x, y) => y.ha - x.ha), toB = r => ({ flagLines: ['False'], pts: r.map(v => plane.fwd(v[0], v[1])), orig: [], dirty: true });
   let skipped = 0;
   if (!P.length) return 0;
   if (asInner) { P.forEach(it => it.rings.forEach(r => bnds.push(toB(r)))); }
@@ -2534,7 +2549,27 @@ function importBoundaries(items, asInner) {
   return skipped;
 }
 function importRest(sel) {
-  const lines = sel.filter(it => it.kind === 'line'), pts = sel.filter(it => it.kind === 'point');
+  const lines = sel.filter(it => it.kind === 'line' && (!it.role || it.role === 'tracks')), pts = sel.filter(it => it.kind === 'point');
+  // Vorgewende: größte Fläche, gleiche Umlaufrichtung wie die Grenze, Richtung je Punkt aus den Nachbarn
+  const hd = sel.filter(it => it.kind === 'poly' && it.role === 'headland').sort((x, y) => y.ha - x.ha)[0];
+  if (hd && bnds[0]) {
+    let Q = hd.rings[0].map(v => plane.fwd(v[0], v[1]));
+    if (Math.sign(fenceSignedArea(Q)) !== Math.sign(fenceSignedArea(bnds[0].pts))) Q = Q.reverse();
+    const n = Q.length;
+    setHeadland(Q.map((p, i) => { const a = Q[(i - 1 + n) % n], c = Q[(i + 1) % n]; return { e: p.e, n: p.n, h: normH(Math.atan2(c.e - a.e, c.n - a.n)) }; }));
+  }
+  // Vorgewende-Linien
+  sel.filter(it => it.kind === 'line' && it.role === 'headlines').forEach(it => { ex.headlines.push({ name: it.name || t('L_headlines'), pts: it.pts.map(v => [v[0], v[1]]), show: it.pts.length > 3, isNew: true }); listDirty.headlines = true; unsaved = true; });
+  // Fahrgassen: geschlossene Linien = Randfahrgasse (größte außen, nächste innen), offene = Fahrgassen
+  const tl = sel.filter(it => it.kind === 'line' && it.role === 'tram');
+  if (tl.length) {
+    const closed = [], open = [];
+    tl.forEach(it => { const a = plane.fwd(...it.pts[0]), b = plane.fwd(...it.pts[it.pts.length - 1]); (it.pts.length > 3 && dSq(a, b) < 4 ? closed : open).push(it.pts.map(v => [v[0], v[1]])); });
+    const ar = r => area(r.map(v => plane.fwd(v[0], v[1])));
+    closed.sort((x, y) => ar(y) - ar(x));
+    const ring = r => r ? r.slice(0, -1) : [];
+    setTramData({ outer: ring(closed[0]), inner: ring(closed[1]), lines: open.concat(closed.slice(2)) });
+  }
   if (lines.length && tracksEditable()) lines.forEach(it => {
     const Q = it.pts.map(v => plane.fwd(v[0], v[1]));
     if (it.ab || Q.length === 2) {
@@ -2555,7 +2590,7 @@ function importInto(sel) {
 function importNewField(sel, name) {
   if (window.showDirectoryPicker && !rootHandle) { setStatus(t('needRoot'), 'err'); return; }
   const go = () => {
-    const o = sel.filter(it => it.kind === 'poly').sort((x, y) => y.ha - x.ha)[0];
+    const o = sel.filter(isBndItem).sort((x, y) => y.ha - x.ha)[0];
     map.fitBounds(L.latLngBounds(o.rings[0]), { animate: false });   // vorläufiger Ursprung = Feldmitte
     createField(name, () => { const sk = importBoundaries(sel, false); importRest(sel); importDone(sk); fitField(); });
   };
@@ -2782,13 +2817,18 @@ function trackBlock(e) {
   return [e.name, String(isFinite(e.heading) ? e.heading : H[0]), r3(P[0].e) + ',' + r3(P[0].n), r3(P[n - 1].e) + ',' + r3(P[n - 1].n), e.nudge || '0', String(e.mode), e.visible || 'True', String(n),
     ...P.map((p, i) => r3(p.e) + ',' + r3(p.n) + ',' + fmtH(H[i]))];
 }
+function headlineBlock(e) {
+  const P = e.pts.map(([la, lo]) => diskPlane.fwd(la, lo)), n = P.length;
+  const H = P.map((p, i) => { const a = P[Math.max(0, i - 1)], c = P[Math.min(n - 1, i + 1)]; return normH(Math.atan2(c.e - a.e, c.n - a.n)); });
+  return [e.name, '0', n === 2 ? '2' : '4', '0', String(n), ...P.map((p, i) => r3(p.e) + ' , ' + r3(p.n) + ' , ' + String(Math.round(H[i] * 1e5) / 1e5))];
+}
 // Liefert den Dateitext und die Zeilennummern der Namen (die dürfen beim Ursprung-Verschieben nicht umgerechnet werden)
 function buildListFile(kind) {
   const f = kind === 'tracks' ? 'TrackLines.txt' : 'Headlines.txt', head = kind === 'tracks' ? '$TrackLines' : '$HeadLines';
   const l = txtLines(files[f] || head), out = [l[0] && l[0].trim().startsWith('$') ? l[0] : head], names = new Set();
   ex[kind].forEach(e => {
     if (e.deleted) return;
-    const block = e.isNew || e.modified ? trackBlock(e) : l.slice(e.line, e.end);
+    const block = e.isNew || e.modified ? (kind === 'headlines' ? headlineBlock(e) : trackBlock(e)) : l.slice(e.line, e.end);
     if (e.name.trim()) block[0] = e.name.trim();
     names.add(out.length);
     out.push(...block);

@@ -69,6 +69,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Alles aus der Datei erscheint als Vorschau. Auf der Karte oder in der Liste anklicken, was übernommen wird.
 - **Neues Feld**: Namen eingeben – die größte Fläche wird die Außengrenze, Löcher und Flächen darin werden Innengrenzen, Linien werden Spuren (AB-Linie oder Kurve), Punkte werden Fahnen.
 - **Ins offene Feld**: Flächen als Außengrenze (ersetzt die bestehende) oder als Innengrenzen, dazu Spuren und Fahnen.
+- Dateien, die mit diesem Editor exportiert wurden (KML, GeoJSON, Shapefile), werden erkannt: Fahrgassen samt Randfahrgasse, Vorgewende und Vorgewende-Linien kommen wieder an ihren Platz. Die bearbeitete Fläche wird nicht importiert.
 
 **Exportieren** (im Register Feld)
 - Format wählen und abhaken, was mit soll: Feldgrenze, Spuren, Vorgewende, Vorgewende-Linien, Fahrgassen, Fahnen, bearbeitete Fläche. Exportiert wird der aktuelle Stand im Editor.
