@@ -10,7 +10,7 @@ Der Editor ist **eine einzige HTML-Datei**. Er braucht keine Installation und ke
 
 ## Funktionen
 
-Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen, Ursprung, Ansicht und Messen**, darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich ausblenden. Bearbeiten lässt sich nur, was zum gewählten Register gehört (z. B. Grenzpunkte nur unter „Grenze“, Fahnen nur unter „Fahnen“), alles andere wird nur angezeigt. **Speichern** und **Rückgängig** sind immer oben links.
+Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Grenze, Spuren, Vorgewende, Fahrgassen, Fahnen und Messen** (in der Reihenfolge, in der man meist arbeitet), darunter die passenden Knöpfe. Links steht die Feldliste, rechts die Liste zum gewählten Register (Grenzen, Spuren, Fahne …), unten die Statuszeile mit Meldungen und der Mausposition. Feldliste und Seitenleiste lassen sich mit den Pfeilen an den Kartenrändern ein- und ausklappen. Bearbeiten lässt sich nur, was zum gewählten Register gehört (z. B. Grenzpunkte nur unter „Grenze“, Fahnen nur unter „Fahnen“), alles andere wird nur angezeigt. **Speichern** und **Rückgängig** sind immer oben links.
 
 **Neues Feld**
 - Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
@@ -37,8 +37,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 
 **Fahrgassen**
 - Oben **Fahrzeug** (Spurweite) und **Gerät** wählen, z. B. die Feldspritze: der Fahrgassenabstand ist dann ihre Arbeitsbreite. Alles lässt sich auch von Hand eingeben.
-- **An Linie:** eine bestimmte Anzahl Fahrgassen neben einer Referenzlinie (AB-Linie oder Kurve), gerechnet wie „Tramlines Multi“ in AgOpenGPS.
-- **Feld füllen:** das ganze Feld parallel zu einer Referenzlinie (eine oder beide Seiten) – oder von zwei Linien aufeinander zu, die Anzahl je Seite wird vorgeschlagen. Wo sich Fahrgassen beider Seiten kreuzen, kann eine Seite am Schnittpunkt gekürzt werden (umschaltbar).
+- **An Linie:** Fahrgassen von einer Referenzlinie (AB-Linie oder Kurve) aus, auf einer oder beiden Seiten, mit bestimmter Anzahl oder bis zum Feldrand – oder von zwei Linien aufeinander zu (Anzahl je Seite wird vorgeschlagen). Wo sich Fahrgassen beider Seiten kreuzen, kann eine Seite am Schnittpunkt enden („Zusammenführen“). Gerechnet wie „Tramlines Multi“ in AgOpenGPS.
 - **Randfahrgasse** um die Außengrenze, auch mehrere Ringe, wahlweise mit gerundeten Ecken (beide Spuren genau parallel).
 - **Gasse dazwischen:** zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. **Löschen:** einzelne Fahrgassen anklicken (Strg+Z holt sie zurück).
 - Die **Arbeitsbreite** jeder Fahrgasse wird als blaue Fläche gezeigt (doppelt befahren = dunkler), auch schon in der Vorschau; mit dem Auge ausblendbar. Bei den anderen Funktionen kann sie gleich mit erzeugt werden; die Fahrgassen enden dann an ihr, sonst an der Grenze.
@@ -48,11 +47,11 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 **Fahnen**
 - Fahnen setzen, verschieben und löschen. Rechts stehen alle Fahnen; ein Klick (in der Liste oder auf der Karte) klappt Farbe, Notiz und Koordinaten auf. Das Register „Fahnen“ blendet die Fahnen auf der Karte ein.
 
-**Feld-Ursprung (StartFix)**
+**Feld-Ursprung (StartFix)** (im Register Grenze)
 - Der Ursprung lässt sich in die Feldmitte oder an eine beliebige Stelle verschieben. Alle Dateien im Feldordner werden dabei mit umgerechnet: Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahrgassen, Pfade, Höhendaten und Hintergrundbild.
 - Ein Kreis zeigt die 500 m, in denen „Drive In“ das Feld findet. „Drive In“ zeigt ein Feld nur an, wenn du höchstens 500 m vom StartFix entfernt bist, also von der Stelle, an der beim Anlegen „Neu“ gedrückt wurde.
 
-**Anzeigen**
+**Anzeigen** (Kartenhintergrund und weitere Ebenen im Register Feld)
 - Alles, was das Feld enthält, lässt sich einzeln mit dem Auge in seinem Register ein- und ausblenden (das Register anwählen blendet seine Ebenen ein) und mit dem Papierkorb komplett löschen (wie „Bearbeitete Fläche löschen“ in AgOpenGPS):
   - bearbeitete Fläche, mit ha-Angabe; doppelt bearbeitete Stellen werden dunkler
   - AB-Linien und Kurven

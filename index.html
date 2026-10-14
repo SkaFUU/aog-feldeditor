@@ -146,6 +146,12 @@
              max-width:calc(100% - 24px); font-size:13px; box-shadow:0 2px 10px rgba(0,0,0,.5); }
   #toolbox button { width:auto; margin:0; padding:7px 12px; }
   #toolbox input[type=range] { width:170px; padding:0; }
+  /* Pfeile an den Kartenrändern: Feldliste und Seitenleiste ein-/ausklappen */
+  .paneTog { position:absolute; top:50%; transform:translateY(-50%); z-index:1002; width:18px; height:58px; margin:0; padding:0;
+             background:rgba(39,43,48,.92); color:var(--fg); font-size:16px; line-height:58px; box-shadow:0 1px 6px rgba(0,0,0,.5); }
+  .paneTog:hover { background:#3c4148; }
+  #togNav { left:0; border-radius:0 6px 6px 0; }
+  #togProps { right:0; border-radius:6px 0 0 6px; }
   #toolTitle, #toolParams { display:none; }
   /* Werkzeug mit Einstellungen: steht oben in der Seitenleiste statt unten auf der Karte */
   #toolbox.inpanel { position:static; transform:none; display:block !important; max-width:none; margin:0 0 14px; padding:10px;
@@ -229,8 +235,6 @@
       <button data-tab="vorgewende" data-i18n="tabVorgewende">Vorgewende</button>
       <button data-tab="fahrgassen" data-i18n="tabFahrgassen">Fahrgassen</button>
       <button data-tab="fahnen" data-i18n="tabFahnen">Fahnen</button>
-      <button data-tab="ursprung" data-i18n="tabUrsprung">Ursprung</button>
-      <button data-tab="ansicht" data-i18n="tabAnsicht">Ansicht</button>
       <button data-tab="messen" data-i18n="tabMessen">Messen</button>
     </nav>
     <div id="ribbon">
@@ -241,9 +245,14 @@
           <button class="big c-file" id="btnNewField"><svg class="ic"><use href="#i-newfield"/></svg><span data-i18n="btnNewField">Neues Feld</span></button>
         </div><div class="gcap" data-i18n="gFields">Felder</div></div>
         <div class="grp"><div class="gbody">
-          <button class="big" id="btnNav"><svg class="ic"><use href="#i-panel"/></svg><span data-i18n="btnNav">Feldliste</span></button>
-          <button class="big" id="btnProps"><svg class="ic"><use href="#i-panelr"/></svg><span data-i18n="btnProps">Seitenleiste</span></button>
-        </div><div class="gcap" data-i18n="gPanels">Fenster</div></div>
+          <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
+          <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
+          <button class="big c-view" data-base="osm"><svg class="ic"><use href="#i-map"/></svg><span>OpenStreetMap</span></button>
+        </div><div class="gcap" data-i18n="gMap">Kartenhintergrund</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-view" id="btnFit" disabled><svg class="ic"><use href="#i-fit"/></svg><span data-i18n="btnFit">Ganzes Feld</span></button>
+        </div><div class="gcap">Zoom</div></div>
+        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-ansicht"></div></div><div class="gcap" data-i18n="gLayers">Ebenen</div></div>
       </div>
       <div class="rpanel" data-tab="grenze">
         <div class="grp"><div class="gbody">
@@ -257,6 +266,11 @@
           <div class="gcol"><label class="muted" for="tol" data-i18n="simpLabel">Toleranz (m)</label><input id="tol" type="number" value="0.01" min="0.001" step="0.01"></div>
           <button class="big c-bnd" id="btnSimp" disabled><svg class="ic"><use href="#i-simp"/></svg><span data-i18n="btnSimp">Ausdünnen</span></button>
         </div><div class="gcap" data-i18n="gReduce">Punkte ausdünnen</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-org" id="btnOriginCenter" disabled><svg class="ic"><use href="#i-ocenter"/></svg><span data-i18n="btnOriginCenter">In Feldmitte</span></button>
+          <button class="big c-org" id="btnOriginClick" disabled><svg class="ic"><use href="#i-oclick"/></svg><span data-i18n="btnOriginClick">Per Klick setzen</span></button>
+          <button class="big c-org" id="btnOriginReset" disabled><svg class="ic"><use href="#i-reset"/></svg><span data-i18n="btnOriginReset">Zurücksetzen</span></button>
+        </div><div class="gcap" data-i18n="gOrigin">Feld-Ursprung (StartFix)</div></div>
       </div>
       <div class="rpanel" data-tab="spuren">
         <div class="grp"><div class="gbody">
@@ -281,8 +295,7 @@
       </div>
       <div class="rpanel" data-tab="fahrgassen">
         <div class="grp"><div class="gbody">
-          <button class="big c-tram" id="btnTram" disabled><svg class="ic"><use href="#i-tram"/></svg><span data-i18n="btnTram">An Linie</span></button>
-          <button class="big c-tram" id="btnTramFill" disabled><svg class="ic"><use href="#i-tramfill"/></svg><span data-i18n="btnTramFill">Feld füllen</span></button>
+          <button class="big c-tram" id="btnTram" disabled><svg class="ic"><use href="#i-tramfill"/></svg><span data-i18n="btnTram">An Linie</span></button>
           <button class="big c-tram" id="btnTramRing" disabled><svg class="ic"><use href="#i-tramring"/></svg><span data-i18n="btnTramRing">Randfahrgasse</span></button>
         </div><div class="gcap" data-i18n="gTramBuild">Fahrgassen erzeugen</div></div>
         <div class="grp"><div class="gbody">
@@ -304,24 +317,6 @@
           <button class="big c-flag" id="btnAddFlag" disabled><svg class="ic"><use href="#i-flag"/></svg><span data-i18n="btnAddFlag">Fahne setzen</span></button>
         </div><div class="gcap" data-i18n="gNew">Neu</div></div>
         <div class="grp"><div class="gbody"><div class="gchecks" id="lay-fahnen"></div></div><div class="gcap" data-i18n="gShow">Anzeigen</div></div>
-      </div>
-      <div class="rpanel" data-tab="ursprung">
-        <div class="grp"><div class="gbody">
-          <button class="big c-org" id="btnOriginCenter" disabled><svg class="ic"><use href="#i-ocenter"/></svg><span data-i18n="btnOriginCenter">In Feldmitte</span></button>
-          <button class="big c-org" id="btnOriginClick" disabled><svg class="ic"><use href="#i-oclick"/></svg><span data-i18n="btnOriginClick">Per Klick setzen</span></button>
-          <button class="big c-org" id="btnOriginReset" disabled><svg class="ic"><use href="#i-reset"/></svg><span data-i18n="btnOriginReset">Zurücksetzen</span></button>
-        </div><div class="gcap" data-i18n="gOrigin">Feld-Ursprung (StartFix)</div></div>
-      </div>
-      <div class="rpanel" data-tab="ansicht">
-        <div class="grp"><div class="gbody">
-          <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
-          <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
-          <button class="big c-view" data-base="osm"><svg class="ic"><use href="#i-map"/></svg><span>OpenStreetMap</span></button>
-        </div><div class="gcap" data-i18n="gMap">Kartenhintergrund</div></div>
-        <div class="grp"><div class="gbody">
-          <button class="big c-view" id="btnFit" disabled><svg class="ic"><use href="#i-fit"/></svg><span data-i18n="btnFit">Ganzes Feld</span></button>
-        </div><div class="gcap">Zoom</div></div>
-        <div class="grp"><div class="gbody"><div class="gchecks" id="lay-ansicht"></div></div><div class="gcap" data-i18n="gLayers">Ebenen</div></div>
       </div>
       <div class="rpanel" data-tab="messen">
         <div class="grp"><div class="gbody">
@@ -349,6 +344,7 @@
     </aside>
 
     <div id="mapwrap"><div id="map"></div><div id="hint"></div>
+      <button id="togNav" class="paneTog" data-i18n-title="togNav">‹</button><button id="togProps" class="paneTog" data-i18n-title="togProps">›</button>
       <div id="toolbox" style="display:none">
         <h2 id="toolTitle"></h2>
         <div id="toolParams" class="form"></div>
@@ -375,6 +371,9 @@
         <div id="bndList" class="muted">–</div>
         <div class="info" id="info">–</div>
         <ul class="muted" data-i18n-html="editHelp"></ul>
+        <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
+        <div class="info" id="originInfo">–</div>
+        <div class="muted" data-i18n="originHelp"></div>
       </div>
       <div class="pp" data-tab="spuren">
         <h2 data-i18n="hNames">Spuren</h2>
@@ -401,11 +400,6 @@
         <div id="flagList" class="muted">–</div>
         <div class="muted" style="margin-top:6px" data-i18n="flagHelp">Fahne ziehen zum Verschieben, anklicken zum Bearbeiten.</div>
       </div>
-      <div class="pp" data-tab="ursprung">
-        <h2 data-i18n="hOrigin">Feld-Ursprung (StartFix)</h2>
-        <div class="info" id="originInfo">–</div>
-        <div class="muted" data-i18n="originHelp"></div>
-      </div>
     </aside>
   </div>
 
@@ -416,8 +410,9 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    btnTramDel: 'Löschen', fFillLines: 'Referenz', segOneLine: '1 Linie', segTwoLines: '2 Linien', fTrim: 'Kürzen', segOff: 'Aus', segLine1: 'Linie 1', segLine2: 'Linie 2',
-    trimHint: 'Wo sich Fahrgassen beider Seiten kreuzen, endet die der gewählten Linie am Schnittpunkt, die andere läuft durch.',
+    togNav: 'Feldliste ein-/ausblenden', togProps: 'Seitenleiste ein-/ausblenden', fMerge: 'Zusammenführen', passes0: '0 = bis zum Feldrand',
+    btnTramDel: 'Löschen', fFillLines: 'Referenz', segOneLine: '1 Linie', segTwoLines: '2 Linien', segOff: 'Aus', segLine1: 'Linie 1', segLine2: 'Linie 2',
+    trimHint: 'Wo sich Fahrgassen beider Seiten kreuzen: die der gewählten Linie endet am Schnittpunkt, die andere läuft durch. Aus = beide laufen durch.',
     segAuto: 'Auto', segRight: 'Rechts', segLeft: 'Links', segBoth: 'Beide', segWithout: 'Ohne', segWith: 'Mit', segCurve: 'Kurve', segLine: 'Gerade',
     delPick: 'Fahrgasse (oder Randfahrgasse) anklicken – sie wird gelöscht. Strg+Z holt sie zurück.', delCount: '{0} gelöscht.',
     btnTramMid: 'Gasse dazwischen', fRingCount: 'Anzahl Randfahrgassen',
@@ -426,17 +421,17 @@ const I18N = {
     midMsg: 'Abstand der beiden Fahrgassen {0} m – die neue liegt genau in der Mitte, {1} m zu jeder.', midFail: 'Die zwei Fahrgassen liegen nicht nebeneinander – zwei benachbarte anklicken.',
     title: 'AOG Feldeditor',
     tabFeld: 'Feld', tabGrenze: 'Grenze', tabSpuren: 'Spuren', tabVorgewende: 'Vorgewende', tabFahrgassen: 'Fahrgassen',
-    tabFahnen: 'Fahnen', tabUrsprung: 'Ursprung', tabAnsicht: 'Ansicht', tabMessen: 'Messen',
-    gFields: 'Felder', gPanels: 'Fenster', gNew: 'Neu', gEdit: 'Bearbeiten', gReduce: 'Punkte ausdünnen', gShow: 'Anzeigen',
+    tabFahnen: 'Fahnen', tabMessen: 'Messen',
+    gFields: 'Felder', gNew: 'Neu', gEdit: 'Bearbeiten', gReduce: 'Punkte ausdünnen', gShow: 'Anzeigen',
     gOrigin: 'Feld-Ursprung (StartFix)', gMap: 'Kartenhintergrund', gLayers: 'Ebenen', gMeasure: 'Messen',
-    btnNav: 'Feldliste', btnProps: 'Seitenleiste', btnSmooth: 'Glätten', btnFit: 'Ganzes Feld',
+    btnSmooth: 'Glätten', btnFit: 'Ganzes Feld',
     smoothNeedSel: 'Zuerst rechts in der Liste eine Kurve anklicken.', bmEsri: 'Satellit (Esri)', bmAt: 'Orthofoto AT',
     btnMeasDist: 'Strecke', btnMeasArea: 'Fläche', close: 'Schließen',
     measDistMsg: 'Punkte auf die Karte klicken – die Strecke wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
     measAreaMsg: 'Eckpunkte auf die Karte klicken – die Fläche wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
     measDist: 'Strecke: <b>{0} m</b>', measArea: 'Fläche: <b>{0} ha</b> ({1} m²) · Umfang: {2} m',
     noField: 'kein Feld geöffnet', noHeadlines: 'Keine Vorgewende-Linien in diesem Feld.',
-    btnHdAround: 'Rundum bauen', btnHdSlice: 'Teilstück', gHdBuild: 'Vorgewende bauen', btnTram: 'An Linie', btnTramFill: 'Feld füllen', btnTramRing: 'Randfahrgasse', gTramBuild: 'Fahrgassen erzeugen', gSprayer: 'Gerät (Fahrgassenabstand)',
+    btnHdAround: 'Rundum bauen', btnHdSlice: 'Teilstück', gHdBuild: 'Vorgewende bauen', btnTram: 'An Linie', btnTramRing: 'Randfahrgasse', gTramBuild: 'Fahrgassen erzeugen', gSprayer: 'Gerät (Fahrgassenabstand)',
     fDist: 'Abstand (m)', fTool: 'Gerät', fWidths: '× Arbeitsbreiten', fRadiusS: 'Ecken runden: Radius (m)', radius0: '0 = Ecken wie AOG', fKind: 'Art', manual: '– von Hand –',
     toolInfo: 'Arbeitsbreite {0} m (Breite {1} m − Überlappung {2} m)', toolInfoS: 'Arbeitsbreite {0} m', needTool: 'Für Arbeitsbreiten oben ein Gerät wählen.',
     hdHelp: 'Wie „Headland“ in AgOpenGPS, um die Außengrenze. „Rundum bauen“ oder „Teilstück“ drücken – die Einstellungen erscheinen dann hier. Radius 0 = genau wie AOG (Ecken gerade abgeschnitten), ein Radius rundet die Ecken. Teilstück: zwei Ecken einer Seite anklicken, das Vorgewende wird an dieser Seite neu gesetzt.',
@@ -445,11 +440,11 @@ const I18N = {
     needHeadland: 'Zuerst ein Vorgewende bauen („Rundum bauen“).', hdSliceA: 'Teilstück: ersten Punkt auf der Außengrenze anklicken.',
     hdSliceOk: 'Teilstück mit {0} m Abstand – orange die neue Linie, gelb das Vorgewende danach. Kurve oder Linie wählen, dann Übernehmen.',
     hdSliceNo: 'Die Linie schneidet das Vorgewende nicht zweimal – andere Punkte oder Abstand wählen.',
-    hVehicle: 'Fahrzeug', fVehicle: 'Fahrzeug', fTrackW: 'Spurweite (m)', fSprayer: 'Gerät', fTramWidth: 'Abstand (m)', fPasses: 'Anzahl Fahrgassen', fRefLine: 'Referenzlinie', fRefLine2: 'Zweite Linie', fCountA: 'Anzahl von Linie 1', fCountB: 'Anzahl von Linie 2',
+    hVehicle: 'Fahrzeug', fVehicle: 'Fahrzeug', fTrackW: 'Spurweite (m)', fSprayer: 'Gerät', fTramWidth: 'Abstand (m)', fPasses: 'Anzahl je Seite', fRefLine: 'Referenzlinie', fRefLine2: 'Zweite Linie', fCountA: 'Anzahl von Linie 1', fCountB: 'Anzahl von Linie 2',
     fSide: 'Seite', fWithRing: 'Randfahrgasse',
     tramReplace: 'Ersetzen', tramAdd: 'Ergänzen', tramAsk: 'Es gibt schon Fahrgassen – ersetzen oder ergänzen?', yes: 'ja', no: 'nein', tramHave: 'Vorhanden: <b>{0}</b> Fahrgassen-Spuren · Randfahrgasse: <b>{1}</b>',
     noProfiles: 'Fahrzeuge und Geräte aus AgOpenGPS gibt es, wenn im Register „Feld“ der Ordner AgOpenGPS (statt Fields) gewählt ist.',
-    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: eine bestimmte Anzahl neben der Referenzlinie. „Feld füllen“: das ganze Feld von einer Linie aus – oder von zwei Linien aufeinander zu; wo sie sich kreuzen, kann eine Seite am Schnittpunkt gekürzt werden. „Randfahrgasse“: auch mehrere Ringe. „Gasse dazwischen“: zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. „Löschen“: einzelne Fahrgassen anklicken. Die blaue Fläche zeigt die Arbeitsbreite – ausblenden mit dem Auge bei „Arbeitsbreite“.',
+    tramHelp: 'Funktion oben drücken, die Einstellungen erscheinen hier, die Vorschau gelb auf der Karte. „An Linie“: von einer Referenzlinie aus (eine oder beide Seiten, bestimmte Anzahl oder bis zum Feldrand) – oder von zwei Linien aufeinander zu; wo sie sich kreuzen, kann eine Seite am Schnittpunkt enden („Zusammenführen“). „Randfahrgasse“: auch mehrere Ringe. „Gasse dazwischen“: zwei Fahrgassen anklicken, eine neue kommt genau in die Mitte. „Löschen“: einzelne Fahrgassen anklicken. Die blaue Fläche zeigt die Arbeitsbreite – ausblenden mit dem Auge bei „Arbeitsbreite“. Die Pfeile am Kartenrand klappen die Seitenleisten ein und aus.',
     tramMsg: 'Vorschau: {0} Fahrgassen-Spuren', tramWithRing: ' + Randfahrgasse', tramOnlyRing: 'Nur die Randfahrgasse – dazwischen ist kein Platz für weitere Fahrgassen.', tramRingMsg: 'Randfahrgasse: Mitte {0} m von der Grenze{1}.',
     tramNone: 'Keine Fahrgasse im Feld – andere Seite oder Linie wählen.', tramDone: 'Fahrgassen übernommen – werden beim Speichern gespeichert.',
     needTrack: 'Für Fahrgassen zuerst eine AB-Linie oder Kurve anlegen (Register „Spuren“).',
@@ -524,8 +519,9 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    btnTramDel: 'Delete', fFillLines: 'Reference', segOneLine: '1 line', segTwoLines: '2 lines', fTrim: 'Trim', segOff: 'Off', segLine1: 'Line 1', segLine2: 'Line 2',
-    trimHint: 'Where tramlines from both sides cross, the one from the chosen line ends at the crossing, the other continues.',
+    togNav: 'Show/hide field list', togProps: 'Show/hide side panel', fMerge: 'Merge', passes0: '0 = up to the field edge',
+    btnTramDel: 'Delete', fFillLines: 'Reference', segOneLine: '1 line', segTwoLines: '2 lines', segOff: 'Off', segLine1: 'Line 1', segLine2: 'Line 2',
+    trimHint: 'Where tramlines from both sides cross: the one from the chosen line ends at the crossing, the other continues. Off = both continue.',
     segAuto: 'Auto', segRight: 'Right', segLeft: 'Left', segBoth: 'Both', segWithout: 'Without', segWith: 'With', segCurve: 'Curve', segLine: 'Straight',
     delPick: 'Click a tramline (or the boundary tram) – it is deleted. Ctrl+Z brings it back.', delCount: '{0} deleted.',
     btnTramMid: 'Tramline between', fRingCount: 'Number of boundary trams',
@@ -534,17 +530,17 @@ const I18N = {
     midMsg: 'The two tramlines are {0} m apart – the new one goes exactly in the middle, {1} m from each.', midFail: 'The two tramlines are not next to each other – click two neighbouring ones.',
     title: 'AOG Field Editor',
     tabFeld: 'Field', tabGrenze: 'Boundary', tabSpuren: 'Tracks', tabVorgewende: 'Headland', tabFahrgassen: 'Tramlines',
-    tabFahnen: 'Flags', tabUrsprung: 'Origin', tabAnsicht: 'View', tabMessen: 'Measure',
-    gFields: 'Fields', gPanels: 'Panels', gNew: 'New', gEdit: 'Edit', gReduce: 'Reduce points', gShow: 'Show',
+    tabFahnen: 'Flags', tabMessen: 'Measure',
+    gFields: 'Fields', gNew: 'New', gEdit: 'Edit', gReduce: 'Reduce points', gShow: 'Show',
     gOrigin: 'Field origin (StartFix)', gMap: 'Map background', gLayers: 'Layers', gMeasure: 'Measure',
-    btnNav: 'Field list', btnProps: 'Side panel', btnSmooth: 'Smooth', btnFit: 'Whole field',
+    btnSmooth: 'Smooth', btnFit: 'Whole field',
     smoothNeedSel: 'Click a curve in the list on the right first.', bmEsri: 'Satellite (Esri)', bmAt: 'Orthophoto AT',
     btnMeasDist: 'Distance', btnMeasArea: 'Area', close: 'Close',
     measDistMsg: 'Click points on the map to measure the distance. Ctrl+Z removes the last point.',
     measAreaMsg: 'Click the corners on the map to measure the area. Ctrl+Z removes the last point.',
     measDist: 'Distance: <b>{0} m</b>', measArea: 'Area: <b>{0} ha</b> ({1} m²) · Perimeter: {2} m',
     noField: 'no field open', noHeadlines: 'No headland lines in this field.',
-    btnHdAround: 'Build around', btnHdSlice: 'Section', gHdBuild: 'Build headland', btnTram: 'Along line', btnTramFill: 'Fill field', btnTramRing: 'Boundary tram', gTramBuild: 'Create tramlines', gSprayer: 'Tool (tramline spacing)',
+    btnHdAround: 'Build around', btnHdSlice: 'Section', gHdBuild: 'Build headland', btnTram: 'Along line', btnTramRing: 'Boundary tram', gTramBuild: 'Create tramlines', gSprayer: 'Tool (tramline spacing)',
     fDist: 'Distance (m)', fTool: 'Tool', fWidths: '× tool widths', fRadiusS: 'Round corners: radius (m)', radius0: '0 = corners like AOG', fKind: 'Type', manual: '– manual –',
     toolInfo: 'Working width {0} m (width {1} m − overlap {2} m)', toolInfoS: 'Working width {0} m', needTool: 'Choose a tool at the top for tool widths.',
     hdHelp: 'Like “Headland” in AgOpenGPS, around the outer boundary. Press “Build around” or “Section” – the settings then appear here. Radius 0 = exactly like AOG (corners cut straight), a radius rounds the corners. Section: click the two corners of one side, the headland is rebuilt on that side.',
@@ -553,11 +549,11 @@ const I18N = {
     needHeadland: 'Build a headland first (“Build around”).', hdSliceA: 'Section: click the first point on the outer boundary.',
     hdSliceOk: 'Section at {0} m – orange is the new line, yellow the headland afterwards. Choose curve or line, then Apply.',
     hdSliceNo: 'The line does not cross the headland twice – choose other points or another distance.',
-    hVehicle: 'Vehicle', fVehicle: 'Vehicle', fTrackW: 'Wheel track (m)', fSprayer: 'Tool', fTramWidth: 'Spacing (m)', fPasses: 'Number of tramlines', fRefLine: 'Reference line', fRefLine2: 'Second line', fCountA: 'Number from line 1', fCountB: 'Number from line 2',
+    hVehicle: 'Vehicle', fVehicle: 'Vehicle', fTrackW: 'Wheel track (m)', fSprayer: 'Tool', fTramWidth: 'Spacing (m)', fPasses: 'Number per side', fRefLine: 'Reference line', fRefLine2: 'Second line', fCountA: 'Number from line 1', fCountB: 'Number from line 2',
     fSide: 'Side', fWithRing: 'Boundary tram',
     tramReplace: 'Replace', tramAdd: 'Add', tramAsk: 'There are tramlines already – replace or add?', yes: 'yes', no: 'no', tramHave: 'Existing: <b>{0}</b> tram tracks · boundary tram: <b>{1}</b>',
     noProfiles: 'Vehicles and tools from AgOpenGPS are available when the AgOpenGPS folder (instead of Fields) is chosen in the “Field” tab.',
-    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: a given number next to the reference line. “Fill field”: the whole field from one line – or from two lines towards each other; where they cross, one side can be trimmed at the crossing. “Boundary tram”: several rings possible. “Tramline between”: click two tramlines, a new one goes exactly in the middle. “Delete”: click single tramlines. The blue area shows the working width – hide it with the eye at “Working width”.',
+    tramHelp: 'Press a function at the top; its settings appear here, the preview in yellow on the map. “Along line”: from one reference line (one or both sides, a given number or up to the field edge) – or from two lines towards each other; where they cross, one side can end at the crossing (“Merge”). “Boundary tram”: several rings possible. “Tramline between”: click two tramlines, a new one goes exactly in the middle. “Delete”: click single tramlines. The blue area shows the working width – hide it with the eye at “Working width”. The arrows at the map edges collapse and expand the side panels.',
     tramMsg: 'Preview: {0} tram tracks', tramWithRing: ' + boundary tram', tramOnlyRing: 'Only the boundary tram – there is no room for further tramlines inside it.', tramRingMsg: 'Boundary tram: centre {0} m from the boundary{1}.',
     tramNone: 'No tramline inside the field – choose the other side or another line.', tramDone: 'Tramlines applied – stored when you save.',
     needTrack: 'For tramlines, create an AB line or curve first (tab “Tracks”).',
@@ -2566,27 +2562,39 @@ function nearestOn(p, P) {
 }
 const bbox = P => { let a = Infinity, b = -Infinity, c = Infinity, d = -Infinity; P.forEach(p => { a = Math.min(a, p.e); b = Math.max(b, p.e); c = Math.min(c, p.n); d = Math.max(d, p.n); }); return [a, b, c, d]; };
 // Spuren zu Fahrgassen paaren (zwei Spuren im Abstand der Spurweite) und deren Mittellinie bilden; einzelne Spuren bleiben für sich
+// Bewertung: welcher Anteil der einen Spur liegt im Abstand der Spurweite (±0,3 m) neben der anderen – so passen auch
+// verschieden lange oder geteilte Spuren zusammen. Die Mittellinie entsteht nur dort, wo beide nebeneinander liegen.
 function trackPairs(TL, c) {
-  const sw = c.trackWidth, used = new Set(), out = [], B = TL.map(bbox);
-  const med = (P, Q) => { const st = Math.max(1, Math.floor(P.length / 15)), s = P.filter((_, i) => i % st === 0).map(p => Math.sqrt(dSq(p, nearestOn(p, Q)))).sort((x, y) => x - y); return s[s.length >> 1]; };
+  const sw = c.trackWidth, n = TL.length, B = TL.map(bbox), used = new Set(), out = [];
+  const S = TL.map(P => { if (P.length < 2) return []; const D = minSpacing(P.map(p => ({ e: p.e, n: p.n, h: 0 })), 3), st = Math.max(1, Math.floor(D.length / 24)); return D.filter((_, i) => i % st === 0); });
   const near = (i, j) => B[i][0] - 1 - sw <= B[j][1] && B[j][0] - 1 - sw <= B[i][1] && B[i][2] - 1 - sw <= B[j][3] && B[j][2] - 1 - sw <= B[i][3];
-  TL.forEach((P, i) => {
-    if (used.has(i) || P.length < 2) return;
-    used.add(i);
-    let best = -1, bd = 0.35;
-    TL.forEach((Q, j) => { if (used.has(j) || Q.length < 2 || !near(i, j)) return; const d = Math.abs(med(P, Q) - sw); if (d < bd) { bd = d; best = j; } });
-    if (best < 0) { out.push({ center: P, tracks: [i] }); return; }
-    used.add(best);
-    const Q = TL[best], D = minSpacing(P.map(p => ({ ...p, h: 0 })), 2);
-    out.push({ center: D.map(p => { const q = nearestOn(p, Q); return { e: (p.e + q.e) / 2, n: (p.n + q.n) / 2 }; }), tracks: [i, best] });
-  });
+  const score = (i, j) => { if (!S[i].length) return 0; let m = 0; for (const p of S[i]) if (Math.abs(Math.sqrt(dSq(p, nearestOn(p, TL[j]))) - sw) < 0.3) m++; return m / S[i].length; };
+  const cand = [];
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    if (TL[i].length < 2 || TL[j].length < 2 || !near(i, j)) continue;
+    const sc = Math.max(score(i, j), score(j, i));
+    if (sc >= 0.6) cand.push({ i, j, sc });
+  }
+  cand.sort((a, b) => b.sc - a.sc);
+  for (const { i, j } of cand) {
+    if (used.has(i) || used.has(j)) continue;
+    used.add(i); used.add(j);
+    const [P, Q] = pathLen(TL[i]) <= pathLen(TL[j]) ? [TL[i], TL[j]] : [TL[j], TL[i]];      // von der kürzeren aus
+    const center = [];
+    minSpacing(P.map(p => ({ e: p.e, n: p.n, h: 0 })), 2).forEach(p => {
+      const q = nearestOn(p, Q);
+      if (Math.abs(Math.sqrt(dSq(p, q)) - sw) < 0.5) center.push({ e: (p.e + q.e) / 2, n: (p.n + q.n) / 2 });
+    });
+    out.push({ center: center.length > 1 ? center : P, tracks: [i, j] });
+  }
+  TL.forEach((P, i) => { if (!used.has(i) && P.length > 1) out.push({ center: P, tracks: [i] }); });
   return out;
 }
 // Arbeitsbreite als Fläche: je Fahrgasse ein Band der Breite „Abstand“ um die Mitte, Randfahrgasse als Ring
 function bandPolys(TL, ring, c) {
   const half = c.tramWidth / 2, polys = [];
-  trackPairs(TL, c).forEach(({ center }) => {
-    if (center.length < 2) return;
+  trackPairs(TL, c).forEach(({ center, tracks }) => {
+    if (center.length < 2 || tracks.length < 2) return;            // nur echte Fahrgassen (Paare), nicht jede Spur einzeln
     if (center.length > 3 && dSq(center[0], center[center.length - 1]) < 4 && pathLen(center) > 50) {   // geschlossener Ring
       const o = offsetRing(center, half, -1), i = offsetRing(center, half, 1);
       if (o.length > 3) polys.push(i.length > 3 ? [o, i] : [o]);
@@ -2629,7 +2637,7 @@ function twoGeo(RA, RB, XF) {
 }
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
-const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 1, hdDist: 12, hdWidths: 0, radius: 0,
+const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
   side: 0, fillSide: 0, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
@@ -2698,10 +2706,10 @@ const PARAMS = {
   tramTrack2: { label: 'fRefLine2', opts: trackOpts },
   side: { label: 'fSide', seg: true, opts: () => [[0, t('segAuto')], [1, t('segRight')], [-1, t('segLeft')]] },
   fillSide: { label: 'fSide', seg: true, opts: () => [[0, t('segBoth')], [1, t('segRight')], [-1, t('segLeft')]] },
-  passes: { label: 'fPasses', num: [1, 1] },
+  passes: { label: 'fPasses', num: [1, 0], hint: () => t('passes0') },
   nA: { label: 'fCountA', num: [1, 0] },
   nB: { label: 'fCountB', num: [1, 0] },
-  trim: { label: 'fTrim', seg: true, opts: () => [[0, t('segOff')], [1, t('segLine1')], [2, t('segLine2')]], hint: () => t('trimHint') },
+  trim: { label: 'fMerge', seg: true, opts: () => [[0, t('segOff')], [1, t('segLine1')], [2, t('segLine2')]], hint: () => t('trimHint') },
   withRing: { label: 'fWithRing', seg: true, opts: () => [[0, t('segWithout')], [1, t('segWith')]] },
   ringCount: { label: 'fRingCount', num: [1, 1] },
 };
@@ -2762,7 +2770,7 @@ function renderCfg() {
   $('cfToolInfo').textContent = cfg.tool ? t('toolInfoS', fmtNum(cfg.toolWidth - cfg.overlap, 2)) : '';
   document.querySelectorAll('.cfNoProf').forEach(el => { el.style.display = aogRoot ? 'none' : ''; });
   ['btnHdAround', 'btnHdSlice', 'btnTramRing'].forEach(id => { $(id).disabled = !bnds[0]; });
-  ['btnTram', 'btnTramFill'].forEach(id => { $(id).disabled = !list.length; $(id).title = plane && !list.length ? t('needTrack') : ''; });
+  ['btnTram'].forEach(id => { $(id).disabled = !list.length; $(id).title = plane && !list.length ? t('needTrack') : ''; });
   const T = ex.tram, nT = T ? T.lines.length + (T.outer.length > 1 ? 1 : 0) : 0;
   $('btnTramMid').disabled = !(T && T.lines.length >= 2);
   $('btnTramDel').disabled = !nT;
@@ -2869,20 +2877,20 @@ function startHdSlice() {
     ok() { setHeadland(hdExit(this.res.hd, true)); setStatus(t('hdDone'), 'ok'); }
   });
 }
-// Fahrgassen: an einer Linie (Anzahl) oder Feld füllen – von einer Linie aus oder von zwei Linien aufeinander zu.
-// Gibt es schon Fahrgassen, heißt es vor dem Übernehmen „Ersetzen“ oder „Ergänzen“.
+// Fahrgassen „An Linie“: von einer Referenzlinie aus (eine oder beide Seiten, Anzahl je Seite oder bis zum Feldrand)
+// oder von zwei Linien aufeinander zu. Gibt es schon Fahrgassen, heißt es vor dem Übernehmen „Ersetzen“ oder „Ergänzen“.
 const drawRing = (g, ring, dash) => { if (!ring) return; prevLine(g, ring.outer, '#ffd400', true, dash); prevLine(g, ring.inner, '#ffd400', true, dash); (ring.extra || []).forEach(l => prevLine(g, l, '#ffd400', true, dash)); };
-function startTramTool(kind) {
-  const list = smallTracks();
+function startTramTool() {
+  const kind = 'fill', list = smallTracks();
   if (!list.length) { setStatus(t('needTrack'), 'err'); return; }
   const have = ex.tram && ex.tram.lines.length > 0;
   const apply = (res, add) => { setTram({ lines: res.lines, add, ring: res.ring || undefined }); setStatus(t('tramDone'), 'ok'); };
   const ring = () => cfg.withRing ? ['withRing', 'ringCount', 'radius'] : ['withRing'];
   startTool({
-    title: kind === 'line' ? 'btnTram' : 'btnTramFill',
-    params: () => kind === 'line' ? ['tramTrack', 'side', 'passes', ...ring()]
-      : cfg.fillLines === 2 && list.length > 1 ? ['fillLines', 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim', ...ring()] : ['fillLines', 'tramTrack', 'fillSide', ...ring()],
-    get two() { return kind === 'fill' && cfg.fillLines === 2 && list.length > 1; },
+    title: 'btnTram',
+    params: () => cfg.fillLines === 2 && list.length > 1 ? ['fillLines', 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim', ...ring()]
+      : ['fillLines', 'tramTrack', 'fillSide', 'passes', ...ring()],
+    get two() { return cfg.fillLines === 2 && list.length > 1; },
     res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
       t('tramMsg', tool.res.lines.length) + (tool.res.ring ? t('tramWithRing') : '') + '.' + (have ? ' ' + t('tramAsk') : ''),
@@ -2892,8 +2900,8 @@ function startTramTool(kind) {
       this.ring = null;
       if (trA && !trA.deleted) {
         const ctx = tramContext(c, c.withRing), RA = refLine(trA);
-        if (kind === 'line') lines = tramAlong(RA, c.side ? Math.sign(c.side) : trA.mode === 2 ? 1 : -1, c.passes, c, ctx);   // automatisch wie AOG: AB rechts, Kurve links
-        else if (!this.two) (c.fillSide ? [Math.sign(c.fillSide)] : [1, -1]).forEach(s => lines.push(...tramAlong(RA, s, Infinity, c, ctx)));
+        if (!this.two)                                 // Anzahl je Seite, 0 = bis zum Feldrand
+          (c.fillSide ? [Math.sign(c.fillSide)] : [1, -1]).forEach(s => lines.push(...tramAlong(RA, s, c.passes > 0 ? c.passes : Infinity, c, ctx)));
         else {
           const trB = ex.tracks[c.tramTrack2];
           if (trB && !trB.deleted && c.tramTrack2 !== c.tramTrack) {
@@ -3015,8 +3023,7 @@ function startTramDel() {
 renderCfg();
 $('btnHdAround').onclick = startHdAround;
 $('btnHdSlice').onclick = startHdSlice;
-$('btnTram').onclick = () => startTramTool('line');
-$('btnTramFill').onclick = () => startTramTool('fill');
+$('btnTram').onclick = startTramTool;
 $('btnTramRing').onclick = startTramRing;
 $('btnTramMid').onclick = startTramMid;
 $('btnTramDel').onclick = startTramDel;
@@ -3067,8 +3074,9 @@ function applyUi() {
   const hasProps = !!document.querySelector(`.pp[data-tab="${ui.tab}"]`);
   $('nav').classList.toggle('hide', !ui.nav);
   $('props').classList.toggle('hide', !ui.props || !hasProps);
-  $('btnNav').classList.toggle('sel', ui.nav);
-  $('btnProps').classList.toggle('sel', ui.props);
+  $('togNav').textContent = ui.nav ? '‹' : '›';             // Pfeile an den Kartenrändern
+  $('togProps').textContent = ui.props ? '›' : '‹';
+  $('togProps').style.display = hasProps ? '' : 'none';
   try { localStorage.setItem('aogUi', JSON.stringify(ui)); } catch (e) { }
   map.invalidateSize();
 }
@@ -3091,8 +3099,8 @@ function showTab(tab) {
   if (ch) renderLayerList();
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
-$('btnNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
-$('btnProps').onclick = () => { ui.props = !ui.props; applyUi(); };
+$('togNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
+$('togProps').onclick = () => { ui.props = !ui.props; applyUi(); };
 applyUi();
 
 // Titel oben: Feldname, Punkt = ungespeicherte Änderungen

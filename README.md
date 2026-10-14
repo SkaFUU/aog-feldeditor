@@ -10,7 +10,7 @@ The editor is **a single HTML file**. It needs no installation and no server, an
 
 ## Features
 
-The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags, Origin, View and Measure**, with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be hidden. Only what belongs to the selected tab can be edited (e.g. boundary points only under "Boundary", flags only under "Flags"); everything else is only shown. **Save** and **Undo** are always at the top left.
+The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Headland, Tramlines, Flags and Measure** (in the order you usually work), with the matching buttons below them. The field list is on the left, the list for the selected tab (boundaries, tracks, flag …) on the right, and the status bar at the bottom shows messages and the mouse position. The field list and the side panel can be collapsed with the arrows at the map edges. Only what belongs to the selected tab can be edited (e.g. boundary points only under "Boundary", flags only under "Flags"); everything else is only shown. **Save** and **Undo** are always at the top left.
 
 **New field**
 - Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.
@@ -37,8 +37,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 
 **Tramlines**
 - Choose the **vehicle** (wheel track) and the **tool** at the top, e.g. the sprayer: the tramline spacing is then its working width. Everything can also be typed in.
-- **Along line:** a given number of tramlines next to a reference line (AB line or curve), calculated like "Tramlines Multi" in AgOpenGPS.
-- **Fill field:** the whole field parallel to a reference line (one or both sides) – or from two lines towards each other, with the number per side suggested. Where tramlines from both sides cross, one side can be trimmed at the crossing (switchable).
+- **Along line:** tramlines from a reference line (AB line or curve), on one or both sides, a given number or up to the field edge – or from two lines towards each other (the number per side is suggested). Where tramlines from both sides cross, one side can end at the crossing ("Merge"). Calculated like "Tramlines Multi" in AgOpenGPS.
 - **Boundary tram** around the outer boundary, also several rings, optionally with rounded corners (both tracks exactly parallel).
 - **Tramline between:** click two tramlines, a new one goes exactly in the middle. **Delete:** click single tramlines (Ctrl+Z brings them back).
 - The **working width** of each tramline is shown as a blue area (covered twice = darker), already in the preview; it can be hidden with the eye. The other functions can create it at the same time; tramlines then end at it, otherwise at the boundary.
@@ -48,11 +47,11 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 **Flags**
 - Add, move and delete flags. All flags are listed on the right; click one (in the list or on the map) to show its color, note and coordinates. Selecting the Flags tab shows the flags on the map.
 
-**Field origin (StartFix)**
+**Field origin (StartFix)** (in the Boundary tab)
 - Move the origin to the field center or to any other point. All files in the field folder are converted along with it: boundary, headland, tracks, coverage, tramlines, recorded paths, elevation data and background image.
 - A circle shows the 500 m within which "Drive In" finds the field. "Drive In" only lists a field when you are within 500 m of its StartFix, which is where you pressed "New" when the field was created.
 
-**Show**
+**Show** (map background and further layers in the Field tab)
 - Everything the field contains can be shown or hidden individually, with the eye button in its tab (selecting a tab shows its layers), and deleted completely with the bin (like "Delete applied area" in AgOpenGPS):
   - coverage, with area in ha; areas covered twice are drawn darker
   - AB lines and curves
