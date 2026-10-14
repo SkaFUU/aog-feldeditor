@@ -100,12 +100,13 @@
   /* Hauptbereich: Feldliste | Karte | Eigenschaften */
   #main { flex:1; display:flex; min-height:0; }
   #nav, #props { flex:none; background:var(--panel); overflow-y:auto; padding:12px; }
-  #nav { width:250px; border-right:1px solid #000; }
+  #nav { width:250px; }
   #props { width:310px; border-left:1px solid #000; }
   /* Griff zwischen Karte und Seitenleiste: ziehen ändert die Breite (wird gemerkt) */
-  #propsGrip { flex:none; width:6px; cursor:col-resize; background:#1d2024; border-left:1px solid #000; }
-  #propsGrip:hover, #propsGrip.drag { background:var(--tab); }
-  #propsGrip.hide { display:none; }
+  #propsGrip, #navGrip { flex:none; width:6px; cursor:col-resize; background:#1d2024; border-left:1px solid #000; }
+  #navGrip { border-left:0; border-right:1px solid #000; }
+  #propsGrip:hover, #propsGrip.drag, #navGrip:hover, #navGrip.drag { background:var(--tab); }
+  #propsGrip.hide, #navGrip.hide { display:none; }
   #nav.hide, #props.hide { display:none; }
   .pp { display:none; } .pp.on { display:block; }
   #mapwrap { flex:1; position:relative; display:flex; min-width:0; }
@@ -201,7 +202,7 @@
     #main { flex-direction:column; }
     #nav, #props { width:100%; max-height:34%; border:0; border-top:1px solid #000; }
     #props { width:100% !important; }
-    #propsGrip { display:none; }
+    #propsGrip, #navGrip { display:none; }
     #nav { order:2; } #mapwrap { order:1; min-height:50%; } #props { order:3; }
     #qat .qtxt { display:none; }
   }
@@ -373,6 +374,7 @@
         Dieses Feld ist mit AgShare verknüpft. Ist dort „Automatisch laden“ aktiv, überschreibt AOG deine Änderungen beim Öffnen mit der Cloud-Version.
       </div>
     </aside>
+    <div id="navGrip" data-i18n-title="gripTitle"></div>
 
     <div id="mapwrap"><div id="map"></div><div id="hint"></div>
       <button id="togNav" class="paneTog" data-i18n-title="togNav">‹</button><button id="togProps" class="paneTog" data-i18n-title="togProps">›</button>
@@ -1261,7 +1263,7 @@ async function useRoot(h) {
 function renderFieldList() {
   const q = $('fieldFilter').value.trim().toLowerCase(), sel = $('fieldList');
   sel.innerHTML = '';
-  fieldNames.filter(n => n.toLowerCase().includes(q)).forEach(n => sel.add(new Option(n, n)));
+  fieldNames.filter(n => n.toLowerCase().includes(q)).forEach(n => { const o = new Option(n, n); o.title = n; sel.add(o); });   // Tooltip: ganzer Name
   sel.value = currentField;
   sel.style.display = $('fieldFilter').style.display = fieldNames.length ? 'block' : 'none';
 }
@@ -3749,6 +3751,8 @@ function applyUi() {
   document.querySelectorAll('.pp').forEach(p => p.classList.toggle('on', p.dataset.tab === ui.tab));
   const hasProps = !!document.querySelector(`.pp[data-tab="${ui.tab}"]`);
   $('nav').classList.toggle('hide', !ui.nav);
+  $('navGrip').classList.toggle('hide', !ui.nav);
+  if (ui.navW) $('nav').style.width = ui.navW + 'px';
   $('props').classList.toggle('hide', !ui.props || !hasProps);
   $('propsGrip').classList.toggle('hide', !ui.props || !hasProps);
   if (ui.propsW) $('props').style.width = ui.propsW + 'px';
@@ -3779,14 +3783,18 @@ function showTab(tab) {
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
 $('togNav').onclick = () => { ui.nav = !ui.nav; applyUi(); };
-// Seitenleiste breiter/schmaler ziehen (280–560 px)
-$('propsGrip').addEventListener('pointerdown', e => {
-  const grip = $('propsGrip'), right = $('main').getBoundingClientRect().right;
-  grip.setPointerCapture(e.pointerId); grip.classList.add('drag');
-  const move = ev => { ui.propsW = Math.round(Math.max(280, Math.min(560, right - ev.clientX))); $('props').style.width = ui.propsW + 'px'; map.invalidateSize(); };
-  const up = () => { grip.classList.remove('drag'); grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); applyUi(); };
-  grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
-});
+// Leisten breiter/schmaler ziehen: rechts 280–700 px, links (Feldliste) 180–600 px
+function gripDrag(gripId, paneId, key, min, max, fromRight) {
+  $(gripId).addEventListener('pointerdown', e => {
+    const grip = $(gripId), box = $('main').getBoundingClientRect();
+    grip.setPointerCapture(e.pointerId); grip.classList.add('drag');
+    const move = ev => { ui[key] = Math.round(Math.max(min, Math.min(max, fromRight ? box.right - ev.clientX : ev.clientX - box.left))); $(paneId).style.width = ui[key] + 'px'; map.invalidateSize(); };
+    const up = () => { grip.classList.remove('drag'); grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); applyUi(); };
+    grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+  });
+}
+gripDrag('propsGrip', 'props', 'propsW', 280, 700, true);
+gripDrag('navGrip', 'nav', 'navW', 180, 600, false);
 $('togProps').onclick = () => { ui.props = !ui.props; applyUi(); };
 applyUi();
 
