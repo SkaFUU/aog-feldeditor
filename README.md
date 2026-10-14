@@ -32,7 +32,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 
 **Headland** (calculated like "Headland" in AgOpenGPS 6.8)
 - Press **Build around** or **Section**; the settings appear in the side panel: distance in metres or as a number of tool widths of the tool chosen at the top (width minus overlap), and rounded corners with a radius (0 = exactly like AgOpenGPS).
-- **Build from lines** (like the Headland Builder): set lines – curve or straight line between two boundary points, or a track – each with its own distance in metres or tool widths. The headland is built from the crossings of the shifted lines; where there is no line the boundary stays. This gives every side its own distance, or e.g. headlands only at the ends.
+- **Build from lines** (like the Headland Builder): set lines – curve or straight line between two boundary points – each with its own distance in metres or tool widths. The headland is built from the crossings of the shifted lines; where there is no line the boundary stays. This gives every side its own distance, or e.g. headlands only at the ends.
 - A yellow preview shows the result and follows every change immediately.
 
 **Tramlines**

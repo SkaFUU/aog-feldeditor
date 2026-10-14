@@ -435,9 +435,9 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    hdLineNo: 'Daraus lässt sich keine Linie machen – andere Punkte wählen.', hdNoLines: 'Noch keine Linien. Art wählen und Linie setzen.', hdAddTrack: 'Spur anklicken, um sie als Linie hinzuzufügen.', hdBuildOk: 'Vorgewende aus {0} Linie(n) – gelb die Vorschau.',
+    hdLineNo: 'Daraus lässt sich keine Linie machen – andere Punkte wählen.', hdNoLines: 'Noch keine Linien. Art wählen und Linie setzen.', hdBuildOk: 'Vorgewende aus {0} Linie(n) – gelb die Vorschau.',
     hdNextSide: 'Übernehmen + nächste Seite',
-    segTrack: 'Spur', hdPickTrack: 'Spur in der Liste wählen oder auf der Karte anklicken.', hdSliceNoBase: 'Noch kein Vorgewende – an den anderen Seiten bleibt die Grenze.',
+    hdSliceNoBase: 'Noch kein Vorgewende – an den anderen Seiten bleibt die Grenze.',
     fCountR: 'Anzahl rechts', fCountL: 'Anzahl links',
     gripTitle: 'Ziehen: Seitenleiste breiter oder schmaler',
     fSmoothW: 'Glättung (m)', fSmoothRound: 'Rundung (%)', trackPickTitle: 'Anklicken zum Auswählen',
@@ -465,7 +465,7 @@ const I18N = {
     btnHdAround: 'Rundum bauen', btnHdSlice: 'Aus Linien bauen', gHdBuild: 'Vorgewende bauen', btnTram: 'An Linie', btnTramRing: 'Randfahrgasse', gTramBuild: 'Fahrgassen erzeugen', gSprayer: 'Gerät (Fahrgassenabstand)',
     fDist: 'Abstand (m)', fTool: 'Gerät', fWidths: '× Arbeitsbreiten', fRadiusS: 'Ecken runden: Radius (m)', radius0: '0 = Ecken wie AOG', fKind: 'Art', manual: '– von Hand –',
     toolInfo: 'Arbeitsbreite {0} m (Breite {1} m − Überlappung {2} m)', toolInfoS: 'Arbeitsbreite {0} m', needTool: 'Für Arbeitsbreiten oben ein Gerät wählen.',
-    hdHelp: '„Rundum bauen“ wie „Headland“ in AgOpenGPS um die Außengrenze; Radius 0 = Ecken wie AOG, ein Radius rundet sie. „Aus Linien bauen“ wie der Headland Builder: Linien setzen – Kurve oder Gerade zwischen zwei Grenzpunkten (z. B. die Ecken einer Seite) oder eine Spur anklicken –, jede Linie bekommt in der Liste ihren eigenen Abstand (m oder × Arbeitsbreiten). Das Vorgewende entsteht aus den Schnittpunkten; wo keine Linie ist, bleibt die Grenze (z. B. nur die Stirnseiten). Gezeichnet wird nur, was nicht auf der Grenze liegt.',
+    hdHelp: '„Rundum bauen“ wie „Headland“ in AgOpenGPS um die Außengrenze; Radius 0 = Ecken wie AOG, ein Radius rundet sie. „Aus Linien bauen“ wie der Headland Builder: Linien setzen – Kurve oder Gerade zwischen zwei Grenzpunkten (z. B. die Ecken einer Seite) –, jede Linie bekommt in der Liste ihren eigenen Abstand (m oder × Arbeitsbreiten). Eine Linie in der Liste oder auf der Karte anklicken wählt sie aus. Das Vorgewende entsteht aus den Schnittpunkten; wo keine Linie ist, bleibt die Grenze (z. B. nur die Stirnseiten). Gezeichnet wird nur, was nicht auf der Grenze liegt.',
     hdAroundMsg: 'Vorgewende rundum mit {0} m{1} – gelb gestrichelt die Vorschau.', hdRound: ', Ecken mit {0} m Radius', hdSharp: ', Ecken wie AOG',
     hdFail: 'Mit diesem Abstand bleibt kein Vorgewende übrig.', hdRoundTooBig: 'Das Feld ist für diesen Radius zu schmal – die Ecken bleiben wie in AOG. Kleineren Radius wählen.', hdDone: 'Vorgewende gebaut – wird beim Speichern übernommen.',
     hdSliceA: 'Linie: zwei Punkte auf der Grenze anklicken (z. B. die Ecken einer Seite).',
@@ -550,9 +550,9 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    hdLineNo: 'No line possible from this – choose other points.', hdNoLines: 'No lines yet. Choose a type and set a line.', hdAddTrack: 'Click a track to add it as a line.', hdBuildOk: 'Headland from {0} line(s) – yellow is the preview.',
+    hdLineNo: 'No line possible from this – choose other points.', hdNoLines: 'No lines yet. Choose a type and set a line.', hdBuildOk: 'Headland from {0} line(s) – yellow is the preview.',
     hdNextSide: 'Apply + next side',
-    segTrack: 'Track', hdPickTrack: 'Choose a track in the list or click it on the map.', hdSliceNoBase: 'No headland yet – the boundary stays on the other sides.',
+    hdSliceNoBase: 'No headland yet – the boundary stays on the other sides.',
     fCountR: 'Number right', fCountL: 'Number left',
     gripTitle: 'Drag: make the side panel wider or narrower',
     fSmoothW: 'Smoothing (m)', fSmoothRound: 'Rounding (%)', trackPickTitle: 'Click to select',
@@ -580,7 +580,7 @@ const I18N = {
     btnHdAround: 'Build around', btnHdSlice: 'Build from lines', gHdBuild: 'Build headland', btnTram: 'Along line', btnTramRing: 'Boundary tram', gTramBuild: 'Create tramlines', gSprayer: 'Tool (tramline spacing)',
     fDist: 'Distance (m)', fTool: 'Tool', fWidths: '× tool widths', fRadiusS: 'Round corners: radius (m)', radius0: '0 = corners like AOG', fKind: 'Type', manual: '– manual –',
     toolInfo: 'Working width {0} m (width {1} m − overlap {2} m)', toolInfoS: 'Working width {0} m', needTool: 'Choose a tool at the top for tool widths.',
-    hdHelp: '“Build around” like “Headland” in AgOpenGPS around the outer boundary; radius 0 = corners like AOG, a radius rounds them. “Build from lines” like the Headland Builder: set lines – curve or straight line between two boundary points (e.g. the corners of one side) or click a track –, each line gets its own distance in the list (m or × tool widths). The headland is built from the crossings; where there is no line the boundary stays (e.g. ends only). Only the parts not on the boundary are drawn.',
+    hdHelp: '“Build around” like “Headland” in AgOpenGPS around the outer boundary; radius 0 = corners like AOG, a radius rounds them. “Build from lines” like the Headland Builder: set lines – curve or straight line between two boundary points (e.g. the corners of one side) –, each line gets its own distance in the list (m or × tool widths). Click a line in the list or on the map to select it. The headland is built from the crossings; where there is no line the boundary stays (e.g. ends only). Only the parts not on the boundary are drawn.',
     hdAroundMsg: 'Headland around at {0} m{1} – dashed yellow is the preview.', hdRound: ', corners with {0} m radius', hdSharp: ', corners like AOG',
     hdFail: 'Nothing is left of the headland at this distance.', hdRoundTooBig: 'The field is too narrow for this radius – the corners stay like in AOG. Choose a smaller radius.', hdDone: 'Headland built – applied when you save.',
     hdSliceA: 'Line: click two points on the boundary (e.g. the corners of one side).',
@@ -2725,7 +2725,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, hdTrack: -1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2789,8 +2789,7 @@ const PARAMS = {
   smoothRound: { label: 'fSmoothRound', num: [1, 10], range: [10, 60] },
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
   radius: { label: 'fRadiusS', num: [0.5, 0], range: [0, 30], hint: () => t('radius0') },
-  hdKind: { label: 'fKind', seg: true, opts: () => [['curve', t('segCurve')], ['line', t('segLine')], ['track', t('segTrack')]] },
-  hdTrack: { label: 'fRefLine', opts: trackOpts },
+  hdKind: { label: 'fKind', seg: true, opts: () => [['curve', t('segCurve')], ['line', t('segLine')]] },
   fillLines: { label: 'fFillLines', seg: true, opts: () => [[1, t('segOneLine')], [2, t('segTwoLines')]] },
   tramTrack: { label: 'fRefLine', opts: trackOpts },
   tramTrack2: { label: 'fRefLine2', opts: trackOpts },
@@ -2847,7 +2846,6 @@ function renderCfg() {
   prof($('cfSprayer'), profiles.tools, cfg.sprayer);
   $('cfVehicle').disabled = !profiles.vehicles.length; $('cfTool').disabled = $('cfSprayer').disabled = !profiles.tools.length;
   const list = plane ? smallTracks() : [], has = i => list.some(x => x.i === i);
-  if (!has(cfg.hdTrack)) cfg.hdTrack = list.length ? list[0].i : -1;
   if (!has(cfg.tramTrack)) cfg.tramTrack = has(hiTrack) ? hiTrack : list.length ? list[0].i : -1;
   if (!has(cfg.tramTrack2) || cfg.tramTrack2 === cfg.tramTrack) { const o = list.find(x => x.i !== cfg.tramTrack); cfg.tramTrack2 = o ? o.i : -1; }
   document.querySelectorAll('[data-cfg]').forEach(el => {
@@ -2873,7 +2871,7 @@ function renderCfg() {
   $('btnTramDel').disabled = !nT;
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
-const INT_KEYS = new Set(['hdTrack', 'nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
+const INT_KEYS = new Set(['nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
 const RERENDER = new Set(['fillLines', 'withRing', 'hdKind']);        // diese Umschalter ändern, welche Einstellungen gezeigt werden
 function onCfg(el) {
   const k = el.dataset.cfg, v = el.value;
@@ -2958,9 +2956,9 @@ function startHdAround() {
 // entsteht aus den Schnittpunkten der verschobenen Linien; wo keine Linie ist, bleibt die Grenze.
 function startHdSlice() {
   if (!bnds[0]) return;
+  if (cfg.hdKind !== 'line') cfg.hdKind = 'curve';
   const F = aogFence(0), n = F.length, bb = bbox(F), ext = Math.hypot(bb[1] - bb[0], bb[3] - bb[2]) + 50;
   const nearestIdx = q => { let bi = 0, bd = Infinity; F.forEach((v, i) => { const d = dSq(v, q); if (d < bd) { bd = d; bi = i; } }); return bi; };
-  const XF = polyIndex(F), tracks = smallTracks().map(({ tr, i }) => { const R = refLine(tr); return { i, R, show: clipToPoly(R, XF), name: tr.name }; });
   const work = () => cfg.toolWidth - cfg.overlap;
   // Quelllinie aus zwei Grenzpunkten (Kurve: kürzerer Weg entlang der Grenze, Gerade: Verbindung)
   const fromPicks = (s, e, kind) => {
@@ -2986,6 +2984,12 @@ function startHdSlice() {
     tool.sel = lines.length - 1;
     renderLines(); tool.recalc();
   };
+  // Linie wählen (Liste oder Karte): weiß zeigen, Zeile markieren, Abstand gleich eintippen können
+  const selectLine = i => {
+    tool.sel = i; renderLines(); redrawTool();
+    const inp = document.querySelectorAll('#toolList .hdline input[type=number]')[i * 2];
+    if (inp) { inp.focus(); inp.select(); }
+  };
   const renderLines = () => {
     const box = $('toolList');
     box.innerHTML = '';
@@ -2993,27 +2997,27 @@ function startHdSlice() {
     lines.forEach((ln, i) => {
       const row = document.createElement('div'), nm = document.createElement('span'), m = document.createElement('input'), w = document.createElement('input');
       row.className = 'hdline' + (i === tool.sel ? ' on' : '') + (ln.fail ? ' fail' : '');
-      nm.className = 'nm'; nm.textContent = (i + 1) + ' · ' + (ln.kind === 'track' ? ln.name : t(ln.kind === 'line' ? 'segLine' : 'segCurve'));
+      nm.className = 'nm'; nm.textContent = (i + 1) + ' · ' + t(ln.kind === 'line' ? 'segLine' : 'segCurve');
       m.type = 'number'; m.step = 0.1; m.min = 0; m.value = ln.dist; m.title = t('fDist');
       w.type = 'number'; w.step = 1; w.min = 0; w.title = t('fWidths'); w.placeholder = '×'; w.disabled = !(work() > 0);
       if (work() > 0) { const k = ln.dist / work(); if (Math.abs(k - Math.round(k)) < 1e-6) w.value = Math.round(k); }
       m.oninput = () => { const v = parseFloat(m.value); if (v >= 0) { ln.dist = v; w.value = ''; tool.recalc(); } };
       w.oninput = () => { const k = parseFloat(w.value); if (k >= 0 && work() > 0) { ln.dist = Math.round(work() * k * 10) / 10; m.value = ln.dist; tool.recalc(); } };
-      row.onclick = ev => { if (ev.target.tagName === 'INPUT') return; tool.sel = i; renderLines(); redrawTool(); };
+      row.onclick = ev => { if (ev.target.tagName === 'INPUT') return; selectLine(i); };
+      m.onfocus = () => { if (tool.sel !== i) { tool.sel = i; document.querySelectorAll('#toolList .hdline').forEach((r, k) => r.classList.toggle('on', k === i)); redrawTool(); } };
       row.append(nm, m, document.createTextNode('m'), w, iconBtn('trash', t('delTitle'), () => { lines.splice(i, 1); tool.sel = -1; renderLines(); tool.recalc(); }));
       box.append(row);
     });
   };
   startTool({
-    title: 'btnHdSlice', params: () => cfg.hdKind === 'track' ? ['hdKind', 'hdTrack', 'hdDist', 'hdWidths'] : ['hdKind', 'hdDist', 'hdWidths'],
+    title: 'btnHdSlice', params: ['hdKind', 'hdDist', 'hdWidths'],
     picks: [], sel: -1, showPts: true, hideLayer: 'headland', list: true,
     msg: () => {
-      const how = cfg.hdKind === 'track' ? t('hdAddTrack') : t(tool.picks.length ? 'abDrawMsgB' : 'hdSliceA');
+      const how = t(tool.picks.length ? 'abDrawMsgB' : 'hdSliceA');
       if (!lines.length) return how;
       return (tool.res ? t('hdBuildOk', lines.length) : t('hdSliceNo')) + ' ' + how;
     },
     onClick: p => {
-      if (cfg.hdKind === 'track') return;                  // Spuren werden über die Klickflächen gewählt
       tool.picks.push(nearestIdx(plane.fwd(p.lat, p.lng)));
       if (tool.picks.length === 2) { const [s, e] = tool.picks; tool.picks = []; addLine(fromPicks(s, e, cfg.hdKind)); }
       else redrawTool();
@@ -3041,22 +3045,20 @@ function startHdSlice() {
       redrawTool();
     },
     draw: g => {
-      if (cfg.hdKind !== 'track') {
-        const vb = map.getBounds().pad(0.2), vis = F.map(ll).filter(q => vb.contains(q));
-        if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff9500', fillOpacity: 1, interactive: false }).addTo(g));
-        tool.picks.forEach(i => dot(ll(F[i]), '#ffd400').addTo(g));
-      } else tracks.forEach(x => x.show.forEach(P => {
-        // Spuren zum Hinzufügen: Hand-Cursor, beim Darüberfahren hell, Klick fügt die Spur als Linie hinzu
-        L.polyline(P.map(ll), { renderer: cv, color: '#ff4fd8', weight: 2.5, interactive: false }).addTo(g);
-        const hit = L.polyline(P.map(ll), { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
-        hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
-        hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
-        hit.on('click', () => { cfg.hdTrack = x.i; saveCfg(); renderCfg(); addLine({ R: x.R, mid: x.R.length >> 1, P: x.R, name: x.name }); });
-      }));
-      // die Quelllinien (gewählte weiß) und ihre verschobene Lage (orange)
+      const vb = map.getBounds().pad(0.2), vis = F.map(ll).filter(q => vb.contains(q));
+      if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff9500', fillOpacity: 1, interactive: false }).addTo(g));
+      tool.picks.forEach(i => dot(ll(F[i]), '#ffd400').addTo(g));
+      // die Linien (gewählte weiß) und ihre verschobene Lage (orange) – anklickbar: Hand-Cursor, beim Darüberfahren hell
       lines.forEach((ln, i) => {
-        L.polyline(ln.P === ln.R ? (tracks.find(x => x.R === ln.R) || { show: [ln.P] }).show.flat().map(ll) : ln.P.map(ll), { renderer: cv, color: i === tool.sel ? '#ffffff' : '#bbbbbb', weight: i === tool.sel ? 4 : 2, interactive: false }).addTo(g);
-        if (ln.seg) prevLine(g, ln.seg, '#ff9500', false, '6 5');
+        const on = i === tool.sel, show = [ln.P.map(ll)].concat(ln.seg ? [ln.seg.map(ll)] : []);
+        L.polyline(show[0], { renderer: cv, color: on ? '#ffffff' : '#bbbbbb', weight: on ? 4 : 2, interactive: false }).addTo(g);
+        if (ln.seg) prevLine(g, ln.seg, on ? '#ffffff' : '#ff9500', false, '6 5');
+        show.forEach(P => {
+          const hit = L.polyline(P, { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
+          hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
+          hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
+          hit.on('click', () => selectLine(i));
+        });
       });
       if (tool.res) offFence(tool.res.hd, true).forEach(run => prevLine(g, run, '#ffd400', false));   // auf der Grenze nichts zeichnen
     },
