@@ -461,8 +461,8 @@ const I18N = {
     btnSmooth: 'Glätten', btnFit: 'Ganzes Feld',
     smoothNeedSel: 'Zuerst rechts in der Liste eine Kurve anklicken.', bmEsri: 'Satellit (Esri)', bmAt: 'Orthofoto AT',
     btnMeasDist: 'Strecke', btnMeasArea: 'Fläche', close: 'Schließen',
-    measDistMsg: 'Punkte auf die Karte klicken – die Strecke wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
-    measAreaMsg: 'Eckpunkte auf die Karte klicken – die Fläche wird gemessen. Strg+Z nimmt den letzten Punkt zurück.',
+    measDistMsg: 'Punkte auf die Karte klicken – die Strecke wird gemessen. Rastet ein auf Grenzpunkten (grün), auf der Grenze und rechtwinklig zur Grenze (⟂, blau). Strg+Z nimmt den letzten Punkt zurück.',
+    measAreaMsg: 'Eckpunkte auf die Karte klicken – die Fläche wird gemessen. Rastet ein auf Grenzpunkten (grün), auf der Grenze und rechtwinklig zur Grenze (⟂, blau). Strg+Z nimmt den letzten Punkt zurück.',
     measDist: 'Strecke: <b>{0} m</b>', measArea: 'Fläche: <b>{0} ha</b> ({1} m²) · Umfang: {2} m',
     noField: 'kein Feld geöffnet', noHeadlines: 'Keine Vorgewende-Linien in diesem Feld.',
     btnHdAround: 'Rundum bauen', btnHdSlice: 'Aus Linien bauen', gHdBuild: 'Vorgewende bauen', btnTram: 'An Linie', btnTramRing: 'Randfahrgasse', gTramBuild: 'Fahrgassen erzeugen', gSprayer: 'Gerät (Fahrgassenabstand)',
@@ -577,8 +577,8 @@ const I18N = {
     btnSmooth: 'Smooth', btnFit: 'Whole field',
     smoothNeedSel: 'Click a curve in the list on the right first.', bmEsri: 'Satellite (Esri)', bmAt: 'Orthophoto AT',
     btnMeasDist: 'Distance', btnMeasArea: 'Area', close: 'Close',
-    measDistMsg: 'Click points on the map to measure the distance. Ctrl+Z removes the last point.',
-    measAreaMsg: 'Click the corners on the map to measure the area. Ctrl+Z removes the last point.',
+    measDistMsg: 'Click points on the map to measure the distance. Snaps to boundary points (green), the boundary and at right angles to it (⟂, blue). Ctrl+Z removes the last point.',
+    measAreaMsg: 'Click the corners on the map to measure the area. Snaps to boundary points (green), the boundary and at right angles to it (⟂, blue). Ctrl+Z removes the last point.',
     measDist: 'Distance: <b>{0} m</b>', measArea: 'Area: <b>{0} ha</b> ({1} m²) · Perimeter: {2} m',
     noField: 'no field open', noHeadlines: 'No headland lines in this field.',
     btnHdAround: 'Build around', btnHdSlice: 'Build from lines', gHdBuild: 'Build headland', btnTram: 'Along line', btnTramRing: 'Boundary tram', gTramBuild: 'Create tramlines', gSprayer: 'Tool (tramline spacing)',
@@ -3333,39 +3333,104 @@ $('btnTramMid').onclick = startTramMid;
 $('btnTramDel').onclick = startTramDel;
 
 // --- Messen: Strecke oder Fläche (geht auch ohne geöffnetes Feld) ---
+// Klicks rasten ein: auf Grenzpunkten und Fahnen, auf der Grenzlinie und – vom letzten Punkt auf der Grenze aus –
+// genau rechtwinklig (90°) zur Grenze, dort auch auf der gegenüberliegenden Grenze. Vor dem Klick zeigt eine
+// Gummilinie mit Länge und eine Marke, wo es einrastet.
+function measureSnap(latlng) {
+  const R = 10, cp = map.latLngToContainerPoint(latlng), px = q => map.latLngToContainerPoint(q);
+  let best = null;
+  const take = (d, q, kind, h) => { if (d < R && (!best || d < best.d)) best = { d, ll: q, kind, h }; };
+  // 1. rechtwinklig zur Grenze vom letzten Punkt aus (±6°) – hat Vorrang, damit es genau 90° bleibt
+  let perp = null;
+  const k = tool.pts.length - 1;
+  if (plane && k >= 0 && tool.hs[k] != null) {
+    const A = plane.fwd(tool.pts[k].lat, tool.pts[k].lng), C = plane.fwd(latlng.lat, latlng.lng), v = { e: C.e - A.e, n: C.n - A.n }, L0 = Math.hypot(v.e, v.n);
+    if (L0 > 0.5) {
+      const h = tool.hs[k], nr = { e: Math.cos(h), n: -Math.sin(h) }, c = (v.e * nr.e + v.n * nr.n) / L0;
+      if (Math.abs(c) > Math.cos(6 * D)) {
+        const s = Math.sign(c), dir = { e: nr.e * s, n: nr.n * s }, len = L0 * Math.abs(c);
+        perp = { A, dir, Q: { e: A.e + dir.e * len, n: A.n + dir.n * len } };
+      }
+    }
+  }
+  // 2. Grenzlinie (mit 90°: dort, wo die Rechtwinklige die Grenze trifft), 3. Grenzpunkte und Fahnen
+  const edges = () => {
+    const C = perp ? perp.Q : plane.fwd(latlng.lat, latlng.lng), cq = perp ? px(ll(perp.Q)) : cp;
+    bnds.forEach(b => {
+      if (b.hidden) return;
+      const n = b.pts.length;
+      for (let i = 0; i < n; i++) {
+        const a = b.pts[i], c = b.pts[(i + 1) % n], s2 = { e: c.e - a.e, n: c.n - a.n };
+        let q;
+        if (perp) {
+          const r = perp.dir, den = r.e * s2.n - r.n * s2.e;
+          if (!den) continue;
+          const tt = ((a.e - perp.A.e) * s2.n - (a.n - perp.A.n) * s2.e) / den, u = ((a.e - perp.A.e) * r.n - (a.n - perp.A.n) * r.e) / den;
+          if (tt <= 0.1 || u < 0 || u > 1) continue;
+          q = { e: perp.A.e + r.e * tt, n: perp.A.n + r.n * tt };
+        } else q = nearestOn(C, [a, c]);
+        const Q = ll(q);
+        take(px(Q).distanceTo(cq), Q, perp ? 'perpEdge' : 'edge', Math.atan2(s2.e, s2.n));
+      }
+    });
+  };
+  if (plane && perp) { edges(); if (best) return best; }
+  if (plane) bnds.forEach(b => {
+    if (b.hidden) return;
+    const n = b.pts.length;
+    b.pts.forEach((p, i) => { const q = ll(p), a = b.pts[(i - 1 + n) % n], c = b.pts[(i + 1) % n]; take(px(q).distanceTo(cp), q, 'pt', Math.atan2(c.e - a.e, c.n - a.n)); });
+  });
+  flags.forEach(f => { const q = L.latLng(f.lat, f.lon); take(px(q).distanceTo(cp), q, 'pt', null); });
+  if (best) return best;
+  if (plane && !perp) { edges(); if (best) return best; }
+  if (perp) return { ll: ll(perp.Q), kind: 'perp', h: null };
+  return { ll: latlng, kind: 'free', h: null };
+}
 function startMeasure(isArea) {
-  const P = () => dedupeClicks(tool.pts);
+  // Länge in lokalen Metern wie AOG (gleich wie die Summe unten)
+  const mdist = (a, b) => { const pl = Plane(a.lat, a.lng); return dist(pl.fwd(a.lat, a.lng), pl.fwd(b.lat, b.lng)); };
   const result = () => {
-    const pts = P(), pl = Plane(pts[0].lat, pts[0].lng), q = pts.map(p => pl.fwd(p.lat, p.lng));
+    const pts = tool.pts, pl = Plane(pts[0].lat, pts[0].lng), q = pts.map(p => pl.fwd(p.lat, p.lng));
     let len = 0;
     for (let i = 1; i < q.length; i++) len += dist(q[i - 1], q[i]);
     if (!isArea) return t('measDist', fmtNum(len, 2));
     const a = Math.abs(fenceSignedArea(q) / 2);
     return t('measArea', fmtNum(a / 10000, 4), fmtNum(a, 0), fmtNum(len + dist(q[q.length - 1], q[0]), 1));
   };
+  const label = (g, a, b, txt) => L.marker(L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), { interactive: false,
+    icon: L.divIcon({ className: '', html: `<span class="mlabel">${txt}</span>`, iconSize: [0, 0] }) }).addTo(g);
   startTool({
-    pts: [],
-    msg: () => P().length < (isArea ? 3 : 2) ? t(isArea ? 'measAreaMsg' : 'measDistMsg') : result(),
+    pts: [], hs: [],
+    msg: () => tool.pts.length < (isArea ? 3 : 2) ? t(isArea ? 'measAreaMsg' : 'measDistMsg') : result(),
     msgHtml: true,
-    onClick: p => { tool.pts.push(p); redrawTool(); },
-    onUndo: () => { tool.pts.pop(); redrawTool(); },
+    onClick: p => { const s = measureSnap(p); tool.pts.push(s.ll); tool.hs.push(s.h); tool.hover = null; redrawTool(); },
+    onUndo: () => { tool.pts.pop(); tool.hs.pop(); redrawTool(); },
+    // Vorschau unter der Maus: Einrast-Marke und Gummilinie mit Länge
+    onMove(p) {
+      const s = this.hover = measureSnap(p);
+      if (!this.hl) this.hl = L.layerGroup().addTo(toolLayer);
+      this.hl.clearLayers();
+      const col = s.kind === 'free' ? '#ffffff' : s.kind.startsWith('perp') ? '#00e5ff' : '#4cbb6c';
+      L.circleMarker(s.ll, { radius: 7, color: col, weight: 2, fill: false, interactive: false }).addTo(this.hl);
+      const last = this.pts[this.pts.length - 1];
+      if (last) {
+        L.polyline([last, s.ll], { color: col, weight: 2, dashArray: '6 5', interactive: false }).addTo(this.hl);
+        label(this.hl, last, s.ll, fmtNum(mdist(last, s.ll), 1) + ' m' + (s.kind.startsWith('perp') ? ' ⟂' : ''));
+      }
+    },
     cancelLabel: 'close',
     draw: g => {
-      const pts = P(), style = { color: '#ffd400', weight: 2.5, interactive: false };
+      const pts = tool.pts, style = { color: '#ffd400', weight: 2.5, interactive: false };
       if (isArea && pts.length > 2) L.polygon(pts, { ...style, fillOpacity: .15 }).addTo(g);
       else if (pts.length > 1) L.polyline(pts, style).addTo(g);
       pts.forEach(p => dot(p, '#ffd400').addTo(g));
-      if (!isArea) {                                   // Teilstrecken beschriften
-        for (let i = 1; i < pts.length; i++) {
-          const m = L.latLng((pts[i - 1].lat + pts[i].lat) / 2, (pts[i - 1].lng + pts[i].lng) / 2);
-          L.marker(m, { interactive: false, icon: L.divIcon({ className: '', html: `<span class="mlabel">${fmtNum(map.distance(pts[i - 1], pts[i]), 1)} m</span>`, iconSize: [0, 0] }) }).addTo(g);
-        }
-      }
+      if (!isArea) for (let i = 1; i < pts.length; i++) label(g, pts[i - 1], pts[i], fmtNum(mdist(pts[i - 1], pts[i]), 1) + ' m');   // Teilstrecken
     }
   });
   $('btnMeasDist').classList.toggle('on', !isArea);
   $('btnMeasArea').classList.toggle('on', isArea);
 }
+map.on('mousemove', e => { if (tool && tool.onMove) tool.onMove(e.latlng); });
 $('btnMeasDist').onclick = () => startMeasure(false);
 $('btnMeasArea').onclick = () => startMeasure(true);
 
