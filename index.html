@@ -247,6 +247,7 @@
   <symbol id="i-trackw" viewBox="0 0 24 24"><rect x="2.5" y="5" width="4" height="14" rx="1.2"/><rect x="17.5" y="5" width="4" height="14" rx="1.2"/><path d="M8.5 12h7M10.5 10l-2 2 2 2M13.5 10l2 2-2 2"/></symbol>
   <symbol id="i-implement" viewBox="0 0 24 24"><path d="M2 8h20M12 4v4"/><path d="M4.5 8v7l-1 2M9.5 8v7l-1 2M14.5 8v7l-1 2M19.5 8v7l-1 2"/></symbol>
   <symbol id="i-spacing" viewBox="0 0 24 24"><path d="M3.5 5v14M20.5 5v14M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/></symbol>
+  <symbol id="i-angle" viewBox="0 0 24 24"><path d="M3 20h18M3 20L15 4"/><path d="M10 20a7 7 0 0 0-2.7-5.5"/></symbol>
   <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 19l3-13 13-2 2 13z"/><path d="M6 15l12-2M5 11l13-2"/></symbol>
 </svg>
 <div id="app">
@@ -293,7 +294,6 @@
           <button class="big c-bnd" id="btnDel" disabled><svg class="ic"><use href="#i-delpt"/></svg><span data-i18n="btnDel">Punkt löschen</span></button>
         </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
         <div class="grp"><div class="gbody">
-          <div class="gcol"><label class="muted" for="tol" data-i18n="simpLabel">Toleranz (m)</label><input id="tol" type="number" value="0.01" min="0.001" step="0.01"></div>
           <button class="big c-bnd" id="btnSimp" disabled><svg class="ic"><use href="#i-simp"/></svg><span data-i18n="btnSimp">Ausdünnen</span></button>
         </div><div class="gcap" data-i18n="gReduce">Punkte ausdünnen</div></div>
         <div class="grp"><div class="gbody">
@@ -350,6 +350,7 @@
         <div class="grp"><div class="gbody">
           <button class="big c-meas" id="btnMeasDist"><svg class="ic"><use href="#i-ruler"/></svg><span data-i18n="btnMeasDist">Strecke</span></button>
           <button class="big c-meas" id="btnMeasArea"><svg class="ic"><use href="#i-area"/></svg><span data-i18n="btnMeasArea">Fläche</span></button>
+          <button class="big c-meas" id="btnMeasAngle"><svg class="ic"><use href="#i-angle"/></svg><span data-i18n="btnMeasAngle">Winkel</span></button>
         </div><div class="gcap" data-i18n="gMeasure">Messen</div></div>
       </div>
     </div>
@@ -444,7 +445,8 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
-    measSeg: 'Strecke', measLen: 'Länge', measDir: 'Richtung', measAngleAt: 'Winkel bei {0}',
+    confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
+    measSeg: 'Strecke', measLen: 'Länge', measAngleAt: 'Winkel bei {0}',
     segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
     hdLineNo: 'Daraus lässt sich keine Linie machen – andere Punkte wählen.', hdNoLines: 'Noch keine Linien. Art wählen und Linie setzen.', hdBuildOk: 'Vorgewende aus {0} Linie(n) – gelb die Vorschau.',
     hdNextSide: 'Übernehmen + nächste Seite',
@@ -561,7 +563,8 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
-    measSeg: 'Segment', measLen: 'Length', measDir: 'Direction', measAngleAt: 'Angle at {0}',
+    confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
+    measSeg: 'Segment', measLen: 'Length', measAngleAt: 'Angle at {0}',
     segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
     hdLineNo: 'No line possible from this – choose other points.', hdNoLines: 'No lines yet. Choose a type and set a line.', hdBuildOk: 'Headland from {0} line(s) – yellow is the preview.',
     hdNextSide: 'Apply + next side',
@@ -933,9 +936,18 @@ function setOrigin(la, lo) {
 }
 function askOrigin(la, lo) {
   const d = distM(plane.lat0, plane.lon0, la, lo);
-  if (!confirm(t('confirmOrigin', d.toFixed(0)))) return;
-  setOrigin(la, lo);
-  setStatus(t('originMoved'), 'ok');
+  startTool({
+    title: 'hOrigin', params: [], msgHtml: true, okLabel: 'apply',
+    msg: () => esc(t('confirmOrigin', d.toFixed(0))).replace(/\n/g, '<br>'),
+    draw: g => {
+      L.circle([la, lo], { radius: 500, color: '#ffd400', weight: 2, dashArray: '8 6', fill: false, interactive: false }).addTo(g);
+      dot(L.latLng(la, lo), '#ffd400').addTo(g);
+    },
+    ok() { setOrigin(la, lo); setStatus(t('originMoved'), 'ok'); }
+  });
+}
+function startOriginPick() {
+  startTool({ title: 'btnOriginClick', params: [], msg: () => t('originPickMsg'), onClick: p => askOrigin(p.lat, p.lng) });
 }
 
 // ---------- Dateien lesen ----------
@@ -1269,16 +1281,20 @@ $('btnRegrant').onclick = async () => {
 
 $('fieldFilter').oninput = renderFieldList;
 
-$('fieldList').onchange = async e => {
-  const name = e.target.value;
-  if (!name || name === currentField) return;
-  if (unsaved && !confirm(t('discard'))) { e.target.value = currentField; return; }
+async function openField(name) {
   try {
     const d = await rootHandle.getDirectoryHandle(name);
     load(await readDir(d));
     dirHandle = d; currentField = name;
+    renderFieldList();
     setStatus(t('fieldLoaded', name), 'ok');
   } catch (err) { setStatus(t('error', err.message), 'err'); }
+}
+$('fieldList').onchange = e => {
+  const name = e.target.value;
+  if (!name || name === currentField) return;
+  if (unsaved) { e.target.value = currentField; askPanel('hFields', t('discard') + '\n„' + name + '“', () => openField(name), 'discardYes'); return; }
+  openField(name);
 };
 
 // Beim Start den gemerkten Felder-Ordner wieder öffnen (Chrome fragt ggf. einmal nach der Erlaubnis)
@@ -1666,12 +1682,11 @@ function renderNames() {
     }
     row.append(tag, inp,
       iconBtn(tr.hidden ? 'eyeoff' : 'eye', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }, tr.hidden ? 'off' : ''),
-      iconBtn('trash', t('delTitle'), () => {
-        if (!confirm(t('confirmDelTrack', tr.name || t('noName')))) return;
+      iconBtn('trash', t('delTitle'), () => askPanel('delTitle', t('confirmDelTrack', tr.name || t('noName')), () => {
         tr.deleted = true; listDirty[kind] = true; unsaved = true;
         if (hiTrack === i) hiTrack = -1;
         drawLayer(kind); renderLayerList(); renderNames();
-      }));
+      }, 'delTitle')));
     boxes[kind].append(row);
   });
   add('tracks', ex.tracks, tr => tr.mode === 2 ? t('tagAB') : tr.mode === 4 ? t('tagCurve') : t('tagTrack'));
@@ -1701,6 +1716,11 @@ function initExtras() {
 const toolLayer = L.layerGroup().addTo(map);
 let tool = null, bndListDirty = false;
 
+// Rückfrage in der Seitenleiste statt Browser-Fenster: Text, Bestätigen, Abbrechen
+const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+function askPanel(title, text, onYes, yesLabel) {
+  startTool({ title, params: [], msgHtml: true, msg: () => esc(text).replace(/\n/g, '<br>'), okLabel: yesLabel || 'confirmYes', ok() { onYes(); } });
+}
 function startTool(def) {
   closeTool();
   if (mode) setMode(mode);                       // laufenden Modus (Fahne/Ursprung) beenden
@@ -1815,27 +1835,25 @@ function startDrawBoundary(inner) {
     okEnabled: () => dedupeClicks(tool.pts).length >= 3,
     ok() {
       const nb = { flagLines: ['False'], pts: dedupeClicks(this.pts).map(p => plane.fwd(p.lat, p.lng)), orig: [], dirty: true };
-      if (inner) { bnds.push(nb); active = bnds.length - 1; }
-      else if (bnds[0]) { if (!confirm(t('confirmReplaceOuter'))) return; bnds[0] = nb; active = 0; }
-      else { bnds.unshift(nb); active = 0; }
-      bndListDirty = true; unsaved = true; undo = []; sel = -1;
-      renderBndList(); drawAll();
-      setStatus(t('bndCreated'), 'ok');
+      const done = () => { bndListDirty = true; unsaved = true; undo = []; sel = -1; renderBndList(); drawAll(); setStatus(t('bndCreated'), 'ok'); };
+      if (inner) { bnds.push(nb); active = bnds.length - 1; done(); }
+      else if (bnds[0]) askPanel('btnNewOuter', t('confirmReplaceOuter'), () => { bnds[0] = nb; active = 0; done(); });
+      else { bnds.unshift(nb); active = 0; done(); }
     }
   });
 }
 
 function deleteBoundary() {
   if (!bnds[active]) return;
-  if (active === 0) {
-    if (bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
-    if (!confirm(t('confirmDelOuter'))) return;
-  } else if (!confirm(t('confirmDelBnd'))) return;
-  bnds.splice(active, 1);
-  active = 0; sel = -1; undo = [];
-  bndListDirty = true; unsaved = true;
-  renderBndList(); drawAll();
-  setStatus(t('bndDeleted'), 'ok');
+  if (active === 0 && bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
+  const i = active;
+  askPanel('delTitle', t(i === 0 ? 'confirmDelOuter' : 'confirmDelBnd'), () => {
+    bnds.splice(i, 1);
+    active = 0; sel = -1; undo = [];
+    bndListDirty = true; unsaved = true;
+    renderBndList(); drawAll();
+    setStatus(t('bndDeleted'), 'ok');
+  }, 'delTitle');
 }
 
 // --- Spuren: neue AB-Linie, neue Kurve, Kurve glätten ---
@@ -2085,10 +2103,25 @@ function newFieldTemplates() {
 }
 function newField() {
   if (window.showDirectoryPicker && !rootHandle) { setStatus(t('needRoot'), 'err'); return; }
-  if (unsaved && !confirm(t('discard'))) return;
-  let name = prompt(t('newFieldName'), '');
-  if (name === null) return;
-  name = name.replace(/[\\/:*?"<>|]/g, '').trim();          // unzulässige Zeichen wie in AOG entfernen
+  if (unsaved) { askPanel('btnNewField', t('discard'), askFieldName, 'discardYes'); return; }
+  askFieldName();
+}
+// Name des neuen Feldes in der Seitenleiste eingeben (Enter = Übernehmen)
+function askFieldName() {
+  startTool({
+    title: 'btnNewField', params: [], okLabel: 'apply', msg: () => t('newFieldName'),
+    okEnabled: () => !!(tool.nameVal || '').replace(/[\\/:*?"<>|]/g, '').trim(),
+    ok() { createField(this.nameVal); }
+  });
+  const inp = document.createElement('input');
+  inp.placeholder = t('newFieldName');
+  inp.oninput = () => { tool.nameVal = inp.value; updateToolbox(); };
+  inp.onkeydown = e => { if (e.key === 'Enter') finishTool(); };
+  $('toolList').append(inp);
+  inp.focus();
+}
+function createField(name) {
+  name = String(name || '').replace(/[\\/:*?"<>|]/g, '').trim();          // unzulässige Zeichen wie in AOG entfernen
   if (!name) return;
   if (fieldNames.some(n => n.toLowerCase() === name.toLowerCase())) { setStatus(t('fieldExists', name), 'err'); return; }
   const c = map.getCenter();                                 // vorläufiger Ursprung, beim Speichern in die Feldmitte
@@ -2107,7 +2140,9 @@ const CLEAR_FILES = {
   backpic: ['BackPic.txt', '$BackPic\r\nFalse\r\n']
 };
 function clearLayer(id, label) {
-  if (!confirm(t('confirmClear', label))) return;
+  askPanel('delTitle', t('confirmClear', label), () => doClearLayer(id, label), 'delTitle');
+}
+function doClearLayer(id, label) {
   if (id === 'flags') { flags = []; selFlag = -1; flagsDirty = true; drawFlags(); updateInfo(); }
   else {
     const [f, empty] = CLEAR_FILES[id];
@@ -2761,7 +2796,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2821,6 +2856,7 @@ const trackOpts = () => smallTracks().map(({ tr, i }) => [i, tr.name]);
 // seg: feste Möglichkeiten als Umschalt-Knöpfe statt Auswahlliste
 const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
+  simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
   smoothW: { label: 'fSmoothW', num: [1, 0], range: [0, 50] },
   smoothRound: { label: 'fSmoothRound', num: [1, 10], range: [10, 60] },
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
@@ -3418,11 +3454,11 @@ function startMeasure(isArea) {
     for (let i = 0; i < segs; i++) {
       const j = (i + 1) % pts.length, d = dist(q[i], q[j]);
       len += d;
-      rows.push(`<tr><td>${i + 1}–${j + 1}</td><td>${fmtNum(d, 2)} m</td><td>${fmtNum(bearing(pts[i], pts[j]), 1)}°</td></tr>`);
+      rows.push(`<tr><td>${i + 1}–${j + 1}</td><td>${fmtNum(d, 2)} m</td></tr>`);
     }
-    const ang = angles().map(x => `<tr><td>${t('measAngleAt', x.i + 1)}</td><td colspan="2">${fmtNum(x.a, 1)}°</td></tr>`);
+    const ang = angles().map(x => `<tr><td>${t('measAngleAt', x.i + 1)}</td><td>${fmtNum(x.a, 1)}°</td></tr>`);
     const head = isArea ? t('measArea', fmtNum(Math.abs(fenceSignedArea(q) / 2) / 10000, 4), fmtNum(Math.abs(fenceSignedArea(q) / 2), 0), fmtNum(len, 1)) : t('measDist', fmtNum(len, 2));
-    return head + `<table class="mtab"><tr><th>${t('measSeg')}</th><th>${t('measLen')}</th><th>${t('measDir')}</th></tr>${rows.join('')}${ang.join('')}</table>`;
+    return head + `<table class="mtab"><tr><th>${t('measSeg')}</th><th>${t('measLen')}</th></tr>${rows.join('')}${ang.join('')}</table>`;
   };
   const label = (g, a, b, txt) => L.marker(L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), { interactive: false,
     icon: L.divIcon({ className: '', html: `<span class="mlabel">${txt}</span>`, iconSize: [0, 0] }) }).addTo(g);
@@ -3460,6 +3496,63 @@ function startMeasure(isArea) {
   $('btnMeasArea').classList.toggle('on', isArea);
 }
 map.on('mousemove', e => { if (tool && tool.onMove) tool.onMove(e.latlng); });
+// Winkel zwischen zwei Linien: Spuren (AB-Linie, bei Kurven Anfang→Ende) oder automatisch erkannte Feldseiten.
+// Erster Klick = Linie 1, zweiter = Linie 2 (Nummern auf der Karte). Angezeigt am Schnittpunkt der verlängerten Linien.
+function startAngle() {
+  const cand = [];                                     // { key, name, A, B (Ebene), show (latlng) }
+  smallTracks().filter(({ tr }) => tr.mode !== 32).forEach(({ tr, i }) => {
+    let A, B;
+    if (tr.mode === 2) { const toP = v => { const [la, lo] = wgs(v[0], v[1]); return plane.fwd(la, lo); }; A = toP(tr.a); B = toP(tr.b); }
+    else { A = plane.fwd(...tr.pts[0]); B = plane.fwd(...tr.pts[tr.pts.length - 1]); }
+    cand.push({ key: 't' + i, track: i, name: tr.name, A, B });
+  });
+  if (bnds[0]) {
+    const F = aogFence(0), n = F.length;
+    detectSides(F).forEach((sd, k) => {
+      const P = []; for (let i = sd.a; i !== sd.b; i = (i + 1) % n) P.push(F[i]); P.push(F[sd.b]);
+      cand.push({ key: 's' + k, name: t('angSide', k + 1), A: F[sd.a], B: F[sd.b], show: P.map(ll) });
+    });
+  }
+  const sel = [], pick = c => { if (sel.length >= 2) sel.length = 0; if (!sel.includes(c)) sel.push(c); redrawTool(); };
+  const result = () => {
+    if (sel.length < 2) return null;
+    const [p, q] = sel, u = { e: p.B.e - p.A.e, n: p.B.n - p.A.n }, v = { e: q.B.e - q.A.e, n: q.B.n - q.A.n };
+    const c = (u.e * v.e + u.n * v.n) / (Math.hypot(u.e, u.n) * Math.hypot(v.e, v.n)), a = Math.acos(Math.min(1, Math.abs(c))) / D;
+    const den = u.e * v.n - u.n * v.e;
+    let X = null;
+    if (Math.abs(den) > 1e-9) { const s1 = ((q.A.e - p.A.e) * v.n - (q.A.n - p.A.n) * v.e) / den; X = { e: p.A.e + u.e * s1, n: p.A.n + u.n * s1 }; }
+    return { a, X };
+  };
+  startTool({
+    title: 'btnMeasAngle', params: [], msgHtml: true, cancelLabel: 'close',
+    msg: () => {
+      if (sel.length < 2) return esc(t(sel.length ? 'angPick2' : 'angPick1'));
+      const r = result();
+      return (r.a < 0.05 ? esc(t('angParallel')) : t('angMsg', fmtNum(r.a, 1), fmtNum(180 - r.a, 1))) + '<br>① ' + esc(sel[0].name) + ' · ② ' + esc(sel[1].name);
+    },
+    draw: g => {
+      // Kandidaten anklickbar: Spuren wie im Register Spuren, Feldseiten entlang der Grenze
+      if (!layerOn.tracks) setLayer('tracks', true);
+      trackPickHits(g, i => { const c = cand.find(x => x.track === i); if (c) pick(c); }, i => cand.some(x => x.track === i));
+      cand.filter(c => c.show).forEach(c => {
+        const hit = L.polyline(c.show, { color: '#fff', opacity: 0, weight: 14, bubblingMouseEvents: false }).addTo(g);
+        hit.on('mouseover', () => hit.setStyle({ opacity: .35 }));
+        hit.on('mouseout', () => hit.setStyle({ opacity: 0 }));
+        hit.on('click', () => pick(c));
+      });
+      sel.forEach((c, k) => {
+        L.polyline([ll(c.A), ll(c.B)], { color: '#ffffff', weight: 5, opacity: .9, interactive: false }).addTo(g);
+        numBadge(g, ll({ e: (c.A.e + c.B.e) / 2, n: (c.A.n + c.B.n) / 2 }), k + 1);
+      });
+      const r = result();
+      if (r && r.X && Math.hypot(r.X.e - sel[0].A.e, r.X.n - sel[0].A.n) < 5000) {
+        sel.forEach(c => { const m = dist(c.A, r.X) < dist(c.B, r.X) ? c.A : c.B; L.polyline([ll(m), ll(r.X)], { color: '#00e5ff', weight: 2.5, dashArray: '6 5', interactive: false }).addTo(g); });
+        L.marker(ll(r.X), { interactive: false, icon: L.divIcon({ className: '', html: `<span class="alabel">${fmtNum(r.a, 1)}°</span>`, iconSize: [0, 0] }) }).addTo(g);
+      }
+    }
+  });
+}
+$('btnMeasAngle').onclick = startAngle;
 $('btnMeasDist').onclick = () => startMeasure(false);
 $('btnMeasArea').onclick = () => startMeasure(true);
 
@@ -3569,17 +3662,30 @@ function setStatus(msg, cls) { const s = document.getElementById('status'); s.te
 document.getElementById('btnDel').onclick = () => deletePoint(sel);
 document.getElementById('btnUndo').onclick = doUndo;
 document.getElementById('btnSimp').onclick = () => {
-  const b = bnds[active], tol = parseFloat(document.getElementById('tol').value);
-  if (!b || !(tol > 0)) return;
-  const res = simplifyRing(b.pts, tol);
-  if (res.length < 3) { setStatus(t('tolTooBig'), 'err'); return; }
-  pushUndo(); const before = b.pts.length;
-  b.pts = res; sel = -1; changed(b); drawAll();
-  setStatus(t('reduced', before, res.length), 'ok');
+  const b = bnds[active];
+  if (!b) return;
+  startTool({
+    title: 'btnSimp', params: ['simpTol'], res: null,
+    msg: () => !tool.res ? t('tolTooBig') : t('simpMsg', b.pts.length, tool.res.length),
+    recalc() { const r = cfg.simpTol > 0 ? simplifyRing(b.pts, cfg.simpTol) : b.pts; this.res = r.length >= 3 ? r : null; redrawTool(); },
+    draw: g => { if (tool.res) { prevLine(g, tool.res, '#ffd400', true); tool.res.forEach(p => L.circleMarker(ll(p), { renderer: cv, radius: 3, color: '#000', weight: 1, fillColor: '#ffd400', fillOpacity: 1, interactive: false }).addTo(g)); } },
+    okEnabled: () => !!tool.res,
+    ok() { pushUndo(); const before = b.pts.length; b.pts = this.res; sel = -1; changed(b); drawAll(); setStatus(t('reduced', before, this.res.length), 'ok'); }
+  });
+  tool.recalc();
 };
-document.getElementById('btnAddFlag').onclick = () => setMode('flag');
+document.getElementById('btnAddFlag').onclick = () => startTool({
+  title: 'btnAddFlag', params: [], hideOk: true, cancelLabel: 'done', msg: () => t('flagPickMsg'),
+  onClick: p => {
+    const id = flags.reduce((m, f) => Math.max(m, f.id || 0), 0) + 1;
+    flags.push({ lat: p.lat, lon: p.lng, heading: 0, color: 0, id, notes: '' });
+    selFlag = flags.length - 1; sel = -1; flagsDirty = unsaved = true;
+    if (!layerOn.flags) setLayer('flags', true);
+    drawFlags(); updateInfo(); renderLayerList();
+  }
+});
 document.getElementById('btnFit').onclick = fitField;          // wie beim Öffnen des Feldes
-document.getElementById('btnOriginClick').onclick = () => setMode('origin');
+document.getElementById('btnOriginClick').onclick = startOriginPick;
 document.getElementById('btnOriginCenter').onclick = () => {
   const c = centroid(bnds[0].pts), [la, lo] = plane.inv(c.e, c.n);
   askOrigin(la, lo);

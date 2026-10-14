@@ -48,7 +48,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Add, move and delete flags. All flags are listed on the right; click one (in the list or on the map) to show its color, note and coordinates. Selecting the Flags tab shows the flags on the map.
 
 **Field origin (StartFix)** (in the Boundary tab)
-- Move the origin to the field center or to any other point. All files in the field folder are converted along with it: boundary, headland, tracks, coverage, tramlines, recorded paths, elevation data and background image.
+- Move the origin to the field center or to any other point. The new point and the 500 m circle are previewed, you confirm in the side panel. All files in the field folder are converted along with it: boundary, headland, tracks, coverage, tramlines, recorded paths, elevation data and background image.
 - A circle shows the 500 m within which "Drive In" finds the field. "Drive In" only lists a field when you are within 500 m of its StartFix, which is where you pressed "New" when the field was created.
 
 **Show** (map background and further layers in the Field tab)
@@ -63,7 +63,8 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
 **Measure**
-- Distance or area with perimeter: click points on the map. The side panel lists length and direction (0–360°) of every segment and the angles at the points; the map shows numbers and angles. Clicks snap to boundary points, flags and the boundary, and at right angles to the boundary – e.g. to measure the field width exactly. Works without an open field too.
+- Distance or area with perimeter: click points on the map. The side panel lists the length of every segment and the angles at the points; the map shows numbers and angles. Clicks snap to boundary points, flags and the boundary, and at right angles to the boundary – e.g. to measure the field width exactly. Works without an open field too.
+- Angle between two lines: click line 1 and line 2 on the map – a track (for curves the straight line from start to end counts) or an automatically detected field side. The angle is shown in the side panel and at the intersection on the map.
 
 **Field list**
 - Choose the folder `Documents\AgOpenGPS` once. All fields then appear in a searchable list, and one click opens a field. Vehicles and tools are read from the same folder. The folder is remembered. (If you choose only `Fields`, you can edit fields but have no vehicle/tool profiles.)

@@ -20,7 +20,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion.
 - Neue Außen- oder Innengrenze zeichnen: Punkte auf die Karte klicken.
 - Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), das Auge blendet ein oder aus, der Papierkorb löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
-- „Ausdünnen“ entfernt überflüssige Punkte.
+- „Ausdünnen“ entfernt überflüssige Punkte. Die Toleranz wird in der Seitenleiste eingestellt, die ausgedünnte Grenze ist vorher als Vorschau zu sehen.
 - Beim Speichern wird die Grenze so aufbereitet, wie AgOpenGPS sie selbst speichert: Punktabstand, Umlaufrichtung und Richtung jedes Punkts. Nur dann berechnet AgOpenGPS daraus eine korrekte Wendelinie.
 - Grenzen mit zu wenigen Punkten erkennt der Editor beim Öffnen und repariert sie beim Speichern.
 
@@ -48,7 +48,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Fahnen setzen, verschieben und löschen. Rechts stehen alle Fahnen; ein Klick (in der Liste oder auf der Karte) klappt Farbe, Notiz und Koordinaten auf. Das Register „Fahnen“ blendet die Fahnen auf der Karte ein.
 
 **Feld-Ursprung (StartFix)** (im Register Grenze)
-- Der Ursprung lässt sich in die Feldmitte oder an eine beliebige Stelle verschieben. Alle Dateien im Feldordner werden dabei mit umgerechnet: Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahrgassen, Pfade, Höhendaten und Hintergrundbild.
+- Der Ursprung lässt sich in die Feldmitte oder an eine beliebige Stelle verschieben. Der neue Punkt und der 500-m-Kreis werden vorher angezeigt, bestätigt wird in der Seitenleiste. Alle Dateien im Feldordner werden dabei mit umgerechnet: Grenze, Vorgewende, Spuren, bearbeitete Fläche, Fahrgassen, Pfade, Höhendaten und Hintergrundbild.
 - Ein Kreis zeigt die 500 m, in denen „Drive In“ das Feld findet. „Drive In“ zeigt ein Feld nur an, wenn du höchstens 500 m vom StartFix entfernt bist, also von der Stelle, an der beim Anlegen „Neu“ gedrückt wurde.
 
 **Anzeigen** (Kartenhintergrund und weitere Ebenen im Register Feld)
@@ -63,7 +63,8 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
 **Messen**
-- Strecke oder Fläche mit Umfang: Punkte auf die Karte klicken. In der Seitenleiste stehen Länge und Richtung (0–360°) jeder Teilstrecke und die Winkel an den Punkten, auf der Karte Nummern und Winkel. Klicks rasten auf Grenzpunkten, Fahnen und der Grenze ein, und rechtwinklig zur Grenze – so lässt sich z. B. die Feldbreite genau messen. Geht auch ohne geöffnetes Feld.
+- Strecke oder Fläche mit Umfang: Punkte auf die Karte klicken. In der Seitenleiste stehen die Länge jeder Teilstrecke und die Winkel an den Punkten, auf der Karte Nummern und Winkel. Klicks rasten auf Grenzpunkten, Fahnen und der Grenze ein, und rechtwinklig zur Grenze – so lässt sich z. B. die Feldbreite genau messen. Geht auch ohne geöffnetes Feld.
+- Winkel zwischen zwei Linien: Linie 1 und Linie 2 auf der Karte anklicken – eine Spur (bei Kurven zählt die Gerade von Anfang bis Ende) oder eine automatisch erkannte Feldseite. Der Winkel steht in der Seitenleiste und am Schnittpunkt auf der Karte.
 
 **Felder-Liste**
 - Einmal den Ordner `Dokumente\AgOpenGPS` wählen. Danach stehen alle Felder in einer Liste mit Suche, ein Klick öffnet das Feld. Fahrzeuge und Geräte liest der Editor aus demselben Ordner. Der Ordner wird gemerkt. (Wer nur `Fields` wählt, kann die Felder bearbeiten, hat aber keine Fahrzeug-/Geräteprofile.)
