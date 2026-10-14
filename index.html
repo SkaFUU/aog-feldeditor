@@ -189,6 +189,8 @@
   .seg button:last-child { border-radius:0 4px 4px 0; border-right:0; }
   .seg button:hover { background:#3a3f46; }
   .seg button.on { background:var(--tab); color:#000; font-weight:600; }
+  .seg[data-seg="expFmt"] { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+  .seg[data-seg="expFmt"] button { border-radius:4px; border-right:0; }
   .form { grid-template-columns:minmax(70px, 38%) minmax(0, 1fr); gap:5px 8px; align-items:center; font-size:12.5px; }
   .form input, .form select { padding:3px 6px; min-width:0; width:100%; }
   .form > * { min-width:0; }
@@ -211,6 +213,9 @@
 <body>
 <svg width="0" height="0" style="position:absolute">
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
+  <symbol id="i-chk" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12.5l3 3 5-6"/></symbol>
+  <symbol id="i-chkoff" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/></symbol>
   <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></symbol>
   <symbol id="i-newfield" viewBox="0 0 24 24"><path d="M3 20l2-10 8-3 4 7-5 6z"/><path d="M19 2v6M16 5h6"/></symbol>
   <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 1-2z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></symbol>
@@ -277,6 +282,9 @@
           <button class="big c-file" id="btnRegrant" style="display:none"><svg class="ic"><use href="#i-key"/></svg><span data-i18n="btnRegrant">Zugriff erlauben</span></button>
           <button class="big c-file" id="btnNewField"><svg class="ic"><use href="#i-newfield"/></svg><span data-i18n="btnNewField">Neues Feld</span></button>
         </div><div class="gcap" data-i18n="gFields">Felder</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-file" id="btnExport" disabled><svg class="ic"><use href="#i-export"/></svg><span data-i18n="btnExport">Exportieren</span></button>
+        </div><div class="gcap">Export</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
           <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
@@ -449,6 +457,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    btnExport: 'Exportieren', fExpFmt: 'Format', expDownload: 'Herunterladen', expBnd: 'Feldgrenze', expTramOuter: 'Randfahrgasse außen', expTramInner: 'Randfahrgasse innen', expFlag: 'Fahne {0}', expIsoOnly: 'Bei ISOXML vorerst nur Grenze und Spuren', expUnsaved: 'Exportiert wird der aktuelle Stand im Editor, auch noch nicht Gespeichertes.', expDone: '{0} heruntergeladen.', expKml: 'Eine <b>.kml</b>-Datei – z. B. für Google Earth. Jede Ebene ist ein eigener Ordner.', expGeo: 'Eine <b>.geojson</b>-Datei – z. B. für QGIS.', expShp: 'Ein <b>ZIP</b> mit einem Shapefile je Ebene (.shp, .shx, .dbf, .prj) – z. B. für QGIS, Hof-Programme und Terminals.', expIso: 'Ein <b>ZIP</b> mit TASKDATA/TASKDATA.XML (ISOXML Version 4) für Terminals. <b>Vorerst nur Grenze und Spuren</b> (AB-Linien und Kurven). Noch nicht an Terminals getestet – Rückmeldungen willkommen!',
     fCovEdge: 'Gerade Kanten ab (m)', covEdgeHint: 'Gerade Stücke ab dieser Länge werden zu geraden Kanten, die zackigen Wendebereiche dazwischen zu einer scharfen Ecke. 0 = aus.', btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
     confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
     measSeg: 'Strecke', measLen: 'Länge', measAngleAt: 'Winkel bei {0}',
@@ -568,6 +577,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    btnExport: 'Export', fExpFmt: 'Format', expDownload: 'Download', expBnd: 'Field boundary', expTramOuter: 'Boundary tram outer', expTramInner: 'Boundary tram inner', expFlag: 'Flag {0}', expIsoOnly: 'ISOXML: only boundary and tracks for now', expUnsaved: 'The current state in the editor is exported, including unsaved changes.', expDone: '{0} downloaded.', expKml: 'One <b>.kml</b> file – e.g. for Google Earth. Each layer is its own folder.', expGeo: 'One <b>.geojson</b> file – e.g. for QGIS.', expShp: 'A <b>ZIP</b> with one shapefile per layer (.shp, .shx, .dbf, .prj) – e.g. for QGIS, farm software and terminals.', expIso: 'A <b>ZIP</b> with TASKDATA/TASKDATA.XML (ISOXML version 4) for terminals. <b>Only boundary and tracks for now</b> (AB lines and curves). Not tested on terminals yet – feedback welcome!',
     fCovEdge: 'Straight edges from (m)', covEdgeHint: 'Straight pieces of at least this length become straight edges, the ragged turning areas between them a sharp corner. 0 = off.', btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
     confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
     measSeg: 'Segment', measLen: 'Length', measAngleAt: 'Angle at {0}',
@@ -2028,6 +2038,184 @@ function startBndFromCoverage() {
 }
 $('btnBndCov').onclick = startBndFromCoverage;
 
+// ---------- Export ----------
+// Alles in WGS84 (Breite, Länge). Was gerade im Editor ist, wird exportiert – auch noch nicht Gespeichertes.
+const EXP_LAYERS = ['bnd', 'tracks', 'headland', 'headlines', 'tram', 'flags', 'sections'];
+const EXP_ISO = new Set(['bnd', 'tracks']);               // ISOXML: vorerst nur Grenze und Spuren
+function exportItems() {
+  const ring = b => b.pts.map(p => plane.inv(p.e, p.n)), out = {};
+  out.bnd = bnds[0] ? [{ name: currentField || 'Feld', kind: 'boundary', rings: [ring(bnds[0])].concat(bnds.slice(1).map(ring)) }] : [];
+  out.tracks = ex.tracks.filter(tr => !tr.deleted && (tr.mode === 2 || ((tr.mode === 4 || tr.mode === 32) && tr.pts.length > 1))).map(tr =>
+    tr.mode === 2 ? { name: tr.name, kind: 'AB', pts: [wgs(tr.a[0], tr.a[1]), wgs(tr.b[0], tr.b[1])], heading: tr.heading } : { name: tr.name, kind: 'Curve', pts: tr.pts });
+  out.headland = (ex.headland || []).map((r, i) => ({ name: t('L_headland') + (ex.headland.length > 1 ? ' ' + (i + 1) : ''), kind: 'headland', rings: [r] }));
+  out.headlines = (ex.headlines || []).filter(h => !h.deleted && h.pts.length > 1).map(h => ({ name: h.name, kind: 'headline', pts: h.pts }));
+  const T = ex.tram;
+  out.tram = T ? [...(T.outer.length > 1 ? [{ name: t('expTramOuter'), kind: 'boundaryTram', pts: T.outer.concat([T.outer[0]]) }] : []),
+    ...(T.inner.length > 1 ? [{ name: t('expTramInner'), kind: 'boundaryTram', pts: T.inner.concat([T.inner[0]]) }] : []),
+    ...T.lines.map((l, i) => ({ name: t('L_tram') + ' ' + (i + 1), kind: 'tram', pts: l }))] : [];
+  out.flags = flags.map(fl => ({ name: fl.notes || t('expFlag', fl.id), kind: 'flag', pt: [fl.lat, fl.lon], color: fl.color }));
+  out.sections = ex.sections ? ex.sections.patches.map((p, i) => ({ name: String(i + 1), kind: 'coverage', rings: [p.ring] })) : [];
+  return out;
+}
+const expLabel = id => id === 'bnd' ? t('expBnd') : t('L_' + id);
+const xmlEsc = x => String(x).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
+const closeRing = r => r.length && (r[0][0] !== r[r.length - 1][0] || r[0][1] !== r[r.length - 1][1]) ? r.concat([r[0]]) : r;
+const llArea = r => { let a = 0; for (let i = 0; i < r.length - 1; i++) a += r[i][1] * r[i + 1][0] - r[i + 1][1] * r[i][0]; return a / 2; };   // > 0 = gegen den Uhrzeiger (x = Länge)
+const orient = (r, ccw) => { r = closeRing(r); return (llArea(r) > 0) === ccw ? r : r.slice().reverse(); };
+
+function toGeoJSON(items, sel) {
+  const F = [], c = p => [+p[1].toFixed(9), +p[0].toFixed(9)];
+  sel.forEach(id => items[id].forEach(it => {
+    const props = { layer: id, name: it.name, type: it.kind };
+    let g;
+    if (it.rings) g = { type: 'Polygon', coordinates: it.rings.map((r, k) => orient(r, k === 0).map(c)) };
+    else if (it.pt) g = { type: 'Point', coordinates: c(it.pt) };
+    else g = { type: 'LineString', coordinates: it.pts.map(c) };
+    F.push({ type: 'Feature', properties: props, geometry: g });
+  }));
+  return JSON.stringify({ type: 'FeatureCollection', name: currentField || 'Feld', features: F }, null, 1);
+}
+function toKML(items, sel) {
+  const col = { bnd: 'ff3a3aff', tracks: 'ffd84fff', headland: 'ff00a5ff', headlines: 'ff00d4ff', tram: 'ffffff00', flags: 'ff0000ff', sections: '80a0971b' };
+  const c = r => r.map(p => p[1].toFixed(9) + ',' + p[0].toFixed(9) + ',0').join(' ');
+  let k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>' + xmlEsc(currentField || 'Feld') + '</name>\n';
+  sel.forEach(id => { k += `<Style id="${id}"><LineStyle><color>${col[id]}</color><width>${id === 'bnd' ? 3 : 2}</width></LineStyle><PolyStyle><color>${id === 'sections' ? col[id] : '00ffffff'}</color></PolyStyle></Style>\n`; });
+  sel.forEach(id => {
+    k += '<Folder><name>' + xmlEsc(expLabel(id)) + '</name>\n';
+    items[id].forEach(it => {
+      k += '<Placemark><name>' + xmlEsc(it.name) + '</name><styleUrl>#' + id + '</styleUrl>';
+      if (it.rings) k += '<Polygon>' + it.rings.map((r, i) => (i ? '<innerBoundaryIs>' : '<outerBoundaryIs>') + '<LinearRing><coordinates>' + c(orient(r, i === 0)) + '</coordinates></LinearRing>' + (i ? '</innerBoundaryIs>' : '</outerBoundaryIs>')).join('') + '</Polygon>';
+      else if (it.pt) k += '<Point><coordinates>' + c([it.pt]) + '</coordinates></Point>';
+      else k += '<LineString><tessellate>1</tessellate><coordinates>' + c(it.pts) + '</coordinates></LineString>';
+      k += '</Placemark>\n';
+    });
+    k += '</Folder>\n';
+  });
+  return k + '</Document></kml>\n';
+}
+// Shapefile: je Ebene .shp/.shx/.dbf/.prj/.cpg, alles in ein ZIP
+const utf8 = x => new TextEncoder().encode(x);
+function shpFiles(base, items, type) {     // type 1 = Punkt, 3 = Linie, 5 = Fläche
+  const recs = items.map(it => {
+    if (type === 1) return { parts: [], pts: [[it.pt[1], it.pt[0]]] };
+    const parts = type === 5 ? it.rings.map((r, i) => orient(r, i !== 0)) : [it.pts];   // Shapefile: außen im Uhrzeigersinn
+    return { parts, pts: parts.flat().map(p => [p[1], p[0]]) };
+  });
+  const bbox = P => P.reduce((b, p) => [Math.min(b[0], p[0]), Math.min(b[1], p[1]), Math.max(b[2], p[0]), Math.max(b[3], p[1])], [Infinity, Infinity, -Infinity, -Infinity]);
+  const box = bbox(recs.map(r => bbox(r.pts)).flatMap(b => [[b[0], b[1]], [b[2], b[3]]]));
+  const lens = recs.map(r => type === 1 ? 20 : 44 + 4 * r.parts.length + 16 * r.pts.length);
+  const shpLen = 100 + lens.reduce((a, l) => a + 8 + l, 0), shp = new DataView(new ArrayBuffer(shpLen)), shx = new DataView(new ArrayBuffer(100 + 8 * recs.length));
+  const head = (v, len) => { v.setInt32(0, 9994); v.setInt32(24, len / 2); v.setInt32(28, 1000, true); v.setInt32(32, type, true); box.forEach((x, i) => v.setFloat64(36 + 8 * i, x, true)); };
+  head(shp, shpLen); head(shx, 100 + 8 * recs.length);
+  let o = 100;
+  recs.forEach((r, i) => {
+    shx.setInt32(100 + 8 * i, o / 2); shx.setInt32(104 + 8 * i, lens[i] / 2);
+    shp.setInt32(o, i + 1); shp.setInt32(o + 4, lens[i] / 2); o += 8;
+    shp.setInt32(o, type, true); o += 4;
+    if (type === 1) { shp.setFloat64(o, r.pts[0][0], true); shp.setFloat64(o + 8, r.pts[0][1], true); o += 16; return; }
+    bbox(r.pts).forEach(x => { shp.setFloat64(o, x, true); o += 8; });
+    shp.setInt32(o, r.parts.length, true); shp.setInt32(o + 4, r.pts.length, true); o += 8;
+    let st = 0; r.parts.forEach(p => { shp.setInt32(o, st, true); o += 4; st += p.length; });
+    r.pts.forEach(p => { shp.setFloat64(o, p[0], true); shp.setFloat64(o + 8, p[1], true); o += 16; });
+  });
+  // dBase: NAME (80) und TYPE (20), Texte UTF-8 (siehe .cpg)
+  const fld = [['NAME', 80], ['TYPE', 20]], recLen = 1 + fld.reduce((a, x) => a + x[1], 0), hl = 32 + 32 * fld.length + 1;
+  const dbf = new Uint8Array(hl + recLen * recs.length + 1), dv = new DataView(dbf.buffer), now = new Date();
+  dbf[0] = 3; dbf[1] = now.getFullYear() - 1900; dbf[2] = now.getMonth() + 1; dbf[3] = now.getDate();
+  dv.setUint32(4, recs.length, true); dv.setUint16(8, hl, true); dv.setUint16(10, recLen, true);
+  fld.forEach(([nm, len], i) => { dbf.set(utf8(nm), 32 + 32 * i); dbf[32 + 32 * i + 11] = 67; dbf[32 + 32 * i + 16] = len; });
+  dbf[hl - 1] = 0x0d;
+  const fit = (txt, len) => { let b = utf8(''), x = ''; for (const ch of String(txt)) { const nb = utf8(x + ch); if (nb.length > len) break; x += ch; b = nb; } return b; };
+  items.forEach((it, i) => {
+    let o2 = hl + recLen * i; dbf[o2++] = 0x20;
+    [it.name, it.kind].forEach((v, j) => { const b = fit(v, fld[j][1]); dbf.fill(0x20, o2, o2 + fld[j][1]); dbf.set(b, o2); o2 += fld[j][1]; });
+  });
+  dbf[dbf.length - 1] = 0x1a;
+  const prj = 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]';
+  return [[base + '.shp', new Uint8Array(shp.buffer)], [base + '.shx', new Uint8Array(shx.buffer)], [base + '.dbf', dbf], [base + '.prj', utf8(prj)], [base + '.cpg', utf8('UTF-8')]];
+}
+// ZIP ohne Kompression (Store)
+const CRC = (() => { const T = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; T[n] = c >>> 0; } return b => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }; })();
+function zip(files) {
+  const parts = [], cen = []; let off = 0;
+  const d = new Date(), dt = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)), dd = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate());
+  files.forEach(([name, data]) => {
+    const nm = utf8(name), crc = CRC(data), h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(10, dt, true); h.setUint16(12, dd, true);
+    h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, nm.length, true);
+    parts.push(new Uint8Array(h.buffer), nm, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(12, dt, true); c.setUint16(14, dd, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    cen.push(new Uint8Array(c.buffer), nm);
+    off += 30 + nm.length + data.length;
+  });
+  const cl = cen.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cl, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], { type: 'application/zip' });
+}
+// ISOXML (ISO 11783-10, TASKDATA.XML Version 4): Schlag mit Grenze (PLN/LSG) und Spuren (GGP/GPN)
+function toISOXML(items, sel) {
+  const pnt = (p, type) => `<PNT A="${type}" C="${p[0].toFixed(9)}" D="${p[1].toFixed(9)}"/>`, name = xmlEsc(currentField || 'Feld');
+  let x = '<?xml version="1.0" encoding="UTF-8"?>\n<ISO11783_TaskData VersionMajor="4" VersionMinor="2" ManagementSoftwareManufacturer="AOG Feldeditor" ManagementSoftwareVersion="2.0" DataTransferOrigin="1">\n';
+  x += `<PFD A="PFD1" C="${name}" D="${bnds[0] ? Math.round(area(bnds[0].pts)) : 0}">\n`;
+  if (sel.includes('bnd')) items.bnd.forEach(it => {
+    x += `<PLN A="1" B="${name}">\n`;
+    it.rings.forEach((r, i) => { x += `<LSG A="${i ? 2 : 1}">` + orient(r, true).map(p => pnt(p, 2)).join('') + '</LSG>\n'; });
+    x += '</PLN>\n';
+  });
+  if (sel.includes('tracks')) items.tracks.forEach((tr, i) => {
+    const P = tr.pts, ab = tr.kind === 'AB';
+    x += `<GGP A="GGP${i + 1}" B="${xmlEsc(tr.name)}"><GPN A="GPN${i + 1}" B="${xmlEsc(tr.name)}" C="${ab ? 1 : 3}"><LSG A="5">`;
+    x += P.map((p, k) => pnt(p, k === 0 ? 6 : k === P.length - 1 ? 7 : 9)).join('') + '</LSG></GPN></GGP>\n';
+  });
+  x += '</PFD>\n';
+  x += `<TSK A="TSK1" B="${name}" E="PFD1" G="1"/>\n`;
+  return x + '</ISO11783_TaskData>\n';
+}
+function download(blob, fname) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function buildExport(fmt, sel) {
+  const items = exportItems(), base = (currentField || 'Feld').replace(/[\\/:*?"<>|]/g, '_');
+  sel = sel.filter(id => items[id].length && (fmt !== 3 || EXP_ISO.has(id)));
+  if (fmt === 0) return [new Blob([toKML(items, sel)], { type: 'application/vnd.google-earth.kml+xml' }), base + '.kml'];
+  if (fmt === 1) return [new Blob([toGeoJSON(items, sel)], { type: 'application/geo+json' }), base + '.geojson'];
+  if (fmt === 2) {
+    const SH = { bnd: 5, headland: 5, sections: 5, flags: 1 };
+    return [zip(sel.flatMap(id => shpFiles(base + '_' + id, items[id], SH[id] || 3))), base + '_shp.zip'];
+  }
+  return [zip([['TASKDATA/TASKDATA.XML', utf8(toISOXML(items, sel))]]), base + '_ISOXML.zip'];
+}
+function startExport() {
+  if (!plane) return;
+  const items = exportItems(), on = new Set(EXP_LAYERS.filter(id => id !== 'sections' && items[id].length));
+  const usable = id => items[id].length && (cfg.expFmt !== 3 || EXP_ISO.has(id));
+  const chosen = () => EXP_LAYERS.filter(id => on.has(id) && usable(id));
+  const list = () => {
+    const box = $('toolList'); box.innerHTML = '';
+    EXP_LAYERS.forEach(id => {
+      const n = items[id].length, b = document.createElement('button'), ok = usable(id), chk = ok && on.has(id);
+      b.className = 'lbtn' + (chk ? ' on' : ''); b.disabled = !ok; b.type = 'button';
+      b.innerHTML = `<svg class="ic"><use href="#i-${chk ? 'chk' : 'chkoff'}"/></svg>`;
+      b.append(expLabel(id) + (n ? ` (${n})` : ''));
+      if (n && !ok) b.title = t('expIsoOnly');
+      b.onclick = () => { on.has(id) ? on.delete(id) : on.add(id); list(); updateToolbox(); };
+      box.append(b);
+    });
+  };
+  startTool({
+    title: 'btnExport', params: ['expFmt'], okLabel: 'expDownload', msgHtml: true,
+    msg: () => t(['expKml', 'expGeo', 'expShp', 'expIso'][cfg.expFmt] || 'expKml') + (unsaved ? '<br>' + esc(t('expUnsaved')) : ''),
+    recalc() { list(); updateToolbox(); },
+    okEnabled: () => chosen().length > 0,
+    ok() { const [blob, fname] = buildExport(cfg.expFmt, chosen()); download(blob, fname); setStatus(t('expDone', fname), 'ok'); }
+  });
+  tool.recalc();
+}
+$('btnExport').onclick = startExport;
+
 function deleteBoundary() {
   if (!bnds[active]) return;
   if (active === 0 && bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
@@ -2981,7 +3169,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -3042,6 +3230,7 @@ const trackOpts = () => smallTracks().map(({ tr, i }) => [i, tr.name]);
 const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
   simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
+  expFmt: { label: 'fExpFmt', seg: true, opts: () => [[0, 'KML'], [1, 'GeoJSON'], [2, 'Shapefile'], [3, 'ISOXML']] },
   covPrec: { label: 'fCovPrec', num: [1, 0], range: [0, 100] },
   covEdge: { label: 'fCovEdge', num: [1, 0], range: [0, 100], hint: () => t('covEdgeHint') },
   smoothW: { label: 'fSmoothW', num: [1, 0], range: [0, 50] },
@@ -3828,6 +4017,7 @@ function updateInfo() {
   ['btnNewOuter', 'btnNewAB'].forEach(id => { document.getElementById(id).disabled = !plane; });
   document.getElementById('btnBndCurve').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
+  document.getElementById('btnExport').disabled = !plane;
   document.getElementById('btnBndCov').disabled = !(plane && ex.sections && ex.sections.patches.length);
   document.getElementById('btnBndCov').title = plane && !(ex.sections && ex.sections.patches.length) ? t('needCoverage') : '';
   document.getElementById('btnSimp').disabled = !bnds[active];

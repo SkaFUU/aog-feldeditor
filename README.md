@@ -63,6 +63,11 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
   - the background image saved by AgOpenGPS
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
+**Export** (in the Field tab)
+- Pick a format and tick what to include: field boundary, tracks, headland, headland lines, tramlines, flags, coverage. The current state in the editor is exported.
+- **KML** (e.g. Google Earth), **GeoJSON** (e.g. QGIS), **Shapefile** (ZIP with one file per layer, e.g. for QGIS, farm software and terminals).
+- **ISOXML** (TASKDATA.XML, version 4) for terminals: only field boundary and tracks (AB lines and curves) for now. Not tested on terminals yet – feedback is welcome.
+
 **Measure**
 - Distance or area with perimeter: click points on the map. The side panel lists the length of every segment and the angles at the points; the map shows numbers and angles. Clicks snap to boundary points, flags and the boundary, and at right angles to the boundary – e.g. to measure the field width exactly. Works without an open field too.
 - Angle between two lines: click line 1 and line 2 on the map – a track (for curves the straight line from start to end counts) or an automatically detected field side. The angle is shown in the side panel and at the intersection on the map.

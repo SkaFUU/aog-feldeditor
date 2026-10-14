@@ -63,6 +63,11 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
   - das Hintergrundbild aus AgOpenGPS
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
+**Exportieren** (im Register Feld)
+- Format wählen und abhaken, was mit soll: Feldgrenze, Spuren, Vorgewende, Vorgewende-Linien, Fahrgassen, Fahnen, bearbeitete Fläche. Exportiert wird der aktuelle Stand im Editor.
+- **KML** (z. B. Google Earth), **GeoJSON** (z. B. QGIS), **Shapefile** (ZIP mit einer Datei je Ebene, z. B. für QGIS, Hof-Programme und Terminals).
+- **ISOXML** (TASKDATA.XML, Version 4) für Terminals: vorerst nur Feldgrenze und Spuren (AB-Linien und Kurven). Noch nicht an Terminals getestet – Rückmeldungen sind willkommen.
+
 **Messen**
 - Strecke oder Fläche mit Umfang: Punkte auf die Karte klicken. In der Seitenleiste stehen die Länge jeder Teilstrecke und die Winkel an den Punkten, auf der Karte Nummern und Winkel. Klicks rasten auf Grenzpunkten, Fahnen und der Grenze ein, und rechtwinklig zur Grenze – so lässt sich z. B. die Feldbreite genau messen. Geht auch ohne geöffnetes Feld.
 - Winkel zwischen zwei Linien: Linie 1 und Linie 2 auf der Karte anklicken – eine Spur (bei Kurven zählt die Gerade von Anfang bis Ende) oder eine automatisch erkannte Feldseite. Der Winkel steht in der Seitenleiste und am Schnittpunkt auf der Karte.
