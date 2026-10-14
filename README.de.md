@@ -63,6 +63,13 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
   - das Hintergrundbild aus AgOpenGPS
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
+**Importieren** (im Register Feld)
+- Datei wählen oder einfach auf die Karte ziehen: **KML/KMZ**, **GeoJSON**, **Shapefile** (ZIP oder .shp mit .dbf und .prj) und **ISOXML** (TASKDATA, auch als ZIP).
+- Koordinaten werden umgerechnet: GPS (WGS84/ETRS89), UTM, MGI Lambert (z. B. AMA/INVEKOS-Feldstücke), MGI Gauß-Krüger und DHDN Gauß-Krüger.
+- Alles aus der Datei erscheint als Vorschau. Auf der Karte oder in der Liste anklicken, was übernommen wird.
+- **Neues Feld**: Namen eingeben – die größte Fläche wird die Außengrenze, Löcher und Flächen darin werden Innengrenzen, Linien werden Spuren (AB-Linie oder Kurve), Punkte werden Fahnen.
+- **Ins offene Feld**: Flächen als Außengrenze (ersetzt die bestehende) oder als Innengrenzen, dazu Spuren und Fahnen.
+
 **Exportieren** (im Register Feld)
 - Format wählen und abhaken, was mit soll: Feldgrenze, Spuren, Vorgewende, Vorgewende-Linien, Fahrgassen, Fahnen, bearbeitete Fläche. Exportiert wird der aktuelle Stand im Editor.
 - **KML** (z. B. Google Earth), **GeoJSON** (z. B. QGIS), **Shapefile** (ZIP mit einer Datei je Ebene, z. B. für QGIS, Hof-Programme und Terminals).

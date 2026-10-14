@@ -63,6 +63,13 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
   - the background image saved by AgOpenGPS
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
+**Import** (in the Field tab)
+- Pick a file or simply drop it on the map: **KML/KMZ**, **GeoJSON**, **shapefile** (ZIP or .shp with .dbf and .prj) and **ISOXML** (TASKDATA, also zipped).
+- Coordinates are converted: GPS (WGS84/ETRS89), UTM, MGI Lambert (e.g. Austrian AMA/INVEKOS plots), MGI Gauss-Krüger and DHDN Gauss-Krüger.
+- Everything in the file is shown as a preview. Click on the map or in the list what to take over.
+- **New field**: enter a name – the largest area becomes the outer boundary, holes and areas inside become inner boundaries, lines become tracks (AB line or curve), points become flags.
+- **Into open field**: areas as outer boundary (replaces the existing one) or as inner boundaries, plus tracks and flags.
+
 **Export** (in the Field tab)
 - Pick a format and tick what to include: field boundary, tracks, headland, headland lines, tramlines, flags, coverage. The current state in the editor is exported.
 - **KML** (e.g. Google Earth), **GeoJSON** (e.g. QGIS), **Shapefile** (ZIP with one file per layer, e.g. for QGIS, farm software and terminals).
