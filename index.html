@@ -63,11 +63,13 @@
   .big.sel { background:#3c4148; box-shadow:inset 0 -2px 0 var(--tab); }
   .gcol { display:flex; flex-direction:column; justify-content:center; gap:4px; height:74px; font-size:12.5px; }
   .gcol input[type=number] { width:76px; padding:4px 6px; }
-  .gchecks { display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; column-gap:16px; height:74px; padding-top:2px; }
+  .gchecks { display:grid; grid-auto-flow:column; grid-template-rows:repeat(3, 25px); grid-auto-columns:max-content; column-gap:14px; align-content:start; align-items:center; height:76px; padding-top:1px; }
   .gchecks .check { margin:1px 0; font-size:12.5px; white-space:nowrap; }
   .gchecks .check.dis { opacity:.4; }
   .gchecks:empty::before { content:'–'; color:var(--muted); }
-  .lrow { display:flex; align-items:center; gap:2px; }
+  .lrow { display:grid; grid-template-columns:1fr 26px; align-items:center; gap:2px; }   /* Papierkorb immer rechts in der Spalte */
+  .lrow > .lbtn { grid-column:1; height:25px; padding-top:0; padding-bottom:0; }
+  .lrow > .mini { height:23px; margin:0; padding:0 4px; display:flex; align-items:center; justify-content:center; }
   .lbtn { display:flex; align-items:center; gap:6px; width:auto; margin:0; padding:3px 8px 3px 5px; background:transparent; color:var(--muted); font-size:12.5px; white-space:nowrap; border-radius:5px; }
   .lbtn .ic { width:17px; height:17px; }
   button.lbtn.on { background:transparent; color:var(--fg); }
