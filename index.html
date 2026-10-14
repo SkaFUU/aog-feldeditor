@@ -426,6 +426,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    hdNextSide: 'Übernehmen + nächste Seite',
     segTrack: 'Spur', hdPickTrack: 'Spur in der Liste wählen oder auf der Karte anklicken.', hdSliceNoBase: 'Noch kein Vorgewende – an den anderen Seiten bleibt die Grenze.',
     fCountR: 'Anzahl rechts', fCountL: 'Anzahl links',
     gripTitle: 'Ziehen: Seitenleiste breiter oder schmaler',
@@ -454,7 +455,7 @@ const I18N = {
     btnHdAround: 'Rundum bauen', btnHdSlice: 'Teilstück', gHdBuild: 'Vorgewende bauen', btnTram: 'An Linie', btnTramRing: 'Randfahrgasse', gTramBuild: 'Fahrgassen erzeugen', gSprayer: 'Gerät (Fahrgassenabstand)',
     fDist: 'Abstand (m)', fTool: 'Gerät', fWidths: '× Arbeitsbreiten', fRadiusS: 'Ecken runden: Radius (m)', radius0: '0 = Ecken wie AOG', fKind: 'Art', manual: '– von Hand –',
     toolInfo: 'Arbeitsbreite {0} m (Breite {1} m − Überlappung {2} m)', toolInfoS: 'Arbeitsbreite {0} m', needTool: 'Für Arbeitsbreiten oben ein Gerät wählen.',
-    hdHelp: '„Rundum bauen“ wie „Headland“ in AgOpenGPS um die Außengrenze; Radius 0 = Ecken wie AOG, ein Radius rundet sie. „Teilstück“ setzt das Vorgewende an einer Seite neu: Art wählen – Kurve oder Gerade zwischen zwei angeklickten Grenzpunkten (z. B. die Ecken einer Seite) oder eine vorhandene Spur –, dann den Abstand. Gibt es noch kein Vorgewende, bleibt an den anderen Seiten die Grenze.',
+    hdHelp: '„Rundum bauen“ wie „Headland“ in AgOpenGPS um die Außengrenze; Radius 0 = Ecken wie AOG, ein Radius rundet sie. „Teilstück“ setzt das Vorgewende an einer Seite neu: Art wählen – Kurve oder Gerade zwischen zwei angeklickten Grenzpunkten (z. B. die Ecken einer Seite) oder eine vorhandene Spur –, dann den Abstand. Gibt es noch kein Vorgewende, bleibt an den anderen Seiten die Grenze – so lassen sich z. B. nur die Stirnseiten machen („Übernehmen + nächste Seite“). Gezeichnet wird nur, was nicht auf der Grenze liegt.',
     hdAroundMsg: 'Vorgewende rundum mit {0} m{1} – gelb gestrichelt die Vorschau.', hdRound: ', Ecken mit {0} m Radius', hdSharp: ', Ecken wie AOG',
     hdFail: 'Mit diesem Abstand bleibt kein Vorgewende übrig.', hdRoundTooBig: 'Das Feld ist für diesen Radius zu schmal – die Ecken bleiben wie in AOG. Kleineren Radius wählen.', hdDone: 'Vorgewende gebaut – wird beim Speichern übernommen.',
     hdSliceA: 'Ersten Punkt auf der Außengrenze anklicken (z. B. eine Ecke).',
@@ -539,6 +540,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    hdNextSide: 'Apply + next side',
     segTrack: 'Track', hdPickTrack: 'Choose a track in the list or click it on the map.', hdSliceNoBase: 'No headland yet – the boundary stays on the other sides.',
     fCountR: 'Number right', fCountL: 'Number left',
     gripTitle: 'Drag: make the side panel wider or narrower',
@@ -567,7 +569,7 @@ const I18N = {
     btnHdAround: 'Build around', btnHdSlice: 'Section', gHdBuild: 'Build headland', btnTram: 'Along line', btnTramRing: 'Boundary tram', gTramBuild: 'Create tramlines', gSprayer: 'Tool (tramline spacing)',
     fDist: 'Distance (m)', fTool: 'Tool', fWidths: '× tool widths', fRadiusS: 'Round corners: radius (m)', radius0: '0 = corners like AOG', fKind: 'Type', manual: '– manual –',
     toolInfo: 'Working width {0} m (width {1} m − overlap {2} m)', toolInfoS: 'Working width {0} m', needTool: 'Choose a tool at the top for tool widths.',
-    hdHelp: '“Build around” like “Headland” in AgOpenGPS around the outer boundary; radius 0 = corners like AOG, a radius rounds them. “Section” rebuilds the headland on one side: choose the type – curve or straight line between two clicked boundary points (e.g. the corners of one side) or an existing track – then the distance. If there is no headland yet, the boundary stays on the other sides.',
+    hdHelp: '“Build around” like “Headland” in AgOpenGPS around the outer boundary; radius 0 = corners like AOG, a radius rounds them. “Section” rebuilds the headland on one side: choose the type – curve or straight line between two clicked boundary points (e.g. the corners of one side) or an existing track – then the distance. If there is no headland yet, the boundary stays on the other sides – e.g. for headlands only at the ends (“Apply + next side”). Only the parts not on the boundary are drawn.',
     hdAroundMsg: 'Headland around at {0} m{1} – dashed yellow is the preview.', hdRound: ', corners with {0} m radius', hdSharp: ', corners like AOG',
     hdFail: 'Nothing is left of the headland at this distance.', hdRoundTooBig: 'The field is too narrow for this radius – the corners stay like in AOG. Choose a smaller radius.', hdDone: 'Headland built – applied when you save.',
     hdSliceA: 'Click the first point on the outer boundary (e.g. a corner).',
@@ -1521,7 +1523,9 @@ function drawLayer(id) {
     if (mid) nameLabel(mid, t.name).addTo(g);
   });
   if (id === 'tracks') refreshTrackHits();
-  if (id === 'headland') ex.headland.forEach(p => L.polygon(p, { renderer: cv, interactive: false, color: '#ff9500', weight: 2, dashArray: '8 6', fill: false }).addTo(g));
+  // Vorgewende: nur die Teile zeichnen, die nicht auf der Grenze liegen (z. B. nur die Stirnseiten)
+  if (id === 'headland' && plane) ex.headland.forEach(p => offFence(p.map(([a, b]) => plane.fwd(a, b)), true)
+    .forEach(run => L.polyline(run.map(ll), { renderer: cv, interactive: false, color: '#ff9500', weight: 2, dashArray: '8 6' }).addTo(g)));
   if (id === 'headlines') ex.headlines.filter(h => h.show && !h.deleted && !h.hidden).forEach(h => {
     line(h.pts, { color: '#ffd400', weight: 2, dashArray: '4 4' });
     nameLabel(h.pts[h.pts.length >> 1], h.name || t('noName')).addTo(g);
@@ -2346,12 +2350,14 @@ function roundedAround(F, d, r) {
 }
 const aroundRing = (F, d, r) => r > 0 ? roundedAround(F, d, r) : buildAround(F, d);
 // Beim Schließen des Vorgewende-Dialogs: Richtung rückwärts, nach Richtungsänderung ausdünnen (genau wie AOG)
-function hdExit(L, keepLast) {
+// noThin: nicht ausdünnen (Teilstück – die Teile auf der Grenze müssen der Grenze genau folgen)
+function hdExit(L, keepLast, noThin) {
   const n = L.length, H = L.map(p => ({ e: p.e, n: p.n, h: p.h || 0 }));
   for (let i = 1; i < n; i++) {
     H[i - 1].h = Math.atan2(H[i - 1].e - H[i].e, H[i - 1].n - H[i].n);
     if (H[i].h < 0) H[i].h += 2 * Math.PI;
   }
+  if (noThin) return H;
   const out = [H[0]]; let d = 0;
   for (let i = 1; i < n; i++) { d += H[i - 1].h - H[i].h; if (Math.abs(d) > 0.005) { out.push(H[i]); d = 0; } }
   if (keepLast && n > 1) out.push(H[n - 1]);
@@ -2371,6 +2377,16 @@ function extendStraight(P, ext) {
   for (let d = ext; d >= 2; d -= 2) pre.push({ e: a.e - Math.sin(a.h) * d, n: a.n - Math.cos(a.h) * d, h: a.h });
   for (let d = 2; d <= ext; d += 2) post.push({ e: b.e + Math.sin(b.h) * d, n: b.n + Math.cos(b.h) * d, h: b.h });
   return { R: pre.concat(P, post), mid: pre.length + (P.length >> 1) };
+}
+// Liegt ein angeklickter Punkt knapp hinter einer Ecke, gehört ein Stück der Nachbarseite dazu – die Verlängerung würde dann
+// an der Nachbarseite entlanglaufen. Eine Ecke in den ersten/letzten 25 m wird deshalb abgeschnitten.
+function trimEndCorners(P) {
+  const n = P.length, turnAt = i => { const a = P[Math.max(0, i - 3)], b = P[i], c = P[Math.min(n - 1, i + 3)]; return Math.abs(wrapPi(Math.atan2(c.e - b.e, c.n - b.n) - Math.atan2(b.e - a.e, b.n - a.n))); };
+  let s = 0, e = n - 1, d = 0;
+  for (let i = 1; i < n - 1 && d < 25; i++) { d += dist(P[i - 1], P[i]); if (turnAt(i) > 0.6) s = i; }
+  d = 0;
+  for (let i = n - 2; i > 0 && d < 25; i--) { d += dist(P[i + 1], P[i]); if (turnAt(i) > 0.6) e = i; }
+  return e - s >= 3 ? P.slice(s, e + 1) : P;
 }
 // Seite, auf der das Feld liegt (+1 rechts, −1 links der Linie)
 function inwardSide(P, F) {
@@ -2930,7 +2946,7 @@ function startHdSlice() {
   if (!bnds[0]) return;
   const F = aogFence(0), n = F.length, bb = bbox(F), ext = Math.hypot(bb[1] - bb[0], bb[3] - bb[2]) + 50;
   const nearestIdx = q => { let bi = 0, bd = Infinity; F.forEach((v, i) => { const d = dSq(v, q); if (d < bd) { bd = d; bi = i; } }); return bi; };
-  const tracks = smallTracks().map(({ tr, i }) => ({ i, R: refLine(tr) }));
+  const XF = polyIndex(F), tracks = smallTracks().map(({ tr, i }) => { const R = refLine(tr); return { i, R, show: clipToPoly(R, XF) }; });   // show: nur im Feld zeigen
   // Quelle: Grenze zwischen zwei Punkten (kürzerer Weg) als Kurve, gerade Linie oder eine Spur
   const source = () => {
     if (cfg.hdKind === 'track') { const tr = tracks.find(x => x.i === cfg.hdTrack); return tr ? { R: tr.R, mid: tr.R.length >> 1, P: tr.R } : null; }
@@ -2943,7 +2959,7 @@ function startHdSlice() {
     } else {
       if (Math.abs(s - e) > n / 2) { if (s < e) [s, e] = [e, s]; for (let i = s; i < n; i++) P.push(F[i]); for (let i = 0; i <= e; i++) P.push(F[i]); }
       else { if (s > e) [s, e] = [e, s]; for (let i = s; i <= e; i++) P.push(F[i]); }
-      P = openHeadings(P.map(p => ({ e: p.e, n: p.n, h: 0 })));
+      P = openHeadings(trimEndCorners(P).map(p => ({ e: p.e, n: p.n, h: 0 })));
       if (P.length < 4) return null;
     }
     return { ...extendStraight(P, ext), P };
@@ -2978,7 +2994,7 @@ function startHdSlice() {
         const sp = spliceHeadland(H, S, mi);
         if (sp && sp.ring.length > 3) {
           const ring = openHeadings(minSpacing(sp.ring.concat([sp.ring[0]]).map(p => ({ e: p.e, n: p.n, h: 0 })), 1.2));
-          this.res = { hd: hdExit(ring, true), seg: sp.seg };
+          this.res = { hd: hdExit(ring, true, true), seg: sp.seg };
         }
       }
       redrawTool();
@@ -2989,13 +3005,28 @@ function startHdSlice() {
         if (vis.length <= 3000) vis.forEach(q => L.circleMarker(q, { renderer: cv, radius: 3, color: '#fff', weight: 1, fillColor: '#ff9500', fillOpacity: 1, interactive: false }).addTo(g));
         tool.picks.forEach(i => dot(ll(F[i]), '#ffd400').addTo(g));
       }
-      if (tool.src) prevLine(g, tool.src.P, '#ffffff', false);
-      if (tool.res) { prevLine(g, tool.res.seg, '#ff9500', false, '6 5'); prevLine(g, tool.res.hd, '#ffd400', true); }
+      if (cfg.hdKind === 'track') tracks.forEach(x => x.show.forEach(P => L.polyline(P.map(ll), { renderer: cv, color: x.i === cfg.hdTrack ? '#ffffff' : '#ff4fd8', weight: x.i === cfg.hdTrack ? 4 : 2.5, interactive: false }).addTo(g)));   // alle Spuren zur Auswahl, die gewählte weiß
+      else if (tool.src) L.polyline(tool.src.P.map(ll), { renderer: cv, color: '#ffffff', weight: 4, interactive: false }).addTo(g);
+      if (tool.res) offFence(tool.res.hd, true).forEach(run => prevLine(g, run, '#ffd400', false));   // auf der Grenze nichts zeichnen
     },
     okEnabled: () => !!tool.res,
+    // „Übernehmen + nächste Seite“: Werkzeug bleibt offen, z. B. für die zweite Stirnseite
+    actions: () => tool.res ? [{ label: 'hdNextSide', keep: true, run() { setHeadland(this.res.hd); this.picks = []; setStatus(t('hdDone'), 'ok'); this.recalc(); } }] : [],
     ok() { setHeadland(this.res.hd); setStatus(t('hdDone'), 'ok'); }
   });
   tool.recalc();
+}
+// Teile einer geschlossenen Linie, die nicht auf der Grenze liegen (Abstand > 0,5 m) – als einzelne Linienstücke
+function offFence(P, closed) {
+  if (!bnds[0] || P.length < 2) return [P];
+  const F = aogFence(0), Fc = F.concat([F[0]]), g = grid(minSpacing(Fc.map(p => ({ e: p.e, n: p.n, h: 0 })), 0.5), 1);
+  const Q = minSpacing((closed ? P.concat([P[0]]) : P).map(p => ({ e: p.e, n: p.n, h: 0 })), 2), runs = [];
+  let cur = null;
+  Q.forEach(p => {
+    if (!g.near(p, 0.25)) { if (!cur) runs.push(cur = []); cur.push(p); }
+    else cur = null;
+  });
+  return runs.filter(r => r.length > 1);
 }
 // Fahrgassen „An Linie“: von einer Referenzlinie aus (eine oder beide Seiten, Anzahl je Seite oder bis zum Feldrand)
 // oder von zwei Linien aufeinander zu. Gibt es schon Fahrgassen, heißt es vor dem Übernehmen „Ersetzen“ oder „Ergänzen“.

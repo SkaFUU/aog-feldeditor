@@ -32,7 +32,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 
 **Vorgewende** (gerechnet wie „Headland“ in AgOpenGPS 6.8)
 - **Rundum bauen** oder **Teilstück** drücken, die Einstellungen erscheinen in der Seitenleiste: Abstand in Metern oder als Anzahl Arbeitsbreiten des oben gewählten Geräts (Breite minus Überlappung), Ecken runden mit Radius (0 = genau wie AgOpenGPS).
-- **Teilstück:** Art wählen – Kurve oder Gerade zwischen zwei angeklickten Grenzpunkten (z. B. die Ecken einer Seite) oder eine vorhandene Spur –, dann den Abstand. Das Vorgewende wird an dieser Seite neu gesetzt; gibt es noch keins, bleibt an den anderen Seiten die Grenze.
+- **Teilstück:** Art wählen – Kurve oder Gerade zwischen zwei angeklickten Grenzpunkten (z. B. die Ecken einer Seite) oder eine vorhandene Spur –, dann den Abstand. Das Vorgewende wird an dieser Seite neu gesetzt; gibt es noch keins, bleibt an den anderen Seiten die Grenze. So lassen sich z. B. nur die Stirnseiten machen („Übernehmen + nächste Seite“).
 - Eine gelbe Vorschau zeigt das Ergebnis, jede Änderung ist sofort zu sehen.
 
 **Fahrgassen**
