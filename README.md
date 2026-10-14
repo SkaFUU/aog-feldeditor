@@ -70,6 +70,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - **New field**: enter a name – the largest area becomes the outer boundary, holes and areas inside become inner boundaries, lines become tracks (AB line or curve), points become flags.
 - **Into open field**: areas as outer boundary (replaces the existing one) or as inner boundaries, plus tracks and flags.
 - Files exported from this editor (KML, GeoJSON, shapefile) are recognised: tramlines including the boundary tram, headland and headland lines go back to their place. Coverage is not imported.
+- A whole field can also be made in Google Earth: create folders "Boundary", "Tramlines", "Headland", "Headland lines", "Tracks" and "Flags" (or the German names), draw inside them, save as KML and import. An area in the "Tramlines" folder becomes the boundary tram. For shapefiles the file name counts, e.g. "Tramlines.shp".
 
 **Export** (in the Field tab)
 - Pick a format and tick what to include: field boundary, tracks, headland, headland lines, tramlines, flags, coverage. The current state in the editor is exported.

@@ -70,6 +70,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 - **Neues Feld**: Namen eingeben – die größte Fläche wird die Außengrenze, Löcher und Flächen darin werden Innengrenzen, Linien werden Spuren (AB-Linie oder Kurve), Punkte werden Fahnen.
 - **Ins offene Feld**: Flächen als Außengrenze (ersetzt die bestehende) oder als Innengrenzen, dazu Spuren und Fahnen.
 - Dateien, die mit diesem Editor exportiert wurden (KML, GeoJSON, Shapefile), werden erkannt: Fahrgassen samt Randfahrgasse, Vorgewende und Vorgewende-Linien kommen wieder an ihren Platz. Die bearbeitete Fläche wird nicht importiert.
+- Ein ganzes Feld lässt sich auch in Google Earth anlegen: Ordner „Grenze“, „Fahrgassen“, „Vorgewende“, „Vorgewende-Linien“, „Spuren“ und „Fahnen“ (oder englisch) anlegen und darin zeichnen, als KML speichern und importieren. Eine Fläche im Ordner „Fahrgassen“ wird zur Randfahrgasse. Bei Shapefiles zählt der Dateiname, z. B. „Fahrgassen.shp“.
 
 **Exportieren** (im Register Feld)
 - Format wählen und abhaken, was mit soll: Feldgrenze, Spuren, Vorgewende, Vorgewende-Linien, Fahrgassen, Fahnen, bearbeitete Fläche. Exportiert wird der aktuelle Stand im Editor.

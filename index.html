@@ -2325,6 +2325,30 @@ function crsFn(c) {
   };
 }
 // --- Formate ---
+// Ebene aus einem Namen (Ordner, Datei, „layer“): deutsch und englisch, die Reihenfolge zählt
+function roleFromName(nm) {
+  const x = String(nm || '').toLowerCase().replace(/[_\-]+/g, ' ').trim();
+  if (!x) return '';
+  if (EXP_LAYERS.includes(x)) return x;
+  if (/vorgewende ?linie|headland ?line|headline/.test(x)) return 'headlines';
+  if (/vorgewende|headland/.test(x)) return 'headland';
+  if (/fahrgass|tram/.test(x)) return 'tram';
+  if (/bearbeitet|coverage|section/.test(x)) return 'sections';
+  if (/fahne|flag|markier|marker/.test(x)) return 'flags';
+  if (/spur|track|ab ?linie|ab ?line|kurve|curve|guidance|leitlinie/.test(x)) return 'tracks';
+  if (/grenze|boundary|feldgrenze|schlag|field/.test(x)) return 'bnd';
+  return '';
+}
+// Geometrie passend zur Ebene: Fahrgassen sind Linien (Fläche = Randfahrgasse), Grenze/Vorgewende sind Flächen
+function fitRole(it) {
+  if (!it.role) return it;
+  const closedLine = it.kind === 'line' && it.pts.length > 3 && Math.hypot(it.pts[0][0] - it.pts[it.pts.length - 1][0], it.pts[0][1] - it.pts[it.pts.length - 1][1]) < 2e-5;
+  if (it.role === 'tram' && it.kind === 'poly') return it.rings.map(r => ({ kind: 'line', name: it.name, role: 'tram', pts: r.concat([r[0]]) }));
+  if ((it.role === 'bnd' || it.role === 'headland') && it.kind === 'line') return closedLine ? { kind: 'poly', name: it.name, role: it.role, rings: [it.pts] } : Object.assign(it, { role: '' });
+  if (it.role === 'flags' && it.kind !== 'point') it.role = '';
+  if ((it.role === 'tracks' || it.role === 'headlines') && it.kind !== 'line') it.role = '';
+  return it;
+}
 function impKML(txt) {
   const doc = new DOMParser().parseFromString(txt, 'application/xml'), out = [];
   if (doc.querySelector('parsererror')) throw new Error(t('impBadFile', 'KML'));
@@ -2332,7 +2356,11 @@ function impKML(txt) {
   const kids = (el, tag) => [...el.getElementsByTagNameNS('*', tag)];
   kids(doc, 'Placemark').forEach(pm => {
     const nm = (pm.getElementsByTagNameNS('*', 'name')[0] || {}).textContent || '';
-    const su = ((pm.getElementsByTagNameNS('*', 'styleUrl')[0] || {}).textContent || '').replace(/^.*#/, ''), role = EXP_LAYERS.includes(su) ? su : '';
+    const su = ((pm.getElementsByTagNameNS('*', 'styleUrl')[0] || {}).textContent || '').replace(/^.*#/, '');
+    // Ebene: Stil aus unserem Export, sonst der Name des nächsten Ordners (z. B. in Google Earth angelegt)
+    let role = EXP_LAYERS.includes(su) ? su : '';
+    for (let p = pm.parentNode; !role && p && p.nodeType === 1; p = p.parentNode)
+      if (p.localName === 'Folder') { const fn = [...p.children].find(c => c.localName === 'name'); role = roleFromName(fn && fn.textContent); }
     kids(pm, 'Polygon').forEach(pg => {
       const ob = kids(pg, 'outerBoundaryIs')[0], rings = [co(ob && kids(ob, 'coordinates')[0])];
       kids(pg, 'innerBoundaryIs').forEach(ib => rings.push(co(kids(ib, 'coordinates')[0])));
@@ -2364,7 +2392,7 @@ function impGeoJSON(txt) {
     out.slice(n0).forEach(it => { if (!it.role) it.role = role; });
   };
   (g.type === 'FeatureCollection' ? g.features : g.type === 'Feature' ? [g] : [{ geometry: g }]).forEach(ft => {
-    const ly = ft.properties && ft.properties.layer; role = EXP_LAYERS.includes(ly) ? ly : '';
+    const ly = ft.properties && (ft.properties.layer || ft.properties.folder); role = roleFromName(ly);
     geom(ft.geometry, nameOf(ft.properties));
   });
   return { items: out, crs: c ? c.name : '' };
@@ -2453,13 +2481,15 @@ async function readImport(fileList) {
     const bs = base(k), get = ext => { const m = keys.find(x => x.toLowerCase() === (bs + ext).toLowerCase()); return m ? F[m] : null; };
     const prj = get('.prj'), cpg = get('.cpg');
     const r = impShp(F[k], get('.dbf'), prj ? impDec(prj) : '', cpg ? impDec(cpg) : undefined), m = bs.match(/_(\w+)$/);
-    if (m && EXP_LAYERS.includes(m[1])) r.items.forEach(it => { it.role = m[1]; });
+    const ro = m && EXP_LAYERS.includes(m[1]) ? m[1] : roleFromName(bs.replace(/^.*\//, ''));   // „…_tram.shp“ oder „Fahrgassen.shp“
+    if (ro) r.items.forEach(it => { it.role = ro; });
     add(r);
   });
   find(/(^|\/)TASKDATA\.XML$/i).forEach(k => {
     const dir = k.replace(/[^\/]*$/, '');
     add(impISO(impDec(F[k]), nm => { const m = keys.find(x => x.toLowerCase() === (dir + nm + '.xml').toLowerCase()); return m ? impDec(F[m]) : null; }));
   });
+  res.items = res.items.flatMap(it => fitRole(it));
   // die bearbeitete Fläche wird nicht importiert (die schreibt AOG beim Fahren)
   const nSec = res.items.filter(it => it.role === 'sections').length;
   if (nSec) { res.items = res.items.filter(it => it.role !== 'sections'); res.warn.push(t('impNoSections', nSec)); }
@@ -2486,7 +2516,7 @@ function startImport(res, fname) {
     if (cfg.impTarget === 0) {
       // Name: solange nichts eingetippt wurde, der Name der größten gewählten Fläche (z. B. aus eAMA)
       const big = chosen('bnd').sort((x, y) => y.ha - x.ha)[0];
-      if (!nameTouched && big && big.name && !/^\d+$/.test(big.name)) fieldName = big.name.replace(/[\\/:*?"<>|]/g, '').trim();
+      if (!nameTouched && big && big.name && !/^\d+$/.test(big.name) && !roleFromName(big.name)) fieldName = big.name.replace(/[\\/:*?"<>|]/g, '').trim();
       const inp = document.createElement('input'); inp.placeholder = t('newFieldName'); inp.value = fieldName;
       inp.oninput = () => { fieldName = inp.value; nameTouched = true; updateToolbox(); };
       box.append(inp);
