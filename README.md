@@ -1,6 +1,6 @@
 # AOG Field Editor
 
-🇩🇪 [Deutsche Version](README.de.md)
+🇦🇹 [Deutsche Version](README.de.md)
 
 A browser-based editor for [AgOpenGPS](https://github.com/AgOpenGPS-Official/AgOpenGPS) fields. It opens the field folder directly, shows everything on a satellite map and writes the files back in AgOpenGPS format, with no detour through KML.
 
