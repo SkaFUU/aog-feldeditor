@@ -421,6 +421,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    fCountR: 'Anzahl rechts', fCountL: 'Anzahl links',
     gripTitle: 'Ziehen: Seitenleiste breiter oder schmaler',
     fSmoothW: 'Glättung (m)', fSmoothRound: 'Rundung (%)', trackPickTitle: 'Anklicken zum Auswählen',
     togNav: 'Feldliste ein-/ausblenden', togProps: 'Seitenleiste ein-/ausblenden', fMerge: 'Zusammenführen', passes0: '0 = bis zum Feldrand',
@@ -532,6 +533,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    fCountR: 'Number right', fCountL: 'Number left',
     gripTitle: 'Drag: make the side panel wider or narrower',
     fSmoothW: 'Smoothing (m)', fSmoothRound: 'Rounding (%)', trackPickTitle: 'Click to select',
     togNav: 'Show/hide field list', togProps: 'Show/hide side panel', fMerge: 'Merge', passes0: '0 = up to the field edge',
@@ -2678,7 +2680,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -2750,6 +2752,8 @@ const PARAMS = {
   fillSide: { label: 'fSide', seg: true, opts: () => [[0, t('segBoth')], [1, t('segRight')], [-1, t('segLeft')]] },
   passes: { label: 'fPasses', num: [1, 0], hint: () => t('passes0') },
   nA: { label: 'fCountA', num: [1, 0] },
+  nR: { label: 'fCountR', num: [1, 0] },
+  nL: { label: 'fCountL', num: [1, 0] },
   nB: { label: 'fCountB', num: [1, 0] },
   trim: { label: 'fMerge', seg: true, opts: () => [[0, t('segOff')], [1, t('segLine1')], [2, t('segLine2')]], hint: () => t('trimHint') },
   withRing: { label: 'fWithRing', seg: true, opts: () => [[0, t('segWithout')], [1, t('segWith')]] },
@@ -2822,7 +2826,7 @@ function renderCfg() {
   $('btnTramDel').disabled = !nT;
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
-const INT_KEYS = new Set(['smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
+const INT_KEYS = new Set(['nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
 const RERENDER = new Set(['fillLines', 'withRing']);        // diese Umschalter ändern, welche Einstellungen gezeigt werden
 function onCfg(el) {
   const k = el.dataset.cfg, v = el.value;
@@ -2935,7 +2939,7 @@ function startTramTool() {
   startTool({
     title: 'btnTram',
     params: () => cfg.fillLines === 2 && list.length > 1 ? ['fillLines', ...ring(), 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim']
-      : ['fillLines', ...ring(), 'tramTrack', 'fillSide', 'passes'],
+      : ['fillLines', ...ring(), 'tramTrack', 'nR', 'nL'],
     get two() { return cfg.fillLines === 2 && list.length > 1; },
     res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
@@ -2944,11 +2948,20 @@ function startTramTool() {
       const c = cfg, trA = ex.tracks[c.tramTrack];
       let lines = [];
       this.ring = null;
+      if (this.mode !== c.fillLines) { this.mode = c.fillLines; this.key = this.key1 = null; }   // Umschalten 1/2 Linien: neu vorschlagen
       if (trA && !trA.deleted) {
         const ctx = tramContext(c, c.withRing), RA = refLine(trA);
-        if (!this.two)                                 // Anzahl je Seite, 0 = bis zum Feldrand
-          (c.fillSide ? [Math.sign(c.fillSide)] : [1, -1]).forEach(s => lines.push(...tramAlong(RA, s, c.passes > 0 ? c.passes : Infinity, c, ctx)));
-        else {
+        if (!this.two) {
+          // 1 Linie: Anzahl rechts/links so vorschlagen, dass das ganze Feld abgedeckt ist (ohne die auf der Randfahrgasse)
+          const key1 = [c.tramTrack, c.tramWidth, c.trackWidth, c.withRing, c.ringCount, c.radius].join('/');
+          if (this.key1 !== key1) {
+            this.key1 = key1;
+            const fit = s => { let m = 0, empty = 0; for (let k = 0; k < 400 && empty < 3; k++) { const p = tramPair(RA, k, s, c, ctx); if (p === null) continue; if (!p.length) { empty++; continue; } empty = 0; m++; } return m; };
+            cfg.nR = fit(1); cfg.nL = fit(-1);
+            saveCfg(); renderCfg();
+          }
+          lines = tramAlong(RA, 1, c.nR, c, ctx).concat(tramAlong(RA, -1, c.nL, c, ctx));
+        } else {
           const trB = ex.tracks[c.tramTrack2];
           if (trB && !trB.deleted && c.tramTrack2 !== c.tramTrack) {
             // Anzahl je Seite neu vorschlagen, wenn sich Linien, Abstand oder die Randfahrgasse ändern

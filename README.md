@@ -37,7 +37,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 
 **Tramlines**
 - Choose the **vehicle** (wheel track) and the **tool** at the top, e.g. the sprayer: the tramline spacing is then its working width. Everything can also be typed in.
-- **Along line:** tramlines from a reference line (AB line or curve), on one or both sides, a given number or up to the field edge – or from two lines towards each other (the number per side is suggested). Where tramlines from both sides cross, one side can end at the crossing ("Merge"). Calculated like "Tramlines Multi" in AgOpenGPS.
+- **Along line:** tramlines from a reference line (AB line or curve), with a suggested number right and left so the whole field is covered – or from two lines towards each other (the number per side is suggested). Where tramlines from both sides cross, one side can end at the crossing ("Merge"). Calculated like "Tramlines Multi" in AgOpenGPS.
 - **Boundary tram** around the outer boundary, also several rings, optionally with rounded corners (both tracks exactly parallel).
 - **Tramline between:** click two tramlines, a new one goes exactly in the middle. **Delete:** click single tramlines (Ctrl+Z brings them back).
 - The **working width** of each tramline is shown as a blue area (covered twice = darker), already in the preview; it can be hidden with the eye. The other functions can create it at the same time; tramlines then end at it, otherwise at the boundary.
