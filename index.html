@@ -488,7 +488,7 @@ const I18N = {
     impNoSections: 'Die bearbeitete Fläche ({0} Teilflächen) wird nicht importiert.', impReplaceLayers: 'Fahrgassen und Vorgewende aus der Datei ersetzen die vorhandenen.',
     btnImport: 'Importieren', gImpExp: 'Import / Export', fImpTarget: 'Ziel', impNewField: 'Neues Feld', impOpenField: 'Ins offene Feld', fImpPolyAs: 'Fläche als', impAsOuter: 'Außengrenze', impAsInner: 'Innengrenze', impPoly: 'Fläche', impLine: 'Linie', impAB: 'AB-Linie', impPoint: 'Punkt', impAll: 'Alle', impNone: 'Keine', impCount: '<b>{0}</b> Flächen, <b>{1}</b> Linien, <b>{2}</b> Punkte gewählt. Auf der Karte oder in der Liste an- und abwählen.', impCrs: 'Koordinaten: {0} – umgerechnet.', impNewHint: 'Größte Fläche = Außengrenze, Löcher und Flächen darin = Innengrenzen, Linien = Spuren, Punkte = Fahnen. Aus einem Export dieses Editors kommen auch Fahrgassen, Vorgewende und Vorgewende-Linien wieder an ihren Platz.', impReplaceOuter: 'Die größte Fläche ersetzt die bestehende Außengrenze.', impSetOuter: 'Die größte Fläche wird die Außengrenze.', impMany: 'Die Liste zeigt nur die ersten 400 von {0} – auf der Karte sind alle wählbar.', impDone: 'Importiert – mit „Speichern“ übernehmen.', impSkipped: '{0} Flächen außerhalb der Außengrenze wurden ausgelassen.', impBusy: 'Datei wird gelesen …', impError: 'Import: {0}', impBadZip: 'ZIP-Datei nicht lesbar', impBadFile: '{0}-Datei nicht lesbar', impBadCrs: 'Koordinatensystem „{0}“ wird nicht unterstützt', impNoPrj: 'Das Shapefile hat keine .prj-Datei – Koordinatensystem unbekannt. Bitte die .prj mit auswählen.', impDatum: 'Unbekanntes Datum „{0}“ – die Lage kann um einige Meter abweichen.', impNothing: 'In der Datei wurde nichts Passendes gefunden.', impNoFiles: 'Keine lesbare Datei (KML, KMZ, GeoJSON, Shapefile, ISOXML).',
     btnExport: 'Exportieren', fExpFmt: 'Format', expDownload: 'Herunterladen', expBnd: 'Feldgrenze', expTramOuter: 'Randfahrgasse außen', expTramInner: 'Randfahrgasse innen', expFlag: 'Fahne {0}', expIsoOnly: 'Bei ISOXML vorerst nur Grenze und Spuren', expUnsaved: 'Exportiert wird der aktuelle Stand im Editor, auch noch nicht Gespeichertes.', expDone: '{0} heruntergeladen.', expKml: 'Eine <b>.kml</b>-Datei – z. B. für Google Earth. Jede Ebene ist ein eigener Ordner.', expGeo: 'Eine <b>.geojson</b>-Datei – z. B. für QGIS.', expShp: 'Ein <b>ZIP</b> mit einem Shapefile je Ebene (.shp, .shx, .dbf, .prj) – z. B. für QGIS, Hof-Programme und Terminals.', expIso: 'Ein <b>ZIP</b> mit TASKDATA/TASKDATA.XML (ISOXML Version 4) für Terminals. <b>Vorerst nur Grenze und Spuren</b> (AB-Linien und Kurven). Noch nicht an Terminals getestet – Rückmeldungen willkommen!',
-    fCovEdge: 'Gerade Kanten ab (m)', covEdgeHint: 'Gerade Stücke ab dieser Länge werden zu geraden Kanten, die zackigen Wendebereiche dazwischen zu einer scharfen Ecke. 0 = aus.', btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
+    covMsgSides: 'Gelb die neue Außengrenze: <b>{0}</b> Feldseiten, jede als eigene Kurve, Ecken aus dem Schnitt der Seiten.<br>Kurve weicht höchstens <b>{1} m</b> von der Kontur ab · <b>{2}</b> Punkte · {3} ha<br>Regler links = grob, rechts = genau.', fCovEdge: 'Seiten ab (m)', covEdgeHint: 'Jede Feldseite ab dieser Länge wird als eigene Kurve nachgezogen, wie abgefahren; wo sich die verlängerten Seiten treffen, ist die Ecke. Kürzere Stücke (zackige Wendebereiche) fallen weg. 0 = aus.', btnBndCov: 'Aus Fahrspur', fCovPrec: 'Genauigkeit', needCoverage: 'Keine bearbeitete Fläche im Feld – zuerst in AOG fahren.', covBusy: 'Rechne Grenze aus der bearbeiteten Fläche …', covFail: 'Aus der bearbeiteten Fläche ließ sich keine Grenze bilden.', covMsg: 'Gelb die neue Außengrenze um die bearbeitete Fläche.<br>Punkt ab <b>{0}°</b> Richtungsänderung · <b>{1}</b> Punkte · {2} ha<br>Regler links = grob, rechts = genau.', covReplace: 'Die bestehende Außengrenze wird ersetzt (Rückgängig möglich).',
     confirmYes: 'Ja', discardYes: 'Verwerfen', originPickMsg: 'In die Karte klicken – dort kommt der neue Ursprung hin.', flagPickMsg: 'In die Karte klicken – jeder Klick setzt eine Fahne. „Fertig“ beendet.', simpMsg: '{0} → {1} Punkte. Gelb die ausgedünnte Grenze.', btnMeasAngle: 'Winkel', angPick1: 'Linie 1 anklicken – eine Spur oder eine Feldseite.', angPick2: 'Linie 2 anklicken.', angMsg: 'Winkel: <b>{0}°</b> (Gegenwinkel {1}°)', angParallel: 'Die beiden Linien sind parallel (0°).', angSide: 'Seite {0}',
     measSeg: 'Strecke', measLen: 'Länge', measAngleAt: 'Winkel bei {0}',
     segTrack: 'Spur', hdAddTrack: 'Spur auf der Karte anklicken – sie kommt als Linie dazu (Nummer wie in der Liste).', hdNoTracks: 'Keine passende Spur (Kurve oder AB-Linie) im Feld.', hdSide: 'Seite', hdAutoSides: 'Seiten erkennen', hdAllDist: 'Alle auf Abstand oben', hdNoSides: 'Keine Ecken gefunden – Linien bitte selbst setzen.', hdSidesFound: '{0} Seiten erkannt – jede hat ihren eigenen Abstand.',
@@ -614,7 +614,7 @@ const I18N = {
     impNoSections: 'The coverage ({0} parts) is not imported.', impReplaceLayers: 'Tramlines and headland from the file replace the existing ones.',
     btnImport: 'Import', gImpExp: 'Import / Export', fImpTarget: 'Target', impNewField: 'New field', impOpenField: 'Into open field', fImpPolyAs: 'Area as', impAsOuter: 'Outer boundary', impAsInner: 'Inner boundary', impPoly: 'Area', impLine: 'Line', impAB: 'AB line', impPoint: 'Point', impAll: 'All', impNone: 'None', impCount: '<b>{0}</b> areas, <b>{1}</b> lines, <b>{2}</b> points selected. Select on the map or in the list.', impCrs: 'Coordinates: {0} – converted.', impNewHint: 'Largest area = outer boundary, holes and areas inside = inner boundaries, lines = tracks, points = flags. From an export of this editor, tramlines, headland and headland lines go back to their place too.', impReplaceOuter: 'The largest area replaces the existing outer boundary.', impSetOuter: 'The largest area becomes the outer boundary.', impMany: 'The list only shows the first 400 of {0} – all can be selected on the map.', impDone: 'Imported – press “Save” to keep it.', impSkipped: '{0} areas outside the outer boundary were skipped.', impBusy: 'Reading file …', impError: 'Import: {0}', impBadZip: 'ZIP file not readable', impBadFile: '{0} file not readable', impBadCrs: 'Coordinate system “{0}” is not supported', impNoPrj: 'The shapefile has no .prj file – coordinate system unknown. Please select the .prj as well.', impDatum: 'Unknown datum “{0}” – the position may be off by a few metres.', impNothing: 'Nothing usable found in the file.', impNoFiles: 'No readable file (KML, KMZ, GeoJSON, shapefile, ISOXML).',
     btnExport: 'Export', fExpFmt: 'Format', expDownload: 'Download', expBnd: 'Field boundary', expTramOuter: 'Boundary tram outer', expTramInner: 'Boundary tram inner', expFlag: 'Flag {0}', expIsoOnly: 'ISOXML: only boundary and tracks for now', expUnsaved: 'The current state in the editor is exported, including unsaved changes.', expDone: '{0} downloaded.', expKml: 'One <b>.kml</b> file – e.g. for Google Earth. Each layer is its own folder.', expGeo: 'One <b>.geojson</b> file – e.g. for QGIS.', expShp: 'A <b>ZIP</b> with one shapefile per layer (.shp, .shx, .dbf, .prj) – e.g. for QGIS, farm software and terminals.', expIso: 'A <b>ZIP</b> with TASKDATA/TASKDATA.XML (ISOXML version 4) for terminals. <b>Only boundary and tracks for now</b> (AB lines and curves). Not tested on terminals yet – feedback welcome!',
-    fCovEdge: 'Straight edges from (m)', covEdgeHint: 'Straight pieces of at least this length become straight edges, the ragged turning areas between them a sharp corner. 0 = off.', btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
+    covMsgSides: 'Yellow is the new outer boundary: <b>{0}</b> field sides, each its own curve, corners where the sides meet.<br>Curve is at most <b>{1} m</b> off the contour · <b>{2}</b> points · {3} ha<br>Slider left = rough, right = precise.', fCovEdge: 'Sides from (m)', covEdgeHint: 'Every field side of at least this length is traced as its own curve, like it was driven; where the extended sides meet is the corner. Shorter pieces (ragged turning areas) are dropped. 0 = off.', btnBndCov: 'From coverage', fCovPrec: 'Precision', needCoverage: 'No coverage in this field – drive it in AOG first.', covBusy: 'Building boundary from coverage …', covFail: 'Could not build a boundary from the coverage.', covMsg: 'Yellow is the new outer boundary around the coverage.<br>Point at <b>{0}°</b> change of direction · <b>{1}</b> points · {2} ha<br>Slider left = rough, right = precise.', covReplace: 'The existing outer boundary is replaced (undo possible).',
     confirmYes: 'Yes', discardYes: 'Discard', originPickMsg: 'Click the map – the new origin goes there.', flagPickMsg: 'Click the map – each click adds a flag. “Done” ends.', simpMsg: '{0} → {1} points. Yellow is the reduced boundary.', btnMeasAngle: 'Angle', angPick1: 'Click line 1 – a track or a field side.', angPick2: 'Click line 2.', angMsg: 'Angle: <b>{0}°</b> (supplementary {1}°)', angParallel: 'The two lines are parallel (0°).', angSide: 'Side {0}',
     measSeg: 'Segment', measLen: 'Length', measAngleAt: 'Angle at {0}',
     segTrack: 'Track', hdAddTrack: 'Click a track on the map – it is added as a line (numbered like the list).', hdNoTracks: 'No suitable track (curve or AB line) in this field.', hdSide: 'Side', hdAutoSides: 'Detect sides', hdAllDist: 'All to distance above', hdNoSides: 'No corners found – please set the lines yourself.', hdSidesFound: '{0} sides detected – each has its own distance.',
@@ -2061,6 +2061,88 @@ function straightEdges({ R, idx, peak }, tol, minLen) {
   });
   return out.length >= 3 ? out : plain();
 }
+// Linie vereinfachen (Douglas-Peucker), Endpunkte bleiben
+function dpLine(P, tol) {
+  if (P.length < 3) return P.slice();
+  const keep = new Uint8Array(P.length); keep[0] = keep[P.length - 1] = 1;
+  const st = [[0, P.length - 1]];
+  while (st.length) {
+    const [i0, i1] = st.pop(), a = P[i0], b = P[i1], L1 = Math.hypot(b.e - a.e, b.n - a.n) || 1e-9;
+    let im = -1, dm = tol;
+    for (let i = i0 + 1; i < i1; i++) { const d = Math.abs((P[i].e - a.e) * (b.n - a.n) - (P[i].n - a.n) * (b.e - a.e)) / L1; if (d > dm) { dm = d; im = i; } }
+    if (im > 0) { keep[im] = 1; st.push([i0, im], [im, i1]); }
+  }
+  return P.filter((_, i) => keep[i]);
+}
+// Feldseiten wie abgefahren: Rand an den Ecken in Seiten teilen, kurze (zackige Wendebereiche) weglassen,
+// jede Seite als Kurve vereinfachen, benachbarte Seiten in ihrer Richtung verlängern – der Schnitt ist die Ecke.
+function sidesBoundary(R0, rough, minLen) {
+  const n0 = R0.length;
+  if (n0 < 40) return null;
+  const k = Math.max(1, Math.round(1 + 3 * rough));            // leicht glätten (Rasterstufen)
+  let R = R0.map((_, i) => { let e = 0, nn = 0; for (let j = -k; j <= k; j++) { const q = R0[(i + j + n0) % n0]; e += q.e; nn += q.n; } return { e: e / (2 * k + 1), n: nn / (2 * k + 1) }; });
+  const n = R.length, at = i => R[((i % n) + n) % n], K = 10;   // Richtung über ±5 m
+  const turn = (a, b) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; };
+  const dir = (a, b) => Math.atan2(b.e - a.e, b.n - a.n);
+  const cr = R.map((_, i) => Math.abs(turn(dir(at(i - K), at(i)), dir(at(i), at(i + K)))));
+  const C = [];                                                  // Ecken: deutlicher Knick, stärkster Punkt in der Umgebung
+  for (let i = 0; i < n; i++) { if (cr[i] < 30 * D) continue; let mx = true; for (let q = -K; q <= K && mx; q++) if (q && (cr[(i + q + n) % n] > cr[i] || (cr[(i + q + n) % n] === cr[i] && q < 0))) mx = false; if (mx) C.push(i); }
+  if (C.length < 2) return null;
+  const sides = [];
+  for (let j = 0; j < C.length; j++) {
+    const a = C[j], b = j + 1 < C.length ? C[j + 1] : C[0] + n, len = (b - a) * 0.5;
+    if (len >= minLen) sides.push({ a, b });
+  }
+  if (sides.length < 2) return null;
+  const tol = 0.05 + 2.95 * rough, trim = 6;                    // 3 m an den Ecken nicht nachziehen (dort ist es meist zackig)
+  // Ausgleichsgerade (Hauptachse) durch Punkte, Richtung vom ersten zum letzten Punkt
+  const fit = Q => {
+    const c = Q.reduce((m, p) => ({ e: m.e + p.e / Q.length, n: m.n + p.n / Q.length }), { e: 0, n: 0 });
+    let xx = 0, xy = 0, yy = 0; Q.forEach(p => { const x = p.e - c.e, y = p.n - c.n; xx += x * x; xy += x * y; yy += y * y; });
+    const an = 0.5 * Math.atan2(2 * xy, xx - yy); let u = { e: Math.cos(an), n: Math.sin(an) };
+    const d = { e: Q[Q.length - 1].e - Q[0].e, n: Q[Q.length - 1].n - Q[0].n }; if (u.e * d.e + u.n * d.n < 0) u = { e: -u.e, n: -u.n };
+    return { c, u };
+  };
+  // je Seite: Geraden über die letzten bis zu 25 m an beiden Enden (Richtung für die Ecken), dazwischen die Kurve
+  sides.forEach(sd => {
+    const P = []; for (let i = sd.a + trim; i <= sd.b - trim; i++) P.push(at(i));
+    sd.P = P;
+    if (P.length < 4) return;
+    const nw = Math.max(2, Math.min(50, Math.floor(P.length / 2)));
+    sd.Ls = fit(P.slice(0, nw)); sd.Le = fit(P.slice(P.length - nw));
+    const mid = P.slice(nw, P.length - nw);
+    sd.S = mid.length > 2 ? dpLine(mid, tol) : [];
+    if (sd.S.length === 2 && P.length <= 2 * nw + 4) sd.S = [];   // kurze Seite: nur die Gerade
+  });
+  const X2 = (p, u, q, v) => { const den = u.e * v.n - u.n * v.e; if (Math.abs(den) < Math.sin(15 * D)) return null; const t1 = ((q.e - p.e) * v.n - (q.n - p.n) * v.e) / den; return { e: p.e + u.e * t1, n: p.n + u.n * t1 }; };
+  const off = (p, Ln) => Math.abs((p.e - Ln.c.e) * Ln.u.n - (p.n - Ln.c.n) * Ln.u.e);
+  const out = [];
+  sides.forEach((A, j) => {
+    const B = sides[(j + 1) % sides.length];
+    if (!A.Le || !B.Ls) return;
+    // gerade Seite: Kurvenpunkte nur, wenn sie wirklich von der Geraden abweichen
+    const whole = fit(A.P);
+    if (A.S.length && A.S.some(p => off(p, whole) > tol)) out.push(...A.S);
+    const ea = A.P[A.P.length - 1], sb = B.P[0];
+    const bEnd = B.a < A.b ? B.a + n : B.a, gap = (bEnd - A.b) * 0.5 + trim, maxD = gap + 15;
+    // Seiten, die fast umkehren (Ecke spitzer als 60°), schneiden sich weit draußen: dann lieber eine Stirnseite
+    const uturn = A.Le.u.e * B.Ls.u.e + A.Le.u.n * B.Ls.u.n < -0.5;
+    const X = uturn ? null : X2(A.Le.c, A.Le.u, B.Ls.c, B.Ls.u);
+    const ahead = X && (X.e - ea.e) * A.Le.u.e + (X.n - ea.n) * A.Le.u.n > -5 && (sb.e - X.e) * B.Ls.u.e + (sb.n - X.n) * B.Ls.u.n > -5;
+    if (X && ahead && Math.hypot(X.e - ea.e, X.n - ea.n) < maxD && Math.hypot(X.e - sb.e, X.n - sb.n) < maxD) { out.push(X); return; }
+    // fast parallel (schmale Stirnseite): Gerade durch das Endstück, zwei Ecken
+    const G = []; for (let i = A.b - trim; i <= bEnd + trim; i++) G.push(at(i));
+    const Gm = G.filter(p => off(p, A.Le) > 1.5 && off(p, B.Ls) > 1.5);
+    if (Gm.length >= 6) {
+      const M = fit(Gm), Y1 = X2(A.Le.c, A.Le.u, M.c, M.u), Y2 = X2(M.c, M.u, B.Ls.c, B.Ls.u);
+      if (Y1 && Y2 && Math.hypot(Y1.e - ea.e, Y1.n - ea.n) < maxD && Math.hypot(Y2.e - sb.e, Y2.n - sb.n) < maxD) { out.push(Y1, Y2); return; }
+    }
+    out.push(...dpLine(G, tol));                                 // sonst bleibt der Rand dort, wie er ist
+  });
+  if (out.length < 3) return null;
+  out.sides = sides.length;
+  return out;
+}
 function startBndFromCoverage() {
   if (!ex.sections || !ex.sections.patches.length) { setStatus(t('needCoverage'), 'err'); return; }
   setStatus(t('covBusy'));
@@ -2071,8 +2153,8 @@ function startBndFromCoverage() {
   if (!layerOn.sections) setLayer('sections', true);
   startTool({
     title: 'btnBndCov', params: ['covPrec', 'covEdge'], res: null, msgHtml: true,
-    msg: () => t('covMsg', fmtNum(thr(), 1), tool.res ? tool.res.length : 0, fmtNum(tool.res ? area(tool.res) / 10000 : 0, 2)) + (bnds[0] ? '<br>' + esc(t('covReplace')) : ''),
-    recalc() { this.res = straightEdges(thinByAngle(R, thr(), 1 + 7 * rough()), 0.3 + 2.7 * rough(), cfg.covEdge); redrawTool(); },
+    msg: () => (tool.res && tool.res.sides ? t('covMsgSides', tool.res.sides, fmtNum(0.05 + 2.95 * rough(), 2), tool.res.length, fmtNum(area(tool.res) / 10000, 2)) : t('covMsg', fmtNum(thr(), 1), tool.res ? tool.res.length : 0, fmtNum(tool.res ? area(tool.res) / 10000 : 0, 2))) + (bnds[0] ? '<br>' + esc(t('covReplace')) : ''),
+    recalc() { this.res = (cfg.covEdge > 0 && sidesBoundary(R, rough(), cfg.covEdge)) || straightEdges(thinByAngle(R, thr(), 1 + 7 * rough()), 0.3 + 2.7 * rough(), cfg.covEdge); redrawTool(); },
     draw: g => {
       if (!tool.res) return;
       prevLine(g, tool.res, '#ffd400', true);
