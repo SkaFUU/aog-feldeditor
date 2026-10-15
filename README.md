@@ -66,6 +66,11 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
   - the background image saved by AgOpenGPS
 - Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
 
+**Overlay / compare** (in the Field tab)
+- Lay another field or a file (KML, shapefile, eAMA, GeoJSON, ISOXML) over the map as a purple outline – optionally with tracks and tramlines. A file with many areas (e.g. all eAMA plots) shows all of them.
+- The overlay stays while you work and when you switch fields, until you remove it.
+- Compare: open field red, overlay blue, shared area purple – with the areas in ha and, if it is (nearly) the same field, the distance between the boundaries.
+
 **Import** (in the Field tab)
 - Pick a file or simply drop it on the map: **KML/KMZ**, **GeoJSON**, **shapefile** (ZIP or .shp with .dbf and .prj) and **ISOXML** (TASKDATA, also zipped).
 - Coordinates are converted: GPS (WGS84/ETRS89), UTM, MGI Lambert (e.g. Austrian AMA/INVEKOS plots), MGI Gauss-Krüger and DHDN Gauss-Krüger.

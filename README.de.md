@@ -66,6 +66,11 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
   - das Hintergrundbild aus AgOpenGPS
 - Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
 
+**Überlagern / Vergleichen** (im Register Feld)
+- Ein anderes Feld oder eine Datei (KML, Shapefile, eAMA, GeoJSON, ISOXML) als lila Umriss über die Karte legen – auf Wunsch mit Spuren und Fahrgassen. Bei einer Datei mit vielen Flächen (z. B. alle eAMA-Schläge) werden alle gezeigt.
+- Die Überlagerung bleibt stehen, auch beim Arbeiten und beim Feldwechsel, bis man sie entfernt.
+- Vergleichen: offenes Feld rot, Überlagerung blau, gemeinsame Fläche lila – dazu die Flächen in ha und, wenn es (fast) dasselbe Feld ist, der Abstand der Grenzen.
+
 **Importieren** (im Register Feld)
 - Datei wählen oder einfach auf die Karte ziehen: **KML/KMZ**, **GeoJSON**, **Shapefile** (ZIP oder .shp mit .dbf und .prj) und **ISOXML** (TASKDATA, auch als ZIP).
 - Koordinaten werden umgerechnet: GPS (WGS84/ETRS89), UTM, MGI Lambert (z. B. AMA/INVEKOS-Feldstücke), MGI Gauß-Krüger und DHDN Gauß-Krüger.

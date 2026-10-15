@@ -147,6 +147,8 @@
   .mtab { width:100%; border-collapse:collapse; margin-top:6px; font-size:12px; font-variant-numeric:tabular-nums; }
   .mtab th { text-align:left; color:var(--muted); font-weight:600; border-bottom:1px solid var(--line); padding:2px 4px; }
   .mtab td { padding:2px 4px; border-bottom:1px solid #2b2f35; }
+  .ovlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#d0a8ff; font:600 12px system-ui,sans-serif; padding:2px 6px; border-radius:3px; white-space:nowrap; }
+  .lg { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
   .mlabel { display:inline-block; transform:translate(-50%,-140%); background:rgba(0,0,0,.8); color:var(--warn); font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
   .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }
@@ -223,6 +225,7 @@
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
   <symbol id="i-split" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M14 3l-4 18" stroke-dasharray="2.5 2"/></symbol>
   <symbol id="i-combine" viewBox="0 0 24 24"><path d="M3 6h7v12H3zM14 6h7v12h-7z"/><path d="M10 9h4M10 15h4"/></symbol>
+  <symbol id="i-overlay" viewBox="0 0 24 24"><path d="M3 8l7-4 8 3-2 9-9 2z"/><path d="M8 11l8-3 5 6-5 7-9-3z" stroke-dasharray="2.5 2"/></symbol>
   <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 17v3h16v-3"/></symbol>
   <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
   <symbol id="i-chk" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12.5l3 3 5-6"/></symbol>
@@ -299,6 +302,9 @@
           <button class="big c-file" id="btnExport" disabled><svg class="ic"><use href="#i-export"/></svg><span data-i18n="btnExport">Exportieren</span></button>
           <input type="file" id="impFile" multiple accept=".kml,.kmz,.geojson,.json,.zip,.shp,.shx,.dbf,.prj,.cpg,.xml" style="display:none">
         </div><div class="gcap" data-i18n="gImpExp">Import / Export</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-view" id="btnOverlay"><svg class="ic"><use href="#i-overlay"/></svg><span data-i18n="btnOverlay">Überlagern</span></button>
+        </div><div class="gcap" data-i18n="gCompare">Vergleich</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
           <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
@@ -475,6 +481,8 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    ovAreas: '{0} Flächen', ovCompareWith: 'Verglichen mit „{0}“ (die Fläche über dem offenen Feld).',
+    btnOverlay: 'Überlagern', gCompare: 'Vergleich', fOvShow: 'Anzeigen', ovOnlyBnd: 'Nur Grenze', ovWithLines: 'Mit Spuren und Fahrgassen', fOvCompare: 'Vergleichen', segOn: 'An', ovFrom: 'Feld oder Datei, das darübergelegt wird', ovChooseField: '– Feld wählen –', ovFile: 'Datei laden …', ovPick: 'Ein anderes Feld wählen oder eine Datei laden (KML, Shapefile, eAMA, GeoJSON, ISOXML). Es wird lila über die Karte gelegt.', ovShown: 'Überlagert: <b>{0}</b>', ovCmp: '<span class="lg" style="background:#ff5a5a"></span>nur im offenen Feld: <b>{0} ha</b><br><span class="lg" style="background:#3d8bff"></span>nur in der Überlagerung: <b>{1} ha</b><br><span class="lg" style="background:#9a6bd8"></span>gemeinsam: <b>{2} ha</b>', ovDist: 'Abstand der Grenzen: im Mittel {0} m, höchstens {1} m', ovNoField: 'Zum Vergleichen ein Feld mit Grenze öffnen.', ovStays: 'Die Überlagerung bleibt nach „Fertig“ stehen, auch beim Arbeiten und Feldwechsel – entfernen hier mit „Überlagerung entfernen“.', ovRemove: 'Überlagerung entfernen', ovRemoved: 'Überlagerung entfernt.',
     btnSplit: 'Teilen', btnCombine: 'Kombinieren', gFieldOps: 'Feld', fSplitMode: 'Ergebnis', splitKeep: 'Ein Teil bleibt', splitBoth: 'Beide neu', splitBothDel: 'Beide neu, altes löschen', splitDo: 'Teilen und speichern', splitPick1: 'Ersten Punkt der Schnittlinie anklicken – nahe an der Grenze rastet er ein.', splitPick2: 'Zweiten Punkt der Schnittlinie anklicken.', splitNoCut: 'Die Linie schneidet das Feld nicht in zwei Teile – neu klicken.', splitParts: 'Teil 1: <b>{0} ha</b> · Teil 2: <b>{1} ha</b>', splitKeepInfo: 'Teil {0} bleibt im Feld „{1}“ (in einen Teil klicken zum Wechseln), der andere wird ein neues Feld.', splitOrigInfo: 'Beide Teile werden neue Felder, „{0}“ bleibt unverändert.', splitDelInfo: 'Beide Teile werden neue Felder, „{0}“ wird danach komplett gelöscht.', splitData: 'AB-Linien und Kurven werden auf jedes Feld gekürzt (mit 99 m Überstand wie beim Erzeugen), Fahnen nach Lage, Fahrgassen und Randfahrgasse werden an der Schnittlinie abgeschnitten. Das Vorgewende bitte danach neu erstellen.', splitUnsaved: 'Ungespeicherte Änderungen werden dabei mitgespeichert.', splitBadName: 'Bitte einen neuen, noch nicht vorhandenen Feldnamen eingeben.', splitNameNew: 'Name des neuen Feldes (Teil {0})', splitNamePart: 'Name Teil {0}', splitBusy: 'Felder werden angelegt und gespeichert …', splitDone: 'Geteilt: „{0}“ und „{1}“ sind gespeichert.', splitDone2: 'Geteilt: „{0}“ und „{1}“ angelegt, „{2}“ ist unverändert.', splitDoneDel: 'Geteilt: „{0}“ und „{1}“ angelegt, „{2}“ gelöscht.', needSavedField: 'Dafür ein Feld aus dem AgOpenGPS-Ordner öffnen.', saveFailed: '„{0}“ konnte nicht gespeichert werden.', combOther: 'Zweites Feld', combPickField: 'Zweites Feld in der Liste wählen.', combNoBnd: '„{0}“ hat keine Grenze.', combPick1: 'Verbindung 1: einen Punkt an einem der beiden Felder anklicken – er rastet auf der Grenze ein.', combPick2: 'Verbindung 1: den Punkt am anderen Feld anklicken, die beiden werden verbunden.', combPick3: 'Verbindung 2: einen Punkt an einem der beiden Felder anklicken.', combPick4: 'Verbindung 2: den Punkt am anderen Feld anklicken.', splitClickKeep: 'Anklicken: dieser Teil bleibt im Feld', splitStays: 'Dieser Teil bleibt im Feld', combResult: 'Neues Feld: <b>{0} ha</b> (aus {1} ha + {2} ha)', combInfo: 'Wird ein neues Feld mit Spuren, Fahnen und Fahrgassen beider Felder. „{0}“ und „{1}“ bleiben unverändert.', combDo: 'Kombinieren und speichern', combBusy: 'Neues Feld wird angelegt und gespeichert …', combDone: '„{0}“ aus „{1}“ und „{2}“ angelegt.',
     impTypeAll: 'Alle unterstützten Dateien', impTypeShp: 'Shapefile (.shp mit .dbf und .prj, oder ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML oder ZIP)', btnDelField: 'Feld löschen', confirmDelField: 'Das Feld „{0}“ komplett löschen?\n\nDer ganze Feldordner wird mit allen Dateien gelöscht – auch mit den Sicherungen (Backup_…). Das lässt sich nicht rückgängig machen.\n\nVorher das Feld in AgOpenGPS schließen.', fieldDeleted: 'Feld „{0}“ wurde gelöscht.',
     impNoSections: 'Die bearbeitete Fläche ({0} Teilflächen) wird nicht importiert.', impReplaceLayers: 'Fahrgassen und Vorgewende aus der Datei ersetzen die vorhandenen.',
@@ -599,6 +607,8 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    ovAreas: '{0} areas', ovCompareWith: 'Compared with “{0}” (the area over the open field).',
+    btnOverlay: 'Overlay', gCompare: 'Compare', fOvShow: 'Show', ovOnlyBnd: 'Boundary only', ovWithLines: 'With tracks and tramlines', fOvCompare: 'Compare', segOn: 'On', ovFrom: 'Field or file to lay over the map', ovChooseField: '– choose field –', ovFile: 'Load file …', ovPick: 'Choose another field or load a file (KML, shapefile, eAMA, GeoJSON, ISOXML). It is laid over the map in purple.', ovShown: 'Overlay: <b>{0}</b>', ovCmp: '<span class="lg" style="background:#ff5a5a"></span>only in the open field: <b>{0} ha</b><br><span class="lg" style="background:#3d8bff"></span>only in the overlay: <b>{1} ha</b><br><span class="lg" style="background:#9a6bd8"></span>in both: <b>{2} ha</b>', ovDist: 'Distance between boundaries: {0} m on average, at most {1} m', ovNoField: 'Open a field with a boundary to compare.', ovStays: 'The overlay stays after “Done”, also while working and when switching fields – remove it here with “Remove overlay”.', ovRemove: 'Remove overlay', ovRemoved: 'Overlay removed.',
     btnSplit: 'Split', btnCombine: 'Combine', gFieldOps: 'Field', fSplitMode: 'Result', splitKeep: 'One part stays', splitBoth: 'Both new', splitBothDel: 'Both new, delete old', splitDo: 'Split and save', splitPick1: 'Click the first point of the cut line – it snaps to the boundary when close.', splitPick2: 'Click the second point of the cut line.', splitNoCut: 'The line does not cut the field in two – click again.', splitParts: 'Part 1: <b>{0} ha</b> · Part 2: <b>{1} ha</b>', splitKeepInfo: 'Part {0} stays in the field “{1}” (click into a part to change), the other becomes a new field.', splitOrigInfo: 'Both parts become new fields, “{0}” stays unchanged.', splitDelInfo: 'Both parts become new fields, “{0}” is deleted completely afterwards.', splitData: 'AB lines and curves are shortened to each field (with 99 m overhang like when they are made), flags by position, tramlines and boundary tram are cut at the line. Please rebuild the headland afterwards.', splitUnsaved: 'Unsaved changes are saved along with it.', splitBadName: 'Please enter a new field name that does not exist yet.', splitNameNew: 'Name of the new field (part {0})', splitNamePart: 'Name part {0}', splitBusy: 'Creating and saving fields …', splitDone: 'Split: “{0}” and “{1}” are saved.', splitDone2: 'Split: “{0}” and “{1}” created, “{2}” unchanged.', splitDoneDel: 'Split: “{0}” and “{1}” created, “{2}” deleted.', needSavedField: 'Open a field from the AgOpenGPS folder first.', saveFailed: '“{0}” could not be saved.', combOther: 'Second field', combPickField: 'Choose the second field in the list.', combNoBnd: '“{0}” has no boundary.', combPick1: 'Connection 1: click a point on one of the two fields – it snaps to the boundary.', combPick2: 'Connection 1: click the point on the other field, the two are joined.', combPick3: 'Connection 2: click a point on one of the two fields.', combPick4: 'Connection 2: click the point on the other field.', splitClickKeep: 'Click: this part stays in the field', splitStays: 'This part stays in the field', combResult: 'New field: <b>{0} ha</b> (from {1} ha + {2} ha)', combInfo: 'Becomes a new field with tracks, flags and tramlines of both. “{0}” and “{1}” stay unchanged.', combDo: 'Combine and save', combBusy: 'Creating and saving the new field …', combDone: '“{0}” created from “{1}” and “{2}”.',
     impTypeAll: 'All supported files', impTypeShp: 'Shapefile (.shp with .dbf and .prj, or ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML or ZIP)', btnDelField: 'Delete field', confirmDelField: 'Delete the field “{0}” completely?\n\nThe whole field folder is deleted with all files – including the backups (Backup_…). This cannot be undone.\n\nClose the field in AgOpenGPS first.', fieldDeleted: 'Field “{0}” was deleted.',
     impNoSections: 'The coverage ({0} parts) is not imported.', impReplaceLayers: 'Tramlines and headland from the file replace the existing ones.',
@@ -799,6 +809,7 @@ const MAX_MARKERS = 800;
 
 function drawAll() {
   otherLayer.clearLayers();
+  drawOverlay();
   bnds.forEach((b, i) => {
     if (i === active || b.hidden) return;
     const drive = i > 0 && /^true$/i.test(b.flagLines[0] || '');      // befahrbare Innengrenze blau
@@ -2981,6 +2992,110 @@ function startCombine() {
 $('btnSplit').onclick = startSplit;
 $('btnCombine').onclick = startCombine;
 
+// ---------- Überlagern / Vergleichen ----------
+// Ein anderes Feld oder eine Datei als lila Umriss über die Karte legen; bleibt stehen, bis man es entfernt.
+// Vergleich: offenes Feld rot, Überlagerung blau, gemeinsam lila – dazu Flächen und Abstand der Grenzen.
+let overlay = null;                                          // { name, polys: [ [Ring außen, Löcher …] … ], lines: [[…]] } in Breite/Länge
+var ovLayer = null;
+function drawOverlay() {
+  if (!ovLayer) ovLayer = L.layerGroup().addTo(map);
+  ovLayer.clearLayers();
+  const btn = document.getElementById('btnOverlay');
+  if (btn) btn.classList.toggle('on', !!overlay);
+  if (!overlay) return;
+  const cmp = cfg.ovCompare === 1 && plane && bnds[0];
+  if (cmp) L.polygon(bnds.filter(b => !b.hidden).map(b => b.pts.map(ll)), { stroke: false, fillColor: '#ff5a5a', fillOpacity: .28, interactive: false }).addTo(ovLayer);
+  const hit = cmp ? ovMatch() : -1;
+  overlay.polys.forEach((rings, i) => L.polygon(rings, { color: '#c77dff', weight: i === hit ? 3 : 2, dashArray: '8 5', fill: i === hit, fillColor: '#3d8bff', fillOpacity: .28, interactive: false }).addTo(ovLayer));
+  if (cfg.ovShow === 1) overlay.lines.forEach(l => L.polyline(l, { color: '#c77dff', weight: 1.5, opacity: .8, interactive: false }).addTo(ovLayer));
+  overlay.polys.forEach((rings, i) => { if (overlay.polys.length > 1 && !rings.name) return; L.marker(L.polygon(rings[0]).getBounds().getCenter(), { interactive: false, icon: L.divIcon({ className: '', html: `<span class="ovlabel">${esc(rings.name || overlay.name)}</span>`, iconSize: [0, 0] }) }).addTo(ovLayer); });
+}
+function ovMatch() {
+  if (!overlay || !plane || !bnds[0]) return -1;
+  const c = centroid(bnds[0].pts); let best = -1, bd = Infinity;
+  overlay.polys.forEach((rings, i) => { const R = rings[0].map(v => plane.fwd(v[0], v[1])); const d = inPoly(c, R) ? -1 : dSq(c, centroid(R)); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+// Flächen über ein Raster (wie bei „Aus Fahrspur“), Abstand über die Grenzpunkte
+function compareOverlay() {
+  if (!overlay || !plane || !bnds[0]) return null;
+  const k = ovMatch(); if (k < 0) return null;
+  const A = bnds.filter(b => !b.hidden).map(b => b.pts), B = overlay.polys[k].map(r => r.map(v => plane.fwd(v[0], v[1])));
+  let e0 = Infinity, e1 = -Infinity, n0 = Infinity, n1 = -Infinity;
+  A.concat(B).forEach(r => r.forEach(p => { e0 = Math.min(e0, p.e); e1 = Math.max(e1, p.e); n0 = Math.min(n0, p.n); n1 = Math.max(n1, p.n); }));
+  const c = Math.max(0.2, Math.sqrt((e1 - e0) * (n1 - n0) / 3e6)), W = Math.ceil((e1 - e0) / c) + 2, H = Math.ceil((n1 - n0) / c) + 2;
+  const mask = R => {
+    const cv2 = document.createElement('canvas'); cv2.width = W; cv2.height = H;
+    const x = cv2.getContext('2d'); x.beginPath();
+    R.forEach(r => r.forEach((p, i) => x[i ? 'lineTo' : 'moveTo']((p.e - e0) / c + 1, (n1 - p.n) / c + 1)));
+    x.fill('evenodd');                                        // Innengrenzen als Löcher
+    return x.getImageData(0, 0, W, H).data;
+  };
+  const ma = mask(A), mb = mask(B), cell = c * c / 10000;
+  let oa = 0, ob = 0, both = 0;
+  for (let i = 3; i < ma.length; i += 4) { const a = ma[i] > 127, b = mb[i] > 127; if (a && b) both++; else if (a) oa++; else if (b) ob++; }
+  const ds = (P, Q) => { const Qc = Q.concat([Q[0]]), st = Math.max(1, Math.floor(P.length / 1500)); const o = []; for (let i = 0; i < P.length; i += st) o.push(Math.sqrt(dSq(P[i], nearestOn(P[i], Qc)))); return o; };
+  const d = ds(A[0], B[0]).concat(ds(B[0], A[0])).sort((x, y) => x - y);
+  return { onlyA: oa * cell, onlyB: ob * cell, both: both * cell, med: d[d.length >> 1], max: d[d.length - 1] };
+}
+async function overlayFromField(name) {
+  const o = await readOtherField(name);
+  if (!o.rings.length) throw new Error(t('combNoBnd', name));
+  const lines = o.tracks.map(tr => tr.mode === 2 ? [tr.aLL, tr.bLL] : tr.pts).concat(o.tram);
+  return { name, polys: [o.rings], lines };
+}
+async function overlayFromFiles(list) {
+  const res = await readImport([...list]), P = res.items.filter(it => it.kind === 'poly' && (!it.role || it.role === 'bnd'));
+  if (!P.length) throw new Error(t('impNothing'));
+  const polys = P.map(it => Object.assign(it.rings.slice(), { name: it.name }));
+  return { name: P.length === 1 && P[0].name ? P[0].name : list[0].name.replace(/\.[^.]+$/, ''), polys, lines: res.items.filter(it => it.kind === 'line').map(it => it.pts) };
+}
+function startOverlay() {
+  let cmp = null;
+  const show = o => {
+    overlay = o; drawOverlay(); cmp = compareOverlay();
+    const k = ovMatch(), around = k >= 0 ? o.polys[k][0] : o.polys.flatMap(r => r[0]);   // auf die passende Fläche und das Feld zoomen
+    map.fitBounds(L.latLngBounds(around.concat(plane && bnds[0] ? bnds[0].pts.map(llOf) : [])), { padding: [40, 40] }); list(); redrawTool();
+  };
+  const list = () => {
+    const box = $('toolList'); box.innerHTML = '';
+    const lb = document.createElement('label'); lb.className = 'muted'; lb.textContent = t('ovFrom');
+    const sel2 = document.createElement('select'); sel2.add(new Option(fieldNames.length ? t('ovChooseField') : '–', ''));
+    fieldNames.filter(n => n !== currentField).forEach(n => sel2.add(new Option(n, n)));
+    sel2.value = overlay && fieldNames.includes(overlay.name) ? overlay.name : '';
+    sel2.onchange = async () => { if (!sel2.value) return; try { show(await overlayFromField(sel2.value)); } catch (err) { setStatus(t('error', err.message), 'err'); } };
+    const fb = document.createElement('button'); fb.type = 'button'; fb.textContent = t('ovFile');
+    fb.onclick = async () => {
+      try {
+        let fl;
+        if (window.showOpenFilePicker) { const hs = await window.showOpenFilePicker({ id: 'aogImport', multiple: true, excludeAcceptAllOption: true, types: IMP_TYPES() }); fl = await Promise.all(hs.map(h => h.getFile())); }
+        else { fl = await new Promise(r => { const i2 = document.createElement('input'); i2.type = 'file'; i2.multiple = true; i2.onchange = () => r(i2.files); i2.click(); }); }
+        if (fl && fl.length) show(await overlayFromFiles(fl));
+      } catch (err) { if (err.name !== 'AbortError') setStatus(t('error', err.message), 'err'); }
+    };
+    box.append(lb, sel2, fb);
+  };
+  startTool({
+    title: 'btnOverlay', msgHtml: true, hideOk: true, cancelLabel: 'done',
+    params: () => plane && bnds[0] ? ['ovShow', 'ovCompare'] : ['ovShow'],
+    actions: () => overlay ? [{ label: 'ovRemove', run() { overlay = null; drawOverlay(); setStatus(t('ovRemoved'), 'ok'); } }] : [],
+    msg: () => {
+      if (!overlay) return esc(t('ovPick'));
+      const h = [t('ovShown', esc(overlay.name) + (overlay.polys.length > 1 ? ' (' + t('ovAreas', overlay.polys.length) + ')' : ''))];
+      if (cmp && overlay.polys.length > 1) { const m = overlay.polys[ovMatch()]; h.push(esc(t('ovCompareWith', m.name || '?'))); }
+      if (cfg.ovCompare === 1 && cmp) h.push(t('ovCmp', fmtNum(cmp.onlyA, 2), fmtNum(cmp.onlyB, 2), fmtNum(cmp.both, 2)));
+      if (cfg.ovCompare === 1 && cmp && cmp.both >= 0.8 * Math.max(cmp.both + cmp.onlyA, cmp.both + cmp.onlyB)) h.push(t('ovDist', fmtNum(cmp.med, 2), fmtNum(cmp.max, 1)));   // nur bei (fast) gleichem Feld sinnvoll
+      else if (cfg.ovCompare === 1 && !(plane && bnds[0])) h.push(esc(t('ovNoField')));
+      h.push(esc(t('ovStays')));
+      return h.join('<br>');
+    },
+    recalc() { drawOverlay(); cmp = compareOverlay(); redrawTool(); }
+  });
+  list();
+  if (overlay) { cmp = compareOverlay(); redrawTool(); }
+}
+$('btnOverlay').onclick = startOverlay;
+
 function deleteBoundary() {
   if (!bnds[active]) return;
   if (active === 0 && bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
@@ -3944,7 +4059,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, splitMode: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, splitMode: 0, ovShow: 0, ovCompare: 1, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -4005,6 +4120,8 @@ const trackOpts = () => smallTracks().map(({ tr, i }) => [i, tr.name]);
 const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
   simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
+  ovShow: { label: 'fOvShow', seg: true, opts: () => [[0, t('ovOnlyBnd')], [1, t('ovWithLines')]] },
+  ovCompare: { label: 'fOvCompare', seg: true, opts: () => [[0, t('segOff')], [1, t('segOn')]] },
   splitMode: { label: 'fSplitMode', seg: true, opts: () => [[0, t('splitKeep')], [1, t('splitBoth')], [2, t('splitBothDel')]] },
   impTarget: { label: 'fImpTarget', seg: true, opts: () => [[0, t('impNewField')], [1, t('impOpenField')]] },
   impPolyAs: { label: 'fImpPolyAs', seg: true, opts: () => [[0, t('impAsOuter')], [1, t('impAsInner')]] },
