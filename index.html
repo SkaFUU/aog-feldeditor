@@ -2835,7 +2835,6 @@ function startSplit() {
         const kept = cfg.splitMode === 0 && i === keep, pick = cfg.splitMode === 0 && !busy, fo = kept ? .35 : .15;
         const pg = L.polygon(P.map(ll), { color: C[i], weight: 2, fillColor: C[i], fillOpacity: fo, dashArray: kept ? null : '6 4', interactive: pick, bubblingMouseEvents: false }).addTo(g);
         if (pick) {                                             // Teil anklicken = dieser bleibt im Feld
-          pg.bindTooltip(t(kept ? 'splitStays' : 'splitClickKeep'), { sticky: true, direction: 'top' });
           pg.on('mouseover', () => pg.setStyle({ fillOpacity: fo + .15 })).on('mouseout', () => pg.setStyle({ fillOpacity: fo }));
           pg.on('click', () => { keep = i; list(); redrawTool(); });
         }
