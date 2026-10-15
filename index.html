@@ -139,6 +139,8 @@
   .tlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .big.c-del .ic { color:#ff5a5a; }
   .alabel { display:inline-block; transform:translate(14px,6px); background:rgba(0,0,0,.8); color:#00e5ff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  #toolList select, #toolList input { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+  #props { overflow-x:hidden; }
   .scrollList .lbtn { width:100%; min-width:0; }
   .scrollList .ell { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
   .scrollList { max-height:260px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--line); border-radius:5px; padding:2px; margin:4px 0; }
@@ -219,6 +221,8 @@
 <body>
 <svg width="0" height="0" style="position:absolute">
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M14 3l-4 18" stroke-dasharray="2.5 2"/></symbol>
+  <symbol id="i-combine" viewBox="0 0 24 24"><path d="M3 6h7v12H3zM14 6h7v12h-7z"/><path d="M10 9h4M10 15h4"/></symbol>
   <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 17v3h16v-3"/></symbol>
   <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
   <symbol id="i-chk" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12.5l3 3 5-6"/></symbol>
@@ -311,6 +315,10 @@
           <button class="big c-bnd" id="btnNewInner" disabled><svg class="ic"><use href="#i-inner"/></svg><span data-i18n="btnNewInner">Innengrenze</span></button>
           <button class="big c-bnd" id="btnBndCov" disabled><svg class="ic"><use href="#i-bndcov"/></svg><span data-i18n="btnBndCov">Aus Fahrspur</span></button>
         </div><div class="gcap" data-i18n="gNew">Neu zeichnen</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-bnd" id="btnSplit" disabled><svg class="ic"><use href="#i-split"/></svg><span data-i18n="btnSplit">Teilen</span></button>
+          <button class="big c-bnd" id="btnCombine" disabled><svg class="ic"><use href="#i-combine"/></svg><span data-i18n="btnCombine">Kombinieren</span></button>
+        </div><div class="gcap" data-i18n="gFieldOps">Feld</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-bnd" id="btnDel" disabled><svg class="ic"><use href="#i-delpt"/></svg><span data-i18n="btnDel">Punkt löschen</span></button>
         </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
@@ -467,6 +475,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    btnSplit: 'Teilen', btnCombine: 'Kombinieren', gFieldOps: 'Feld', fSplitMode: 'Ergebnis', splitKeep: 'Ein Teil bleibt', splitBoth: 'Beide neu', splitBothDel: 'Beide neu, altes löschen', splitDo: 'Teilen und speichern', splitPick1: 'Ersten Punkt der Schnittlinie anklicken – nahe an der Grenze rastet er ein.', splitPick2: 'Zweiten Punkt der Schnittlinie anklicken.', splitNoCut: 'Die Linie schneidet das Feld nicht in zwei Teile – neu klicken.', splitParts: 'Teil 1: <b>{0} ha</b> · Teil 2: <b>{1} ha</b>', splitKeepInfo: 'Teil {0} bleibt im Feld „{1}“ (in einen Teil klicken zum Wechseln), der andere wird ein neues Feld.', splitOrigInfo: 'Beide Teile werden neue Felder, „{0}“ bleibt unverändert.', splitDelInfo: 'Beide Teile werden neue Felder, „{0}“ wird danach komplett gelöscht.', splitData: 'Spuren kommen in beide Felder, Fahnen nach Lage, Fahrgassen werden an der Schnittlinie gekürzt. Vorgewende und Randfahrgasse bitte danach neu erstellen.', splitUnsaved: 'Ungespeicherte Änderungen werden dabei mitgespeichert.', splitBadName: 'Bitte einen neuen, noch nicht vorhandenen Feldnamen eingeben.', splitNameNew: 'Name des neuen Feldes (Teil {0})', splitNamePart: 'Name Teil {0}', splitBusy: 'Felder werden angelegt und gespeichert …', splitDone: 'Geteilt: „{0}“ und „{1}“ sind gespeichert.', splitDone2: 'Geteilt: „{0}“ und „{1}“ angelegt, „{2}“ ist unverändert.', splitDoneDel: 'Geteilt: „{0}“ und „{1}“ angelegt, „{2}“ gelöscht.', needSavedField: 'Dafür ein Feld aus dem AgOpenGPS-Ordner öffnen.', saveFailed: '„{0}“ konnte nicht gespeichert werden.', combOther: 'Zweites Feld', combPickField: 'Zweites Feld in der Liste wählen.', combNoBnd: '„{0}“ hat keine Grenze.', combPick1: 'Verbindungspunkt 1 anklicken – dort springt die neue Grenze von einem Feld zum anderen.', combPick2: 'Verbindungspunkt 2 anklicken.', combResult: 'Neues Feld: <b>{0} ha</b> (aus {1} ha + {2} ha)', combInfo: 'Wird ein neues Feld mit Spuren, Fahnen und Fahrgassen beider Felder. „{0}“ und „{1}“ bleiben unverändert.', combDo: 'Kombinieren und speichern', combBusy: 'Neues Feld wird angelegt und gespeichert …', combDone: '„{0}“ aus „{1}“ und „{2}“ angelegt.',
     impTypeAll: 'Alle unterstützten Dateien', impTypeShp: 'Shapefile (.shp mit .dbf und .prj, oder ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML oder ZIP)', btnDelField: 'Feld löschen', confirmDelField: 'Das Feld „{0}“ komplett löschen?\n\nDer ganze Feldordner wird mit allen Dateien gelöscht – auch mit den Sicherungen (Backup_…). Das lässt sich nicht rückgängig machen.\n\nVorher das Feld in AgOpenGPS schließen.', fieldDeleted: 'Feld „{0}“ wurde gelöscht.',
     impNoSections: 'Die bearbeitete Fläche ({0} Teilflächen) wird nicht importiert.', impReplaceLayers: 'Fahrgassen und Vorgewende aus der Datei ersetzen die vorhandenen.',
     btnImport: 'Importieren', gImpExp: 'Import / Export', fImpTarget: 'Ziel', impNewField: 'Neues Feld', impOpenField: 'Ins offene Feld', fImpPolyAs: 'Fläche als', impAsOuter: 'Außengrenze', impAsInner: 'Innengrenze', impPoly: 'Fläche', impLine: 'Linie', impAB: 'AB-Linie', impPoint: 'Punkt', impAll: 'Alle', impNone: 'Keine', impCount: '<b>{0}</b> Flächen, <b>{1}</b> Linien, <b>{2}</b> Punkte gewählt. Auf der Karte oder in der Liste an- und abwählen.', impCrs: 'Koordinaten: {0} – umgerechnet.', impNewHint: 'Größte Fläche = Außengrenze, Löcher und Flächen darin = Innengrenzen, Linien = Spuren, Punkte = Fahnen. Aus einem Export dieses Editors kommen auch Fahrgassen, Vorgewende und Vorgewende-Linien wieder an ihren Platz.', impReplaceOuter: 'Die größte Fläche ersetzt die bestehende Außengrenze.', impSetOuter: 'Die größte Fläche wird die Außengrenze.', impMany: 'Die Liste zeigt nur die ersten 400 von {0} – auf der Karte sind alle wählbar.', impDone: 'Importiert – mit „Speichern“ übernehmen.', impSkipped: '{0} Flächen außerhalb der Außengrenze wurden ausgelassen.', impBusy: 'Datei wird gelesen …', impError: 'Import: {0}', impBadZip: 'ZIP-Datei nicht lesbar', impBadFile: '{0}-Datei nicht lesbar', impBadCrs: 'Koordinatensystem „{0}“ wird nicht unterstützt', impNoPrj: 'Das Shapefile hat keine .prj-Datei – Koordinatensystem unbekannt. Bitte die .prj mit auswählen.', impDatum: 'Unbekanntes Datum „{0}“ – die Lage kann um einige Meter abweichen.', impNothing: 'In der Datei wurde nichts Passendes gefunden.', impNoFiles: 'Keine lesbare Datei (KML, KMZ, GeoJSON, Shapefile, ISOXML).',
@@ -590,6 +599,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    btnSplit: 'Split', btnCombine: 'Combine', gFieldOps: 'Field', fSplitMode: 'Result', splitKeep: 'One part stays', splitBoth: 'Both new', splitBothDel: 'Both new, delete old', splitDo: 'Split and save', splitPick1: 'Click the first point of the cut line – it snaps to the boundary when close.', splitPick2: 'Click the second point of the cut line.', splitNoCut: 'The line does not cut the field in two – click again.', splitParts: 'Part 1: <b>{0} ha</b> · Part 2: <b>{1} ha</b>', splitKeepInfo: 'Part {0} stays in the field “{1}” (click into a part to change), the other becomes a new field.', splitOrigInfo: 'Both parts become new fields, “{0}” stays unchanged.', splitDelInfo: 'Both parts become new fields, “{0}” is deleted completely afterwards.', splitData: 'Tracks go into both fields, flags by position, tramlines are cut at the line. Please rebuild headland and boundary tram afterwards.', splitUnsaved: 'Unsaved changes are saved along with it.', splitBadName: 'Please enter a new field name that does not exist yet.', splitNameNew: 'Name of the new field (part {0})', splitNamePart: 'Name part {0}', splitBusy: 'Creating and saving fields …', splitDone: 'Split: “{0}” and “{1}” are saved.', splitDone2: 'Split: “{0}” and “{1}” created, “{2}” unchanged.', splitDoneDel: 'Split: “{0}” and “{1}” created, “{2}” deleted.', needSavedField: 'Open a field from the AgOpenGPS folder first.', saveFailed: '“{0}” could not be saved.', combOther: 'Second field', combPickField: 'Choose the second field in the list.', combNoBnd: '“{0}” has no boundary.', combPick1: 'Click connection point 1 – there the new boundary jumps from one field to the other.', combPick2: 'Click connection point 2.', combResult: 'New field: <b>{0} ha</b> (from {1} ha + {2} ha)', combInfo: 'Becomes a new field with tracks, flags and tramlines of both. “{0}” and “{1}” stay unchanged.', combDo: 'Combine and save', combBusy: 'Creating and saving the new field …', combDone: '“{0}” created from “{1}” and “{2}”.',
     impTypeAll: 'All supported files', impTypeShp: 'Shapefile (.shp with .dbf and .prj, or ZIP)', impTypeIso: 'ISOXML (TASKDATA.XML or ZIP)', btnDelField: 'Delete field', confirmDelField: 'Delete the field “{0}” completely?\n\nThe whole field folder is deleted with all files – including the backups (Backup_…). This cannot be undone.\n\nClose the field in AgOpenGPS first.', fieldDeleted: 'Field “{0}” was deleted.',
     impNoSections: 'The coverage ({0} parts) is not imported.', impReplaceLayers: 'Tramlines and headland from the file replace the existing ones.',
     btnImport: 'Import', gImpExp: 'Import / Export', fImpTarget: 'Target', impNewField: 'New field', impOpenField: 'Into open field', fImpPolyAs: 'Area as', impAsOuter: 'Outer boundary', impAsInner: 'Inner boundary', impPoly: 'Area', impLine: 'Line', impAB: 'AB line', impPoint: 'Point', impAll: 'All', impNone: 'None', impCount: '<b>{0}</b> areas, <b>{1}</b> lines, <b>{2}</b> points selected. Select on the map or in the list.', impCrs: 'Coordinates: {0} – converted.', impNewHint: 'Largest area = outer boundary, holes and areas inside = inner boundaries, lines = tracks, points = flags. From an export of this editor, tramlines, headland and headland lines go back to their place too.', impReplaceOuter: 'The largest area replaces the existing outer boundary.', impSetOuter: 'The largest area becomes the outer boundary.', impMany: 'The list only shows the first 400 of {0} – all can be selected on the map.', impDone: 'Imported – press “Save” to keep it.', impSkipped: '{0} areas outside the outer boundary were skipped.', impBusy: 'Reading file …', impError: 'Import: {0}', impBadZip: 'ZIP file not readable', impBadFile: '{0} file not readable', impBadCrs: 'Coordinate system “{0}” is not supported', impNoPrj: 'The shapefile has no .prj file – coordinate system unknown. Please select the .prj as well.', impDatum: 'Unknown datum “{0}” – the position may be off by a few metres.', impNothing: 'Nothing usable found in the file.', impNoFiles: 'No readable file (KML, KMZ, GeoJSON, shapefile, ISOXML).',
@@ -1369,11 +1379,11 @@ document.getElementById('fileIn').onchange = async e => {
   } catch (err) { setStatus(t('error', err.message), 'err'); }
 };
 
-document.getElementById('btnSave').onclick = async () => {
+async function saveField() {
   // neues Feld: Ursprung in die Feldmitte, damit „Drive In“ das Feld findet
   if (newFieldName && bnds[0] && !originChanged()) { const c = centroid(bnds[0].pts), [la, lo] = plane.inv(c.e, c.n); setOrigin(la, lo); }
   const outs = newFieldName ? { ...newFieldTemplates(), ...buildOutputs() } : buildOutputs(), names = Object.keys(outs);
-  if (!names.length) { setStatus(t('nothingToSave'), ''); return; }
+  if (!names.length) { setStatus(t('nothingToSave'), ''); return true; }
   try {
     if (newFieldName && rootHandle) dirHandle = await rootHandle.getDirectoryHandle(newFieldName, { create: true });
     if (dirHandle) {
@@ -1405,8 +1415,10 @@ document.getElementById('btnSave').onclick = async () => {
       newFieldName = null;
       renderFieldList();
     }
-  } catch (e) { setStatus(t('saveError', e.message), 'err'); }
-};
+    return true;
+  } catch (e) { setStatus(t('saveError', e.message), 'err'); return false; }
+}
+document.getElementById('btnSave').onclick = saveField;
 
 // ---------- Weitere Felddaten anzeigen (Ebenen) und umbenennen ----------
 // Alles wird beim Laden in Längen-/Breitengrad umgerechnet, ist also vom Ursprung unabhängig.
@@ -2670,6 +2682,228 @@ $('impFile').onchange = e => importFiles(e.target.files);
 $('mapwrap').addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
 $('mapwrap').addEventListener('drop', e => { if (!e.dataTransfer || !e.dataTransfer.files.length) return; e.preventDefault(); importFiles(e.dataTransfer.files); });
 
+// ---------- Feld teilen / kombinieren ----------
+// Ein „Feld-Bauplan“: Name, Ringe (Breite/Länge, der erste ist außen), Spuren, Fahnen, Fahrgassen.
+// Daraus wird ein neues Feld angelegt und gespeichert – über denselben Weg wie „Neues Feld“ + „Speichern“.
+const llOf = p => plane.inv(p.e, p.n);
+function fieldSpecFrom(name, ring, inners, tracks, flg, tram) {
+  const X = polyIndex(ring), loop = l => l.length > 3 && dSq(l[0], l[l.length - 1]) < 4;
+  const tl = (tram || []).map(l => l.map(v => plane.fwd(v[0], v[1]))).filter(l => !loop(l)).flatMap(l => clipToPoly(l, X)).filter(l => l.length > 1).map(l => l.map(llOf));
+  return { name, rings: [ring.map(llOf)].concat(inners.map(r => r.map(llOf))), tracks, flags: flg.filter(fl => X.inside(plane.fwd(fl.lat, fl.lon))).map(fl => ({ ...fl })), tram: tl };
+}
+// Spuren des offenen Feldes in Breite/Länge (AB-Linien und Kurven; Grenz-Kurven passen nach dem Teilen nicht mehr)
+const tracksLL = (list, inv) => list.filter(tr => !tr.deleted && (tr.mode === 2 || tr.mode === 4)).map(tr => tr.mode === 2 ? { name: tr.name, mode: 2, aLL: inv(tr.a), bLL: inv(tr.b) } : { name: tr.name, mode: 4, heading: tr.heading, pts: tr.pts });
+async function writeFieldSpec(sp) {
+  map.fitBounds(L.latLngBounds(sp.rings[0]), { animate: false });     // vorläufiger Ursprung = Feldmitte
+  createField(sp.name, () => { });
+  if (newFieldName !== sp.name) throw new Error(t('fieldExists', sp.name));
+  bnds = sp.rings.map(r => ({ flagLines: ['False'], pts: r.map(v => plane.fwd(v[0], v[1])), orig: [], dirty: true }));
+  active = 0; bndListDirty = true;
+  sp.tracks.forEach(tr => {
+    if (tr.mode === 2) { const a = diskPlane.fwd(...tr.aLL), b = diskPlane.fwd(...tr.bLL); addTrack({ name: tr.name, mode: 2, heading: normH(Math.atan2(b.e - a.e, b.n - a.n)), a: [a.e, a.n], b: [b.e, b.n], pts: [] }); }
+    else addTrack({ name: tr.name, mode: 4, heading: tr.heading, pts: tr.pts });
+  });
+  flags = sp.flags; flagsDirty = true;
+  if (sp.tram.length) setTramData({ outer: [], inner: [], lines: sp.tram });
+  unsaved = true;
+  if (!await saveField()) throw new Error(t('saveFailed', sp.name));
+}
+// Ring an einer Geraden durch p1, p2 in zwei Ringe schneiden (Ebene). Gibt [A, B] oder null.
+function cutRing(P, p1, p2) {
+  const n = P.length, d = { e: p2.e - p1.e, n: p2.n - p1.n }, L2 = d.e * d.e + d.n * d.n, X = [];
+  if (L2 < 1) return null;
+  for (let i = 0; i < n; i++) {
+    const a = P[i], b = P[(i + 1) % n], r = { e: b.e - a.e, n: b.n - a.n }, den = d.e * r.n - d.n * r.e;
+    if (Math.abs(den) < 1e-12) continue;
+    const t1 = ((a.e - p1.e) * r.n - (a.n - p1.n) * r.e) / den, s1 = ((a.e - p1.e) * d.n - (a.n - p1.n) * d.e) / den;
+    if (s1 >= 0 && s1 < 1) X.push({ t: t1, i, q: { e: p1.e + d.e * t1, n: p1.n + d.n * t1 } });
+  }
+  X.sort((x, y) => x.t - y.t);
+  let k = -1; for (let j = 0; j + 1 < X.length; j += 2) if (X[j].t <= 0.5 + 1e-9 && X[j + 1].t >= 0.5 - 1e-9) k = j;
+  if (k < 0) return null;
+  let I1 = X[k], I2 = X[k + 1];
+  if (I1.i === I2.i) return null;
+  const arc = (x, y) => { const o = [x.q]; for (let j = (x.i + 1) % n; ; j = (j + 1) % n) { o.push(P[j]); if (j === y.i) break; } o.push(y.q); return o; };
+  const A = arc(I1, I2), B = arc(I2, I1);
+  return A.length > 2 && B.length > 2 ? [A, B] : null;
+}
+// Punkt auf der Grenze einrasten, wenn der Klick nahe dran ist (15 Pixel)
+function snapToRing(latlng, R) {
+  const q = plane.fwd(latlng.lat, latlng.lng), s2 = nearestOn(q, R.concat([R[0]]));
+  const px = map.distance(map.containerPointToLatLng([0, 0]), map.containerPointToLatLng([15, 0]));
+  return Math.sqrt(dSq(q, s2)) <= px ? s2 : q;
+}
+function startSplit() {
+  if (!(rootHandle && dirHandle && currentField && bnds[0])) { setStatus(t('needSavedField'), 'err'); return; }
+  const R = bnds[0].pts, orig = currentField, C = ['#ffd400', '#00e5ff'];
+  let pts = [], parts = null, keep = 0, names = [orig + ' 2', orig + ' 1'], busy = false;
+  const ha = P => fmtNum(area(P) / 10000, 2);
+  const nameOk = (nm, other) => !!nm.trim() && !/[\\/:*?"<>|]/.test(nm) && !fieldNames.some(x => x.toLowerCase() === nm.trim().toLowerCase()) && nm.trim().toLowerCase() !== (other || '').trim().toLowerCase();
+  const list = () => {
+    const box = $('toolList'); box.innerHTML = '';
+    if (!parts) return;
+    const add = (label, i) => { const lb = document.createElement('label'); lb.className = 'muted'; lb.textContent = label; const inp = document.createElement('input'); inp.value = names[i]; inp.oninput = () => { names[i] = inp.value; updateToolbox(); }; box.append(lb, inp); };
+    if (cfg.splitMode === 0) add(t('splitNameNew', keep === 0 ? 2 : 1), 0);
+    else { add(t('splitNamePart', 1), 1); add(t('splitNamePart', 2), 0); }
+  };
+  startTool({
+    title: 'btnSplit', params: ['splitMode'], msgHtml: true, okLabel: 'splitDo',
+    msg: () => {
+      if (busy) return esc(t('splitBusy'));
+      if (pts.length < 2) return esc(t(pts.length ? 'splitPick2' : 'splitPick1'));
+      if (!parts) return '<span class="warn">' + esc(t('splitNoCut')) + '</span>';
+      const h = [t('splitParts', ha(parts[0]), ha(parts[1]))];
+      if (cfg.splitMode === 0) h.push(esc(t('splitKeepInfo', keep + 1, orig)));
+      else h.push(esc(t(cfg.splitMode === 2 ? 'splitDelInfo' : 'splitOrigInfo', orig)));
+      h.push(esc(t('splitData')));
+      if (cfg.splitMode === 0 && unsaved) h.push(esc(t('splitUnsaved')));
+      if (parts && !(cfg.splitMode === 0 ? nameOk(names[0]) : nameOk(names[1], names[0]) && nameOk(names[0], names[1]))) h.push('<span class="warn">' + esc(t('splitBadName')) + '</span>');
+      return h.join('<br>');
+    },
+    onClick: p => {
+      if (busy) return;
+      if (pts.length === 2 && parts) {                        // Klick in einen Teil: der bleibt im Feld
+        const q = plane.fwd(p.lat, p.lng), k = inPoly(q, parts[0]) ? 0 : inPoly(q, parts[1]) ? 1 : -1;
+        if (k >= 0) { keep = k; list(); redrawTool(); return; }
+      }
+      if (pts.length === 2) pts = [];
+      pts.push(snapToRing(p, R));
+      parts = pts.length === 2 ? cutRing(R, pts[0], pts[1]) : null;
+      if (parts && area(parts[1]) > area(parts[0])) parts.reverse();   // Teil 1 = der größere
+      keep = 0; list(); redrawTool();
+    },
+    draw: g => {
+      if (parts) parts.forEach((P, i) => {
+        const kept = cfg.splitMode === 0 && i === keep;
+        L.polygon(P.map(ll), { color: C[i], weight: 2, fillColor: C[i], fillOpacity: kept ? .35 : .15, dashArray: kept ? null : '6 4', interactive: false }).addTo(g);
+        numBadge(g, ll(centroid(P)), i + 1);
+      });
+      if (pts.length === 2) L.polyline(pts.map(ll), { color: '#ff5a5a', weight: 3, interactive: false }).addTo(g);
+      pts.forEach((q, i) => dot(ll(q), '#ff5a5a').addTo(g));
+    },
+    recalc() { list(); redrawTool(); },
+    okEnabled: () => !busy && !!parts && (cfg.splitMode === 0 ? nameOk(names[0]) : nameOk(names[1], names[0]) && nameOk(names[0], names[1])),
+    ok() {
+      const mode = cfg.splitMode, [A, B] = parts, inside = (P, r) => inPoly(r[0], P);
+      const inn = bnds.slice(1).map(b => b.pts), tr = tracksLL(ex.tracks, v => wgs(v[0], v[1])), tram = ex.tram ? ex.tram.lines : [];
+      const spec = (nm, P) => fieldSpecFrom(nm.trim(), P, inn.filter(r => inside(P, r)), tr, flags, tram);
+      (async () => {
+        try {
+          setStatus(t('splitBusy'));
+          if (mode === 0) {
+            const K = keep === 0 ? A : B, N = keep === 0 ? B : A, sp = spec(names[0], N);
+            // das offene Feld wird zum Teil, der bleibt
+            bnds = [Object.assign(bnds[0], { pts: K, dirty: true })].concat(bnds.slice(1).filter(b => inside(K, b.pts)));
+            bndListDirty = true; active = 0; sel = -1;
+            const X = polyIndex(K);
+            flags = flags.filter(fl => X.inside(plane.fwd(fl.lat, fl.lon))); flagsDirty = true;
+            if (ex.tram) setTramData({ outer: [], inner: [], lines: fieldSpecFrom('', K, [], [], [], ex.tram.lines).tram });
+            if (ex.headland && ex.headland.length) { clearedFiles['Headland.txt'] = CLEAR_FILES.headland[1]; delete generated['Headland.txt']; ex.headland = []; }
+            unsaved = true;
+            if (!await saveField()) throw new Error(t('saveFailed', orig));
+            await writeFieldSpec(sp);
+            await openField(orig);
+            setStatus(t('splitDone', orig, sp.name), 'ok');
+          } else {
+            const s1 = spec(names[1], A), s2 = spec(names[0], B);
+            await writeFieldSpec(s1); await writeFieldSpec(s2);
+            if (mode === 2) { await rootHandle.removeEntry(orig, { recursive: true }); fieldNames = fieldNames.filter(x => x !== orig); }
+            await openField(s1.name);
+            setStatus(t(mode === 2 ? 'splitDoneDel' : 'splitDone2', s1.name, s2.name, orig), 'ok');
+          }
+        } catch (err) { setStatus(t('error', err.message), 'err'); }
+      })();
+    }
+  });
+}
+// Kombinieren: zweites Feld wählen, Verbindungspunkt 1 und 2 anklicken – dort springt die neue Grenze hinüber
+async function readOtherField(name) {
+  const d = await rootHandle.getDirectoryHandle(name), fl = {}, want = ['Field.txt', 'Boundary.txt', 'TrackLines.txt', 'Flags.txt', 'Tram.txt'];
+  for await (const [n, h] of d.entries()) { const k = want.find(w => w.toLowerCase() === n.toLowerCase()); if (h.kind === 'file' && k) fl[k] = await (await h.getFile()).text(); }   // nur lesen, das offene Feld bleibt unberührt
+  const [la, lo] = parseField(fl['Field.txt']), pl = Plane(la, lo), keep = diskPlane;
+  try {
+    diskPlane = pl;                                           // die Leser rechnen mit dem Ursprung des jeweiligen Feldes
+    const B = fl['Boundary.txt'] ? parseBoundary(fl['Boundary.txt']) : [];
+    return {
+      name, rings: B.map(b => b.pts.map(p => pl.inv(p.e, p.n))),
+      tracks: fl['TrackLines.txt'] ? tracksLL(parseTrackLines(fl['TrackLines.txt']), v => pl.inv(v[0], v[1])) : [],
+      flags: fl['Flags.txt'] ? parseFlags(fl['Flags.txt']) : [],
+      tram: fl['Tram.txt'] ? parseTramFile(fl['Tram.txt']).lines : []
+    };
+  } finally { diskPlane = keep; }
+}
+function mergeRings(A, B, c1, c2) {
+  const near = (R, c) => { let best = null; for (let i = 0; i < R.length; i++) { const a = R[i], b = R[(i + 1) % R.length], q = nearestOn(c, [a, b]), d = dSq(c, q); if (!best || d < best.d) best = { d, i, q, s: dSq(a, q) }; } return best; };
+  const arc = (R, x, y) => { const n = R.length, o = [x.q]; if (x.i === y.i && x.s <= y.s) return o.concat([y.q]); for (let j = (x.i + 1) % n; ; j = (j + 1) % n) { o.push(R[j]); if (j === y.i) break; } o.push(y.q); return o; };
+  const away = (P, O) => { const Oc = O.concat([O[0]]); let s1 = 0; P.forEach(p => { s1 += Math.sqrt(dSq(p, nearestOn(p, Oc))); }); return s1 / P.length; };
+  const a1 = near(A, c1), a2 = near(A, c2), b1 = near(B, c1), b2 = near(B, c2);
+  const pa = [arc(A, a1, a2), arc(A, a2, a1).reverse()], pb = [arc(B, b2, b1), arc(B, b1, b2).reverse()];
+  const PA = away(pa[0], B) > away(pa[1], B) ? pa[0] : pa[1], PB = away(pb[0], A) > away(pb[1], A) ? pb[0] : pb[1];
+  return PA.concat(PB);
+}
+function startCombine() {
+  if (!(rootHandle && dirHandle && currentField && bnds[0])) { setStatus(t('needSavedField'), 'err'); return; }
+  const orig = currentField, A = bnds[0].pts;
+  let other = null, O = null, pts = [], merged = null, name = '', touched = false, busy = false;
+  const nameOk = () => !!name.trim() && !/[\\/:*?"<>|]/.test(name) && !fieldNames.some(x => x.toLowerCase() === name.trim().toLowerCase());
+  const list = () => {
+    const box = $('toolList'); box.innerHTML = '';
+    const lb = document.createElement('label'); lb.className = 'muted'; lb.textContent = t('combOther');
+    const sel2 = document.createElement('select'); sel2.add(new Option('–', ''));
+    fieldNames.filter(n => n !== orig).forEach(n => sel2.add(new Option(n, n)));
+    sel2.value = other ? other.name : '';
+    sel2.onchange = async () => {
+      if (!sel2.value) { other = O = null; merged = null; pts = []; redrawTool(); return; }
+      try {
+        other = await readOtherField(sel2.value); O = other.rings[0] ? other.rings[0].map(v => plane.fwd(v[0], v[1])) : null;
+        pts = []; merged = null;
+        if (!touched) name = orig + ' + ' + other.name;
+        if (O) map.fitBounds(L.latLngBounds(A.concat(O).map(ll)), { padding: [40, 40] });
+        list(); redrawTool();
+      } catch (err) { setStatus(t('error', err.message), 'err'); }
+    };
+    box.append(lb, sel2);
+    if (other) { const l2 = document.createElement('label'); l2.className = 'muted'; l2.textContent = t('newFieldName'); const inp = document.createElement('input'); inp.value = name; inp.oninput = () => { name = inp.value; touched = true; updateToolbox(); }; box.append(l2, inp); }
+  };
+  startTool({
+    title: 'btnCombine', params: [], msgHtml: true, okLabel: 'combDo',
+    msg: () => {
+      if (busy) return esc(t('combBusy'));
+      if (!other) return esc(t('combPickField'));
+      if (!O) return '<span class="warn">' + esc(t('combNoBnd', other.name)) + '</span>';
+      if (pts.length < 2) return esc(t(pts.length ? 'combPick2' : 'combPick1'));
+      const h = [t('combResult', fmtNum(area(merged) / 10000, 2), fmtNum(area(A) / 10000, 2), fmtNum((area(O)) / 10000, 2)), esc(t('combInfo', orig, other.name))];
+      if (!nameOk()) h.push('<span class="warn">' + esc(t('splitBadName')) + '</span>');
+      return h.join('<br>');
+    },
+    onClick: p => {
+      if (busy || !O) return;
+      if (pts.length === 2) pts = [];
+      pts.push(plane.fwd(p.lat, p.lng));
+      merged = pts.length === 2 ? mergeRings(A, O, pts[0], pts[1]) : null;
+      redrawTool();
+    },
+    draw: g => {
+      L.polygon(A.map(ll), { color: '#ff5a5a', weight: 2, fillOpacity: .08, interactive: false }).addTo(g);
+      if (O) L.polygon(O.map(ll), { color: '#00e5ff', weight: 2, fillOpacity: .08, interactive: false }).addTo(g);
+      if (merged) L.polygon(merged.map(ll), { color: '#ffd400', weight: 3, fillColor: '#ffd400', fillOpacity: .2, interactive: false }).addTo(g);
+      pts.forEach((q, i) => numBadge(g, ll(q), i + 1));
+    },
+    okEnabled: () => !busy && !!merged && nameOk(),
+    ok() {
+      const inn = bnds.slice(1).map(b => b.pts).concat(other.rings.slice(1).map(r => r.map(v => plane.fwd(v[0], v[1]))));
+      const sp = fieldSpecFrom(name.trim(), merged, inn, tracksLL(ex.tracks, v => wgs(v[0], v[1])).concat(other.tracks), flags.concat(other.flags), (ex.tram ? ex.tram.lines : []).concat(other.tram));
+      (async () => {
+        try { setStatus(t('combBusy')); await writeFieldSpec(sp); await openField(sp.name); setStatus(t('combDone', sp.name, orig, other.name), 'ok'); }
+        catch (err) { setStatus(t('error', err.message), 'err'); }
+      })();
+    }
+  });
+  list();
+}
+$('btnSplit').onclick = startSplit;
+$('btnCombine').onclick = startCombine;
+
 function deleteBoundary() {
   if (!bnds[active]) return;
   if (active === 0 && bnds.length > 1) { setStatus(t('outerHasInner'), 'err'); return; }
@@ -3631,7 +3865,7 @@ function twoGeo(RA, RB, XF) {
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, splitMode: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -3692,6 +3926,7 @@ const trackOpts = () => smallTracks().map(({ tr, i }) => [i, tr.name]);
 const PARAMS = {
   hdDist: { label: 'fDist', num: [0.1, 0], range: [0, 50] },
   simpTol: { label: 'simpLabel', num: [0.01, 0], range: [0, 1] },
+  splitMode: { label: 'fSplitMode', seg: true, opts: () => [[0, t('splitKeep')], [1, t('splitBoth')], [2, t('splitBothDel')]] },
   impTarget: { label: 'fImpTarget', seg: true, opts: () => [[0, t('impNewField')], [1, t('impOpenField')]] },
   impPolyAs: { label: 'fImpPolyAs', seg: true, opts: () => [[0, t('impAsOuter')], [1, t('impAsInner')]] },
   expFmt: { label: 'fExpFmt', seg: true, opts: () => [[0, 'KML'], [1, 'GeoJSON'], [2, 'Shapefile'], [3, 'ISOXML']] },
@@ -3784,7 +4019,7 @@ function renderCfg() {
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
 const INT_KEYS = new Set(['nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
-const RERENDER = new Set(['fillLines', 'withRing', 'hdKind', 'impTarget']);        // diese Umschalter ändern, welche Einstellungen gezeigt werden
+const RERENDER = new Set(['fillLines', 'withRing', 'hdKind', 'impTarget', 'splitMode']);        // diese Umschalter ändern, welche Einstellungen gezeigt werden
 function onCfg(el) {
   const k = el.dataset.cfg, v = el.value;
   if (k === 'vehicle') pickVehicle(v);
@@ -4483,6 +4718,7 @@ function updateInfo() {
   document.getElementById('btnNewInner').disabled = !bnds[0];
   document.getElementById('btnExport').disabled = !plane;
   document.getElementById('btnDelField').disabled = !(rootHandle && dirHandle && currentField);
+  ['btnSplit', 'btnCombine'].forEach(id => { document.getElementById(id).disabled = !(rootHandle && dirHandle && currentField && bnds[0]); });
   document.getElementById('btnBndCov').disabled = !(plane && ex.sections && ex.sections.patches.length);
   document.getElementById('btnBndCov').title = plane && !(ex.sections && ex.sections.patches.length) ? t('needCoverage') : '';
   document.getElementById('btnSimp').disabled = !bnds[active];
