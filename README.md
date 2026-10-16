@@ -112,6 +112,32 @@ Firefox cannot open folders. There you select the field files by hand and get th
 - The file formats (`Field.txt`, `Boundary.txt`, `Flags.txt`, `TrackLines.txt`, `Headland.txt`, `Headlines.txt`, `Sections.txt`, `Contour.txt`, `Tram.txt`, `RecPath.txt`, `Elevation.txt`, `BackPic.txt`) follow the AgOpenGPS source code (`develop` branch, 2026) and were tested with real fields.
 - Files in the field folder that the editor does not know are left untouched.
 
+## Code structure
+
+Plain HTML, CSS and JavaScript – no build step, no framework (only [Leaflet](https://leafletjs.com) for the map). `index.html` holds the page layout, the code is split by topic:
+
+| File | Content |
+|---|---|
+| `css/editor.css` | Layout and colours |
+| `js/01-i18n.js` | German / English texts |
+| `js/02-map.js` | Local plane (like AgOpenGPS `LocalPlane`), state, map, editing boundary points, origin |
+| `js/03-files.js` | Reading and writing the AgOpenGPS files, loading/saving, fields folder |
+| `js/04-layers.js` | Showing the field layers (tracks, headland, tramlines …) |
+| `js/05-boundary-tools.js` | Tool frame (side panel), drawing boundaries, boundary from coverage |
+| `js/06-export.js` | Export: KML, GeoJSON, shapefile, ISOXML |
+| `js/07-import.js` | Import incl. coordinate systems (UTM, MGI, DHDN) |
+| `js/08-split-combine.js` | Split and combine fields |
+| `js/09-overlay.js` | Overlay / compare |
+| `js/10-tracks.js` | AB lines, curves, smoothing, track files |
+| `js/11-new-field.js` | New field, clearing layers, AB/curve like in AgOpenGPS |
+| `js/12-geometry.js` | Geometry like AgOpenGPS 6.8: headland, tramlines, offsets, clipping (no UI) |
+| `js/13-settings.js` | Settings, vehicle and tool profiles |
+| `js/14-headland-tram-tools.js` | Headland and tramline tools |
+| `js/15-measure.js` | Measuring distance, area, angle |
+| `js/16-ui.js` | Ribbon, side panels, controls, language switch |
+
+The files are loaded in this order and share their functions. `node tools/build-single.js` builds everything into a single `dist/aog-feldeditor.html`, e.g. to pass it on or to use it offline.
+
 ## Feedback
 
 Bugs and ideas are welcome as a [GitHub issue](https://github.com/SkaFUU/aog-feldeditor/issues) or in the [AgOpenGPS forum](https://discourse.agopengps.com). If a field doesn't load or looks wrong after saving, the files of that field help a lot.

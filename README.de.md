@@ -112,6 +112,32 @@ Firefox kann keine Ordner öffnen. Dort wählst du die Dateien des Feldes von Ha
 - Die Dateiformate (`Field.txt`, `Boundary.txt`, `Flags.txt`, `TrackLines.txt`, `Headland.txt`, `Headlines.txt`, `Sections.txt`, `Contour.txt`, `Tram.txt`, `RecPath.txt`, `Elevation.txt`, `BackPic.txt`) sind am Quellcode von AgOpenGPS (Zweig `develop`, Stand 2026) ausgerichtet und mit echten Feldern getestet.
 - Unbekannte Dateien im Feldordner fasst der Editor nicht an.
 
+## Aufbau des Codes
+
+Reines HTML, CSS und JavaScript – ohne Build-Schritt und ohne Framework (nur [Leaflet](https://leafletjs.com) für die Karte). `index.html` enthält den Seitenaufbau, der Code ist nach Themen aufgeteilt:
+
+| Datei | Inhalt |
+|---|---|
+| `css/editor.css` | Aussehen und Farben |
+| `js/01-i18n.js` | Texte Deutsch / Englisch |
+| `js/02-map.js` | Lokale Ebene (wie `LocalPlane` in AgOpenGPS), Zustand, Karte, Grenzpunkte bearbeiten, Ursprung |
+| `js/03-files.js` | AgOpenGPS-Dateien lesen und schreiben, Laden/Speichern, Felder-Ordner |
+| `js/04-layers.js` | Ebenen anzeigen (Spuren, Vorgewende, Fahrgassen …) |
+| `js/05-boundary-tools.js` | Werkzeug-Rahmen (Seitenleiste), Grenze zeichnen, Grenze aus Fahrspur |
+| `js/06-export.js` | Export: KML, GeoJSON, Shapefile, ISOXML |
+| `js/07-import.js` | Import samt Koordinatensystemen (UTM, MGI, DHDN) |
+| `js/08-split-combine.js` | Felder teilen und kombinieren |
+| `js/09-overlay.js` | Überlagern / Vergleichen |
+| `js/10-tracks.js` | AB-Linien, Kurven, Glätten, Spurdateien |
+| `js/11-new-field.js` | Neues Feld, Ebenen löschen, AB/Kurve wie in AgOpenGPS |
+| `js/12-geometry.js` | Geometrie wie AgOpenGPS 6.8: Vorgewende, Fahrgassen, Versatz, Schnitte (ohne Bedienung) |
+| `js/13-settings.js` | Einstellungen, Fahrzeug- und Geräteprofile |
+| `js/14-headland-tram-tools.js` | Werkzeuge Vorgewende und Fahrgassen |
+| `js/15-measure.js` | Messen: Strecke, Fläche, Winkel |
+| `js/16-ui.js` | Register, Seitenleisten, Bedienelemente, Sprachumschaltung |
+
+Die Dateien werden in dieser Reihenfolge geladen und teilen sich ihre Funktionen. `node tools/build-single.js` baut alles in eine einzige Datei `dist/aog-feldeditor.html`, z. B. zum Weitergeben oder für die Offline-Nutzung.
+
 ## Rückmeldungen
 
 Fehler und Ideen gern als [GitHub-Issue](https://github.com/SkaFUU/aog-feldeditor/issues) oder im [AgOpenGPS-Forum](https://discourse.agopengps.com). Wenn ein Feld nicht lädt oder nach dem Speichern falsch aussieht, helfen die Dateien dieses Feldes sehr.
