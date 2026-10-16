@@ -227,6 +227,7 @@ function applyLang(l) {
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
   if (rootLabel) showRoot(rootLabel);
   if (plane) { renderBndList(); updateInfo(); drawFlags(); drawMarkers(); renderLayerList(); renderNames(); drawLayer('headlines'); }
+  if (typeof updateOrthoBtn === 'function') updateOrthoBtn();     // Knopf „Orthofoto …“ (js/17-maps.js)
 }
 document.querySelectorAll('[data-lang]').forEach(b => { b.onclick = () => applyLang(b.dataset.lang); });
 applyLang();

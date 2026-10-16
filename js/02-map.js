@@ -53,7 +53,7 @@ function setBase(k) {
   bases[k].addTo(map);
   document.querySelectorAll('[data-base]').forEach(el => el.classList.toggle('sel', el.dataset.base === k));
   const more = document.getElementById('btnMaps');
-  if (more) more.classList.toggle('sel', !['esri', 'at', 'osm'].includes(k));
+  if (more) more.classList.toggle('sel', k.startsWith('c_'));         // eigene Karte gewählt
   if (known) try { localStorage.setItem('aogBase', k); } catch (e) { }   // eine eigene Karte bleibt gemerkt, auch wenn sie noch nicht geladen ist
 }
 let savedBase = 'esri';
