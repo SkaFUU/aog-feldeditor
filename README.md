@@ -64,7 +64,9 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
   - contour
   - recorded path
   - the background image saved by AgOpenGPS
-- Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap.
+- Map background: Esri satellite imagery, the basemap.at orthophoto (Austria only), or OpenStreetMap. "More …" adds basemap.at grey, terrain and surface.
+- Show on top: roads and places (basemap.at) and the Austrian **AMA field blocks** and **AMA plots** (INVEKOS, always the latest year).
+- **Add your own map**: a tile address (XYZ with `{z}/{x}/{y}`) or a WMS service, as background or as a layer on top – e.g. the aerial images of your state. Kept in the browser; the terms of use of the service apply.
 
 **Overlay / compare** (in the Field tab)
 - Lay another field or a file (KML, shapefile, eAMA, GeoJSON, ISOXML) over the map as a purple outline – optionally with tracks and tramlines. A file with many areas (e.g. all eAMA plots) shows all of them.
@@ -135,6 +137,7 @@ Plain HTML, CSS and JavaScript – no build step, no framework (only [Leaflet](h
 | `js/14-headland-tram-tools.js` | Headland and tramline tools |
 | `js/15-measure.js` | Measuring distance, area, angle |
 | `js/16-ui.js` | Ribbon, side panels, controls, language switch |
+| `js/17-maps.js` | More map backgrounds, layers on top (AMA), your own maps |
 
 The files are loaded in this order and share their functions. `node tools/build-single.js` builds everything into a single `dist/aog-feldeditor.html`, e.g. to pass it on or to use it offline.
 

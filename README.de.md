@@ -64,7 +64,9 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
   - Kontur
   - aufgezeichneter Pfad
   - das Hintergrundbild aus AgOpenGPS
-- Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap.
+- Kartenhintergrund: Satellitenbild von Esri, für Österreich wahlweise das Orthofoto von basemap.at, oder OpenStreetMap. Unter „Weitere …“ gibt es dazu basemap.at grau, Gelände und Oberfläche.
+- Darüber einblenden: Straßen und Orte (basemap.at) sowie die **AMA-Feldstücke** und **AMA-Schläge** (INVEKOS, immer der neueste Jahrgang).
+- **Eigene Karte hinterlegen**: Kachel-Adresse (XYZ mit `{z}/{x}/{y}`) oder WMS-Dienst, als Hintergrund oder als Ebene darüber – z. B. das Orthofoto des eigenen Bundeslandes. Wird im Browser gemerkt; die Nutzungsbedingungen des Dienstes gelten.
 
 **Überlagern / Vergleichen** (im Register Feld)
 - Ein anderes Feld oder eine Datei (KML, Shapefile, eAMA, GeoJSON, ISOXML) als lila Umriss über die Karte legen – auf Wunsch mit Spuren und Fahrgassen. Bei einer Datei mit vielen Flächen (z. B. alle eAMA-Schläge) werden alle gezeigt.
@@ -135,6 +137,7 @@ Reines HTML, CSS und JavaScript – ohne Build-Schritt und ohne Framework (nur [
 | `js/14-headland-tram-tools.js` | Werkzeuge Vorgewende und Fahrgassen |
 | `js/15-measure.js` | Messen: Strecke, Fläche, Winkel |
 | `js/16-ui.js` | Register, Seitenleisten, Bedienelemente, Sprachumschaltung |
+| `js/17-maps.js` | Weitere Kartenhintergründe, Ebenen darüber (AMA), eigene Karten |
 
 Die Dateien werden in dieser Reihenfolge geladen und teilen sich ihre Funktionen. `node tools/build-single.js` baut alles in eine einzige Datei `dist/aog-feldeditor.html`, z. B. zum Weitergeben oder für die Offline-Nutzung.
 

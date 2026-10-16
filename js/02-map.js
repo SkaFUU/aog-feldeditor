@@ -45,12 +45,16 @@ const bases = {
     { maxZoom: 22, maxNativeZoom: 19, attribution: '© OpenStreetMap' })
 };
 // Kartenhintergrund (Register „Ansicht“), wird gemerkt
+// (weitere Hintergründe und eigene Karten kommen aus js/17-maps.js dazu)
 function setBase(k) {
-  if (!bases[k]) k = 'esri';
+  const known = !!bases[k];
+  if (!known) k = 'esri';
   for (const b in bases) if (b !== k) map.removeLayer(bases[b]);
   bases[k].addTo(map);
   document.querySelectorAll('[data-base]').forEach(el => el.classList.toggle('sel', el.dataset.base === k));
-  try { localStorage.setItem('aogBase', k); } catch (e) { }
+  const more = document.getElementById('btnMaps');
+  if (more) more.classList.toggle('sel', !['esri', 'at', 'osm'].includes(k));
+  if (known) try { localStorage.setItem('aogBase', k); } catch (e) { }   // eine eigene Karte bleibt gemerkt, auch wenn sie noch nicht geladen ist
 }
 let savedBase = 'esri';
 try { savedBase = localStorage.getItem('aogBase') || 'esri'; } catch (e) { }

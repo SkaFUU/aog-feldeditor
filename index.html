@@ -13,6 +13,7 @@
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
   <symbol id="i-split" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M14 3l-4 18" stroke-dasharray="2.5 2"/></symbol>
   <symbol id="i-combine" viewBox="0 0 24 24"><path d="M3 6h7v12H3zM14 6h7v12h-7z"/><path d="M10 9h4M10 15h4"/></symbol>
+  <symbol id="i-layers2" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".6"/></symbol>
   <symbol id="i-overlay" viewBox="0 0 24 24"><path d="M3 8l7-4 8 3-2 9-9 2z"/><path d="M8 11l8-3 5 6-5 7-9-3z" stroke-dasharray="2.5 2"/></symbol>
   <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 17v3h16v-3"/></symbol>
   <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
@@ -97,6 +98,7 @@
           <button class="big c-view" data-base="esri"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmEsri">Satellit</span></button>
           <button class="big c-view" data-base="at"><svg class="ic"><use href="#i-sat"/></svg><span data-i18n="bmAt">Orthofoto AT</span></button>
           <button class="big c-view" data-base="osm"><svg class="ic"><use href="#i-map"/></svg><span>OpenStreetMap</span></button>
+          <button class="big c-view" id="btnMaps"><svg class="ic"><use href="#i-layers2"/></svg><span data-i18n="btnMapsShort">Weitere …</span></button>
         </div><div class="gcap" data-i18n="gMap">Kartenhintergrund</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-view" id="btnFit" disabled><svg class="ic"><use href="#i-fit"/></svg><span data-i18n="btnFit">Ganzes Feld</span></button>
@@ -281,5 +283,6 @@
 <script src="js/14-headland-tram-tools.js"></script>
 <script src="js/15-measure.js"></script>
 <script src="js/16-ui.js"></script>
+<script src="js/17-maps.js"></script>
 </body>
 </html>
