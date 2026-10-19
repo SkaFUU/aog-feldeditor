@@ -49,7 +49,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 - **Along line:** tramlines from a reference line (AB line or curve), with a suggested number right and left so the whole field is covered – or from two lines towards each other (the number per side is suggested). Where tramlines from both sides cross, one side can end at the crossing ("Merge"). Calculated like "Tramlines Multi" in AgOpenGPS.
   - **Middle of 2:** click two tracks – the first tramline lies exactly in the middle between them (for curves equally far from both at every point), more follow at the tramline spacing to both sides.
 - **Boundary tram** around the outer boundary, also several rings, optionally with rounded corners (both tracks exactly parallel).
-- **Tramline between:** click two tramlines, a new one goes exactly in the middle. **Delete:** click single tramlines (Ctrl+Z brings them back).
+- **Tramline between:** click two tramlines, a new one goes exactly in the middle. **Delete:** click single tramlines (Ctrl+Z brings them back). Crossing tramlines are split at the crossings – the right track where it crosses the right track of the other one, the left at the left – so you can delete single pieces and the rest runs on without an offset.
 - The **working width** of each tramline is shown as a blue area (covered twice = darker), already in the preview; it can be hidden with the eye. The other functions can create it at the same time; tramlines then end at it, otherwise at the boundary.
 - The reference line is extended so the tramlines reach the boundary. If there are tramlines already, you choose **Replace** or **Add** before applying.
 - Checked with real fields: tramlines created by AgOpenGPS come out the same within 0–2 cm.

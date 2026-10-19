@@ -373,21 +373,28 @@ function startTramMid() {
     ok() { setTram({ lines: this.res.lines, add: true }); setStatus(t('tramDone'), 'ok'); }
   });
 }
-// Löschen: einzelne Fahrgassen (oder die Randfahrgasse) anklicken, sie verschwinden sofort; Strg+Z holt sie zurück
+// Löschen: einzelne Fahrgassen (oder die Randfahrgasse) anklicken, sie verschwinden sofort; Strg+Z holt sie zurück.
+// Kreuzen sich Fahrgassen, sind sie an den Kreuzungen geteilt (rechte Spur an der rechten, linke an der linken) –
+// dann verschwindet nur das angeklickte Stück, und die übrigen Stücke gehen ohne Versatz ineinander über.
 function startTramDel() {
   if (!ex.tram) return;
   const stack = [];
   startTool({
     title: 'btnTramDel', params: [], hideOk: true, cancelLabel: 'done',
-    msg: () => t('delPick') + (stack.length ? ' ' + t('delCount', stack.length) : ''),
+    msg: () => t('delPick') + (tool.splitN ? ' ' + t('delSplit', tool.splitN) : '') + (stack.length ? ' ' + t('delCount', stack.length) : ''),
     onUndo: () => { const T = stack.pop(); if (T) { setTramData(T); redrawTool(); } },
     draw: g => {
       if (!ex.tram) return;
-      const { T, TL, pairs, ring } = tramPlane();
-      tramHits(g, TL, pairs, ring, key => {
+      const { T, TL, pairs, ring } = tramPlane(), P = tramPieces(TL, pairs);
+      tool.splitN = P.lines.length - TL.length;
+      P.lines.forEach((S, q) => { if (P.idx[q] > 0) dot(ll(S[0]), '#fff').setRadius(3).addTo(g); });   // Teilungspunkte
+      tramHits(g, P.lines, P.pieces, ring, key => {
         stack.push({ outer: T.outer, inner: T.inner, lines: T.lines.slice() });
         if (key === 'ring') setTramData({ outer: [], inner: [], lines: T.lines });
-        else { const del = new Set(pairs[key].tracks); setTramData({ outer: T.outer, inner: T.inner, lines: T.lines.filter((_, i) => !del.has(i)) }); }
+        else {
+          const kept = joinPieces(TL, P, new Set(P.pieces[key].tracks));
+          setTramData({ outer: T.outer, inner: T.inner, lines: kept.map(L => { const k = TL.indexOf(L); return k >= 0 ? T.lines[k] : L.map(p => plane.inv(p.e, p.n)); }) });
+        }
         redrawTool();
       });
     }

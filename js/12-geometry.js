@@ -368,6 +368,99 @@ function firstCross(P, Q) {
   }
   return null;
 }
+// Alle Schnittpunkte zweier offener Linien, Lage auf P (i + t) und Q (j + u). inP/inQ: liegt nicht am Ende der Linie
+// (endet eine Linie genau auf der anderen, wird nur die andere dort geteilt)
+function allCrosses(P, Q) {
+  const out = [], LP = pathLen(P), LQ = pathLen(Q);
+  let sP = 0;
+  for (let i = 0; i + 1 < P.length; i++) {
+    const a = P[i], b = P[i + 1], r = { e: b.e - a.e, n: b.n - a.n }, lr = Math.hypot(r.e, r.n);
+    let sQ = 0;
+    for (let j = 0; j + 1 < Q.length; j++) {
+      const c = Q[j], d = Q[j + 1], ls = Math.hypot(d.e - c.e, d.n - c.n);
+      if (!(Math.max(c.e, d.e) < Math.min(a.e, b.e) || Math.min(c.e, d.e) > Math.max(a.e, b.e) || Math.max(c.n, d.n) < Math.min(a.n, b.n) || Math.min(c.n, d.n) > Math.max(a.n, b.n))) {
+        const s = { e: d.e - c.e, n: d.n - c.n }, den = r.e * s.n - r.n * s.e;
+        if (den) {
+          const t1 = ((c.e - a.e) * s.n - (c.n - a.n) * s.e) / den, u = ((c.e - a.e) * r.n - (c.n - a.n) * r.e) / den;
+          const dP = sP + t1 * lr, dQ = sQ + u * ls;
+          const inP = dP > 0.05 && dP < LP - 0.05, inQ = dQ > 0.05 && dQ < LQ - 0.05, pt = { e: a.e + r.e * t1, n: a.n + r.n * t1 };
+          if (t1 >= -1e-9 && t1 <= 1 + 1e-9 && u >= -1e-9 && u <= 1 + 1e-9 && (inP || inQ) && !out.some(o => dSq(o.pt, pt) < 1e-4))
+            out.push({ i, t: Math.min(1, Math.max(0, t1)), j, u: Math.min(1, Math.max(0, u)), pt, inP, inQ });
+        }
+      }
+      sQ += ls;
+    }
+    sP += lr;
+  }
+  return out;
+}
+// Linie an Schnittpunkten (aus allCrosses, Lage i + t) in Stücke teilen
+function splitAt(P, cuts) {
+  const cs = cuts.slice().sort((x, y) => x.i + x.t - (y.i + y.t)), out = [];
+  let cur = [P[0]], k = 0;
+  for (let i = 0; i + 1 < P.length; i++) {
+    while (k < cs.length && cs[k].i === i) { cur.push(cs[k].pt); out.push(cur); cur = [cs[k].pt]; k++; }
+    cur.push(P[i + 1]);
+  }
+  out.push(cur);
+  return out.map(S => S.filter((p, m) => !m || dSq(p, S[m - 1]) > 1e-8));
+}
+// Sich kreuzende Fahrgassen an den Kreuzungen in Stücke teilen – die rechte Spur nur dort, wo sie die rechte Spur der anderen
+// Fahrgasse kreuzt, die linke nur an der linken. Bleibt von zwei Fahrgassen je ein Stück stehen, gehen die Spuren so ohne Versatz
+// ineinander über. Gibt die Stücke zurück: lines (Spurstücke), pieces [{ tracks: [Stück rechts, Stück links] | [Stück] }],
+// src[k] = Nummer der ursprünglichen Spur, idx[k] = Nummer des Stücks auf ihr.
+function tramPieces(TL, pairs) {
+  const dir = P => { const a = P[0], b = P[P.length - 1]; const l = Math.hypot(b.e - a.e, b.n - a.n) || 1; return { e: (b.e - a.e) / l, n: (b.n - a.n) / l }; };
+  const info = pairs.map(p => {
+    if (p.tracks.length < 2 || p.center.length < 2) return null;
+    const d = dir(p.center), m = p.center[p.center.length >> 1];
+    const side = k => { const q = nearestOn(m, TL[k]); return Math.sign(d.e * (q.n - m.n) - d.n * (q.e - m.e)) || 1; };   // −1 rechts, +1 links
+    const [a, b] = p.tracks;
+    return { d, R: side(a) < 0 ? a : b, L: side(a) < 0 ? b : a };
+  });
+  const cuts = TL.map(() => []), B = TL.map(bbox);
+  const near = (x, y) => B[x][0] <= B[y][1] && B[y][0] <= B[x][1] && B[x][2] <= B[y][3] && B[y][2] <= B[x][3];
+  for (let x = 0; x < pairs.length; x++) for (let y = x + 1; y < pairs.length; y++) {
+    const A = info[x], C = info[y];
+    if (!A || !C) continue;
+    const same = A.d.e * C.d.e + A.d.n * C.d.n >= 0;              // gleiche Richtung? sonst sind rechts und links vertauscht
+    const CR = same ? C.R : C.L, CL = same ? C.L : C.R;
+    if (!near(A.R, CR) && !near(A.L, CL)) continue;
+    const xr = allCrosses(TL[A.R], TL[CR]), xl = allCrosses(TL[A.L], TL[CL]);
+    if (!xr.length || xr.length !== xl.length) continue;          // nur wenn beide Seiten gleich oft kreuzen
+    const put = (k1, k2) => c => { if (c.inP) cuts[k1].push(c); if (c.inQ) cuts[k2].push({ i: c.j, t: c.u, pt: c.pt }); };
+    xr.forEach(put(A.R, CR)); xl.forEach(put(A.L, CL));
+  }
+  const lines = [], src = [], idx = [], first = [];
+  TL.forEach((P, k) => { first[k] = lines.length; splitAt(P, cuts[k]).forEach((S, m) => { lines.push(S); src.push(k); idx.push(m); }); });
+  const count = k => (k + 1 < TL.length ? first[k + 1] : lines.length) - first[k];
+  const pieces = [];
+  pairs.forEach((p, x) => {
+    if (!info[x]) { p.tracks.forEach(k => { for (let m = 0; m < count(k); m++) pieces.push({ tracks: [first[k] + m] }); }); return; }
+    const { R, L: Lf } = info[x], nR = count(R), nL = count(Lf);
+    if (nR !== nL) { [R, Lf].forEach(k => { for (let m = 0; m < count(k); m++) pieces.push({ tracks: [first[k] + m] }); }); return; }
+    // Stücke beider Spuren in Fahrtrichtung der Fahrgasse zählen, damit Stück m rechts zu Stück m links gehört
+    const ord = k => { const P = TL[k], fw = (P[P.length - 1].e - P[0].e) * info[x].d.e + (P[P.length - 1].n - P[0].n) * info[x].d.n >= 0; return m => first[k] + (fw ? m : count(k) - 1 - m); };
+    const oR = ord(R), oL = ord(Lf);
+    for (let m = 0; m < nR; m++) pieces.push({ tracks: [oR(m), oL(m)] });
+  });
+  return { lines, pieces, src, idx };
+}
+// Aus den Stücken wieder Spuren machen: was zusammenhängend übrig bleibt, wird wieder eine Linie
+function joinPieces(TL, P, gone) {
+  const out = [];
+  TL.forEach((L0, k) => {
+    const mine = P.lines.map((_, q) => q).filter(q => P.src[q] === k);
+    if (!mine.some(q => gone.has(q))) { out.push(L0); return; }
+    let cur = null;
+    mine.forEach(q => {
+      if (gone.has(q)) { if (cur) out.push(cur); cur = null; return; }
+      cur = cur ? cur.concat(P.lines[q].slice(1)) : P.lines[q].slice();
+    });
+    if (cur) out.push(cur);
+  });
+  return out.filter(L => L.length > 1 && pathLen(L) > 0.5);
+}
 // „Kürzen“ (T-Kreuzung): von innen gezählt endet die Fahrgasse der gekürzten Seite am Schnittpunkt mit ihrer Partnerin von der
 // anderen Seite, die andere läuft durch – so lange sich die Paare kreuzen. Behalten wird das Stück, das weiter von der anderen
 // Linie weg liegt. which: 1 = Linie 1 kürzen, 2 = Linie 2 kürzen. Ergebnis: [{ C, cut }] (cut = endet am Schnittpunkt)
