@@ -139,7 +139,7 @@ Plain HTML, CSS and JavaScript – no build step, no framework (only [Leaflet](h
 | `js/16-ui.js` | Ribbon, side panels, controls, language switch |
 | `js/17-maps.js` | Official aerial images by country, your own maps |
 
-The files are loaded in this order and share their functions. `node tools/build-single.js` builds everything into a single `dist/aog-feldeditor.html`, e.g. to pass it on or to use it offline.
+The files are loaded in this order and share their functions. `node tools/build-single.js` builds everything into a single `dist/aog-feldeditor.html`, e.g. to pass it on or to use it offline. Before publishing, `node tools/stamp.js` adds a content-based version to every CSS/JS link in `index.html` (`?v=…`), so browsers load changed files right away instead of from their cache.
 
 ## Feedback
 

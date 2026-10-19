@@ -139,7 +139,7 @@ Reines HTML, CSS und JavaScript – ohne Build-Schritt und ohne Framework (nur [
 | `js/16-ui.js` | Register, Seitenleisten, Bedienelemente, Sprachumschaltung |
 | `js/17-maps.js` | Amtliche Luftbilder nach Land, eigene Karten |
 
-Die Dateien werden in dieser Reihenfolge geladen und teilen sich ihre Funktionen. `node tools/build-single.js` baut alles in eine einzige Datei `dist/aog-feldeditor.html`, z. B. zum Weitergeben oder für die Offline-Nutzung.
+Die Dateien werden in dieser Reihenfolge geladen und teilen sich ihre Funktionen. `node tools/build-single.js` baut alles in eine einzige Datei `dist/aog-feldeditor.html`, z. B. zum Weitergeben oder für die Offline-Nutzung. Vor dem Veröffentlichen hängt `node tools/stamp.js` an jeden CSS-/JS-Verweis in `index.html` einen Kennwert aus dem Dateiinhalt (`?v=…`) – so laden Browser geänderte Dateien sofort statt aus dem Zwischenspeicher.
 
 ## Rückmeldungen
 
