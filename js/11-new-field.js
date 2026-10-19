@@ -92,8 +92,9 @@ const CLEAR_FILES = {
 function clearLayer(id, label) {
   askPanel('delTitle', t('confirmClear', label), () => doClearLayer(id, label), 'delTitle');
 }
-function doClearLayer(id, label) {
+function doClearLayer(id, label, quiet) {
   if (id === 'flags') { flags = []; selFlag = -1; flagsDirty = true; drawFlags(); updateInfo(); }
+  else if (id === 'tracks') { ex.tracks.forEach(tr => { tr.deleted = true; }); listDirty.tracks = true; hiTrack = -1; drawLayer('tracks'); }
   else {
     const [f, empty] = CLEAR_FILES[id];
     clearedFiles[f] = empty;
@@ -104,9 +105,32 @@ function doClearLayer(id, label) {
     if (id === 'tram') drawLayer('tramw');
   }
   unsaved = true;
-  renderLayerList(); renderNames();
-  setStatus(t('cleared', label), 'ok');
+  renderLayerList(); renderNames(); updateInfo(); updateTitle();
+  if (!quiet) setStatus(t('cleared', label), 'ok');
 }
+// Nach einer Grenzänderung neu anfangen: Spuren, Vorgewende und Fahrgassen auf einmal löschen (per Häkchen wählbar)
+const REBUILD_IDS = ['tracks', 'headland', 'headlines', 'tram'];
+function startRebuild() {
+  const has = REBUILD_IDS.filter(id => exCount(id));
+  if (!has.length) { setStatus(t('rebuildNothing'), 'ok'); return; }
+  const pick = new Set(has);
+  startTool({
+    title: 'btnRebuild', params: [], okLabel: 'delTitle', msg: () => t('rebuildMsg'),
+    okEnabled: () => pick.size > 0,
+    ok() {
+      const done = [...pick].map(id => { doClearLayer(id, t('L_' + id), true); return t('L_' + id); });
+      setStatus(t('cleared', done.join(', ')), 'ok');
+    }
+  });
+  has.forEach(id => {
+    const lab = document.createElement('label'), cb = document.createElement('input'), n = exCount(id);
+    lab.className = 'chkrow'; cb.type = 'checkbox'; cb.checked = true;
+    cb.onchange = () => { cb.checked ? pick.add(id) : pick.delete(id); updateToolbox(); };
+    lab.append(cb, ' ' + t('L_' + id) + (n > 1 && id !== 'headland' ? ` (${n})` : ''));
+    $('toolList').append(lab);
+  });
+}
+$('btnRebuild').onclick = () => { closeTool(); startRebuild(); };
 
 // --- AB-Linie / Kurve wie „AB zeichnen“ in AgOpenGPS (FormABDraw) ---
 // Zwei Punkte, die auf der Grenze einrasten; daraus eine AB-Linie oder eine Kurve entlang der Grenze.

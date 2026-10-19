@@ -179,7 +179,7 @@ function exCount(id) {
   switch (id) {
     case 'sections': return ex.sections ? ex.sections.patches.length : 0;
     case 'tracks': return ex.tracks.filter(x => !x.deleted).length;
-    case 'headland': return ex.headland.length;
+    case 'headland': return ex.headland ? ex.headland.length : 0;      // beim Laden kurz noch nicht gelesen
     case 'headlines': return ex.headlines.filter(h => h.show && !h.deleted).length;
     case 'tram': return ex.tram ? ex.tram.lines.length + (ex.tram.outer.length > 1) + (ex.tram.inner.length > 1) : 0;
     case 'tramw': return ex.tram && (ex.tram.lines.length || ex.tram.outer.length > 1) ? 1 : 0;
@@ -278,7 +278,7 @@ function renderLayerList() {
     eye.append(label + extra);
     eye.onclick = () => { setLayer(id, !layerOn[id]); renderLayerList(); };
     row.append(eye);
-    if ((CLEAR_FILES[id] || id === 'flags') && n) row.append(iconBtn('trash', t('clearTitle'), () => clearLayer(id, label)));
+    if ((CLEAR_FILES[id] || id === 'flags' || id === 'tracks') && n) row.append(iconBtn('trash', t('clearTitle'), () => clearLayer(id, label)));
     box.append(row);
     showLayer(id);
   });

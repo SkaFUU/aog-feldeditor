@@ -6,7 +6,7 @@
 <title>AOG Feldeditor</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="css/editor.css?v=93997053">
+<link rel="stylesheet" href="css/editor.css?v=8c484b27">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute">
@@ -126,6 +126,9 @@
         <div class="grp"><div class="gbody">
           <button class="big c-bnd" id="btnSimp" disabled><svg class="ic"><use href="#i-simp"/></svg><span data-i18n="btnSimp">Ausdünnen</span></button>
         </div><div class="gcap" data-i18n="gReduce">Punkte ausdünnen</div></div>
+        <div class="grp"><div class="gbody">
+          <button class="big c-del" id="btnRebuild" disabled><svg class="ic"><use href="#i-trash"/></svg><span data-i18n="btnRebuild">Spuren &amp; Co. löschen</span></button>
+        </div><div class="gcap" data-i18n="gRebuild">Nach Grenzänderung</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-org" id="btnOriginCenter" disabled><svg class="ic"><use href="#i-ocenter"/></svg><span data-i18n="btnOriginCenter">In Feldmitte</span></button>
           <button class="big c-org" id="btnOriginClick" disabled><svg class="ic"><use href="#i-oclick"/></svg><span data-i18n="btnOriginClick">Per Klick setzen</span></button>
@@ -273,22 +276,22 @@
   <footer id="statusbar"><span id="status"></span><span id="sbCoord"></span></footer>
 </div>
 
-<script src="js/01-i18n.js?v=43225162"></script>
+<script src="js/01-i18n.js?v=51201d3d"></script>
 <script src="js/02-map.js?v=994b5722"></script>
 <script src="js/03-files.js?v=567a72f7"></script>
-<script src="js/04-layers.js?v=36dd48b2"></script>
+<script src="js/04-layers.js?v=ec8a2c62"></script>
 <script src="js/05-boundary-tools.js?v=a9547dec"></script>
 <script src="js/06-export.js?v=f0901926"></script>
 <script src="js/07-import.js?v=6a3a19c3"></script>
 <script src="js/08-split-combine.js?v=8ed6a464"></script>
 <script src="js/09-overlay.js?v=1d3f1e87"></script>
 <script src="js/10-tracks.js?v=03613323"></script>
-<script src="js/11-new-field.js?v=0e0d27bd"></script>
+<script src="js/11-new-field.js?v=285df3d1"></script>
 <script src="js/12-geometry.js?v=03b8b13c"></script>
 <script src="js/13-settings.js?v=0a0c5569"></script>
 <script src="js/14-headland-tram-tools.js?v=62795b85"></script>
 <script src="js/15-measure.js?v=e8bf4533"></script>
-<script src="js/16-ui.js?v=1a389d00"></script>
+<script src="js/16-ui.js?v=11bd1eeb"></script>
 <script src="js/17-maps.js?v=e42405ec"></script>
 </body>
 </html>

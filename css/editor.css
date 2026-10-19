@@ -131,6 +131,8 @@ button.mini.off .ic { opacity:.6; }
 .big.c-del .ic { color:#ff5a5a; }
 .alabel { display:inline-block; transform:translate(14px,6px); background:rgba(0,0,0,.8); color:#00e5ff; font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
 #toolList select, #toolList input { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+#toolList label.chkrow { display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer; }
+#toolList label.chkrow input { width:auto; margin:0; }
 #props { overflow-x:hidden; }
 .scrollList .lbtn { width:100%; min-width:0; }
 .scrollList .ell { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
