@@ -92,22 +92,36 @@ function cutRing(P, p1, p2) {
     const a = P[i], b = P[(i + 1) % n], r = { e: b.e - a.e, n: b.n - a.n }, den = d.e * r.n - d.n * r.e;
     if (Math.abs(den) < 1e-12) continue;
     const t1 = ((a.e - p1.e) * r.n - (a.n - p1.n) * r.e) / den, s1 = ((a.e - p1.e) * d.n - (a.n - p1.n) * d.e) / den;
-    if (s1 >= 0 && s1 < 1) X.push({ t: t1, i, q: { e: p1.e + d.e * t1, n: p1.n + d.n * t1 } });
+    if (s1 >= -1e-9 && s1 < 1 + 1e-9) X.push({ t: t1, i, q: { e: p1.e + d.e * t1, n: p1.n + d.n * t1 } });
   }
   X.sort((x, y) => x.t - y.t);
+  for (let j = X.length - 1; j > 0; j--) if (Math.abs(X[j].t - X[j - 1].t) * Math.sqrt(L2) < 1e-6) X.splice(j, 1);   // Schnitt genau auf einem Grenzpunkt nur einmal zählen
   let k = -1; for (let j = 0; j + 1 < X.length; j += 2) if (X[j].t <= 0.5 + 1e-9 && X[j + 1].t >= 0.5 - 1e-9) k = j;
   if (k < 0) return null;
   let I1 = X[k], I2 = X[k + 1];
   if (I1.i === I2.i) return null;
-  const arc = (x, y) => { const o = [x.q]; for (let j = (x.i + 1) % n; ; j = (j + 1) % n) { o.push(P[j]); if (j === y.i) break; } o.push(y.q); return o; };
+  const arc = (x, y) => { const o = [x.q]; for (let j = (x.i + 1) % n; ; j = (j + 1) % n) { o.push(P[j]); if (j === y.i) break; } o.push(y.q); return o.filter((p, k) => !k || dSq(p, o[k - 1]) > 1e-6); };
   const A = arc(I1, I2), B = arc(I2, I1);
   return A.length > 2 && B.length > 2 ? [A, B] : null;
 }
-// Punkt auf der Grenze einrasten, wenn der Klick nahe dran ist (15 Pixel)
+// Punkt auf der Grenze einrasten, wenn der Klick nahe dran ist (15 Pixel) – ein Grenzpunkt in der Nähe (10 Pixel) geht vor
+const snapPx = n => map.distance(map.containerPointToLatLng([0, 0]), map.containerPointToLatLng([n, 0]));
+function nearVertex(q, R) {
+  let best = null, bd = Infinity;
+  for (const p of R) { const d = dSq(q, p); if (d < bd) { bd = d; best = p; } }
+  return best && Math.sqrt(bd) <= snapPx(10) ? best : null;
+}
 function snapToRing(latlng, R) {
-  const q = plane.fwd(latlng.lat, latlng.lng), s2 = nearestOn(q, R.concat([R[0]]));
-  const px = map.distance(map.containerPointToLatLng([0, 0]), map.containerPointToLatLng([15, 0]));
-  return Math.sqrt(dSq(q, s2)) <= px ? s2 : q;
+  const q = plane.fwd(latlng.lat, latlng.lng), v = nearVertex(q, R);
+  if (v) return v;
+  const s2 = nearestOn(q, R.concat([R[0]]));
+  return Math.sqrt(dSq(q, s2)) <= snapPx(15) ? s2 : q;
+}
+// Grenzpunkte sichtbar machen, damit man sie anklicken kann (Canvas, damit auch viele Punkte flüssig bleiben)
+let vertexCanvas = null;
+function vertexDots(g, R, color) {
+  vertexCanvas = vertexCanvas || L.canvas({ padding: 0.3 });
+  for (const p of R) L.circleMarker(ll(p), { renderer: vertexCanvas, radius: 3, weight: 1, color: '#000', fillColor: color, fillOpacity: 1, interactive: false }).addTo(g);
 }
 function startSplit() {
   if (!(rootHandle && dirHandle && currentField && bnds[0])) { setStatus(t('needSavedField'), 'err'); return; }
@@ -158,6 +172,7 @@ function startSplit() {
         }
         numBadge(g, ll(centroid(P)), i + 1);
       });
+      vertexDots(g, R, '#fff');
       if (pts.length === 2) L.polyline(pts.map(ll), { color: '#ff5a5a', weight: 3, interactive: false }).addTo(g);
       pts.forEach((q, i) => dot(ll(q), '#ff5a5a').addTo(g));
     },
@@ -269,7 +284,7 @@ function startCombine() {
     onClick: p => {
       if (busy || !O) return;
       if (pts.length === 4) pts = [];
-      const q = plane.fwd(p.lat, p.lng), on = R => nearestOn(q, R.concat([R[0]]));
+      const q = plane.fwd(p.lat, p.lng), on = R => nearVertex(q, R) || nearestOn(q, R.concat([R[0]]));
       // erster Punkt einer Verbindung: am näheren Feld; zweiter: immer am anderen Feld
       let f2 = pts.length % 2 ? (pts[pts.length - 1].f === 'A' ? 'O' : 'A') : (dSq(q, on(A)) <= dSq(q, on(O)) ? 'A' : 'O');
       pts.push({ q: on(f2 === 'A' ? A : O), f: f2 });
@@ -280,6 +295,7 @@ function startCombine() {
     draw: g => {
       L.polygon(A.map(ll), { color: '#ff5a5a', weight: 2, fillOpacity: .08, interactive: false }).addTo(g);
       if (O) L.polygon(O.map(ll), { color: '#00e5ff', weight: 2, fillOpacity: .08, interactive: false }).addTo(g);
+      vertexDots(g, A, '#ff5a5a'); if (O) vertexDots(g, O, '#00e5ff');
       if (merged) L.polygon(merged.map(ll), { color: '#ffd400', weight: 3, fillColor: '#ffd400', fillOpacity: .2, interactive: false }).addTo(g);
       for (let k = 0; k + 1 < pts.length; k += 2) L.polyline([ll(pts[k].q), ll(pts[k + 1].q)], { color: '#fff', weight: 3, dashArray: '6 5', interactive: false }).addTo(g);
       pts.forEach((x, i) => numBadge(g, ll(x.q), (i >> 1) + 1));
