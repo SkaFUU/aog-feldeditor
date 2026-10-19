@@ -217,7 +217,7 @@ function startTramTool() {
     get mid() { return cfg.fillLines === 3 && list.length > 1; },
     res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
-      t('tramMsg', tool.res.lines.length) + (tool.res.ring ? t('tramWithRing') : '') + '.' + (have ? ' ' + t('tramAsk') : ''),
+      t('tramMsg', tool.res.lines.length) + (tool.res.ring ? t('tramWithRing') : '') + '.' + (tool.midInfo ? ' ' + t('tramMidCount', tool.midInfo[0], tool.midInfo[1]) : '') + (have ? ' ' + t('tramAsk') : ''),
     recalc() {
       const c = cfg, trA = ex.tracks[c.tramTrack];
       let lines = [];
@@ -225,7 +225,7 @@ function startTramTool() {
       if (this.mode !== c.fillLines) { this.mode = c.fillLines; this.key = this.key1 = null; }   // Umschalten 1/2 Linien: neu vorschlagen
       if (trA && !trA.deleted) {
         const ctx = tramContext(c, c.withRing), RA = refLine(trA);
-        this.midR = null;
+        this.midR = null; this.midInfo = null;
         if (this.mid) {
           // Mitte von 2: die erste Fahrgasse liegt genau auf der Mittellinie, weitere im Abstand nach beiden Seiten.
           // Bezug ist die um einen halben Abstand verschobene Mitte – so liegt Fahrgasse 0 rechts davon genau auf der Mitte.
@@ -239,11 +239,15 @@ function startTramTool() {
             const key1 = ['m', c.tramTrack, c.tramTrack2, c.tramWidth, c.trackWidth, c.withRing, c.ringCount, c.radius].join('/');
             if (this.key1 !== key1) {
               this.key1 = key1;
-              const fit = sd => { let m = 0, empty = 0; for (let k = 0; k < 400 && empty < 3; k++) { const p = tramPair(RR, k, sd, c, ctx); if (p === null) continue; if (!p.length) { empty++; continue; } empty = 0; m++; } return m; };
+              const fit = sd => { let m = 0, empty = 0; for (let k = sd > 0 ? 1 : 0; k < 400 && empty < 3; k++) { const p = tramPair(RR, k, sd, c, ctx); if (p === null) continue; if (!p.length) { empty++; continue; } empty = 0; m++; } return m; };
               cfg.nR = fit(1); cfg.nL = fit(-1);
               saveCfg(); renderCfg();
             }
-            lines = tramAlong(RR, 1, c.nR, c, ctx).concat(tramAlong(RR, -1, c.nL, c, ctx));
+            // die Mitte ist immer dabei; Anzahl rechts/links zählt nur die zusätzlichen je Seite
+            const along = (sd, start, count) => { const o = []; let kept = 0, empty = 0; for (let k = start; k < 400 && kept < count && empty < 3; k++) { const p = tramPair(RR, k, sd, c, ctx); if (p === null) continue; if (!p.length) { empty++; continue; } empty = 0; kept++; o.push(...p); } return o; };
+            const m0 = tramPair(RR, 0, 1, c, ctx);
+            lines = (m0 || []).concat(along(1, 1, c.nR), along(-1, 0, c.nL));
+            this.midInfo = [c.nR, c.nL];
           }
         } else if (!this.two) {
           // 1 Linie: Anzahl rechts/links so vorschlagen, dass das ganze Feld abgedeckt ist (ohne die auf der Randfahrgasse)
