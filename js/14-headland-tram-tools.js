@@ -211,8 +211,10 @@ function startTramTool() {
   startTool({
     title: 'btnTram',
     params: () => cfg.fillLines === 2 && list.length > 1 ? ['fillLines', ...ring(), 'tramTrack', 'nA', 'tramTrack2', 'nB', 'trim']
+      : cfg.fillLines === 3 && list.length > 1 ? ['fillLines', ...ring(), 'tramTrack', 'tramTrack2', 'nR', 'nL']
       : ['fillLines', ...ring(), 'tramTrack', 'nR', 'nL'],
-    get two() { return cfg.fillLines === 2 && list.length > 1; },
+    get two() { return cfg.fillLines >= 2 && list.length > 1; },
+    get mid() { return cfg.fillLines === 3 && list.length > 1; },
     res: { lines: [], ring: null }, hideOk: have,
     msg: () => !tool.res.lines.length ? t(tool.res.ring ? 'tramOnlyRing' : 'tramNone') :
       t('tramMsg', tool.res.lines.length) + (tool.res.ring ? t('tramWithRing') : '') + '.' + (have ? ' ' + t('tramAsk') : ''),
@@ -223,7 +225,27 @@ function startTramTool() {
       if (this.mode !== c.fillLines) { this.mode = c.fillLines; this.key = this.key1 = null; }   // Umschalten 1/2 Linien: neu vorschlagen
       if (trA && !trA.deleted) {
         const ctx = tramContext(c, c.withRing), RA = refLine(trA);
-        if (!this.two) {
+        this.midR = null;
+        if (this.mid) {
+          // Mitte von 2: die erste Fahrgasse liegt genau auf der Mittellinie, weitere im Abstand nach beiden Seiten.
+          // Bezug ist die um einen halben Abstand verschobene Mitte – so liegt Fahrgasse 0 rechts davon genau auf der Mitte.
+          const trB = ex.tracks[c.tramTrack2];
+          if (trB && !trB.deleted && c.tramTrack2 !== c.tramTrack) {
+            const keyM = [c.tramTrack, c.tramTrack2].join('/');
+            if (this.keyM !== keyM) { this.keyM = keyM; this.M = midLine(RA, refLine(trB)); this.key1 = null; }
+            const R = offsetLine(this.M, -c.tramWidth / 2).map(p => ({ ...p }));
+            const RR = openHeadings(minSpacing(R, 2));
+            this.midR = this.M;
+            const key1 = ['m', c.tramTrack, c.tramTrack2, c.tramWidth, c.trackWidth, c.withRing, c.ringCount, c.radius].join('/');
+            if (this.key1 !== key1) {
+              this.key1 = key1;
+              const fit = sd => { let m = 0, empty = 0; for (let k = 0; k < 400 && empty < 3; k++) { const p = tramPair(RR, k, sd, c, ctx); if (p === null) continue; if (!p.length) { empty++; continue; } empty = 0; m++; } return m; };
+              cfg.nR = fit(1); cfg.nL = fit(-1);
+              saveCfg(); renderCfg();
+            }
+            lines = tramAlong(RR, 1, c.nR, c, ctx).concat(tramAlong(RR, -1, c.nL, c, ctx));
+          }
+        } else if (!this.two) {
           // 1 Linie: Anzahl rechts/links so vorschlagen, dass das ganze Feld abgedeckt ist (ohne die auf der Randfahrgasse)
           const key1 = [c.tramTrack, c.tramWidth, c.trackWidth, c.withRing, c.ringCount, c.radius].join('/');
           if (this.key1 !== key1) {
@@ -262,6 +284,7 @@ function startTramTool() {
       if (layerOn.tramw) drawBands(g, bandPolys(r.lines, r.ring, cfg));
       r.lines.forEach(l => prevLine(g, l, '#ffd400', false));
       drawRing(g, r.ring, '8 6');
+      if (tool.midR) { const X = bnds[0] ? polyIndex(aogFence(0)) : null; (X ? clipToPoly(tool.midR, X) : [tool.midR]).forEach(P => prevLine(g, P, '#ffffff', false, '10 6')); }   // Mittellinie
       // Referenzlinien auf der Karte wählen wie im Register Spuren; Nummer 1 (und 2) an der gewählten Linie
       trackPickHits(g, i => tool.pickTrack(i), i => list.some(x => x.i === i));
       const m1 = trackMidInField(cfg.tramTrack, tool.mids); if (m1) numBadge(g, m1, 1);

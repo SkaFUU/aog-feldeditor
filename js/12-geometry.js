@@ -457,6 +457,21 @@ function tramAlong(R, side, count, c, ctx) {
   }
   return out;
 }
+// Mathematische Mitte zwischen zwei Linien (AB oder Kurve): zu jedem Punkt der einen der nächste der anderen, davon die Mitte
+function midLine(RA, RB) {
+  const out = [];
+  RA.forEach(p => {
+    let m = { e: (p.e + nearestOn(p, RB).e) / 2, n: (p.n + nearestOn(p, RB).n) / 2, h: 0 };
+    // bei Kurven nachbessern: den Punkt so weit verschieben, bis er von beiden Linien gleich weit weg ist
+    for (let k = 0; k < 6; k++) {
+      const a = nearestOn(m, RA), b = nearestOn(m, RB), dA = Math.sqrt(dSq(m, a)), dB = Math.sqrt(dSq(m, b)), L1 = Math.sqrt(dSq(a, b)) || 1;
+      if (Math.abs(dA - dB) < 0.005) break;
+      const s = (dB - dA) / 2 / L1; m = { e: m.e + (b.e - a.e) * s, n: m.n + (b.n - a.n) * s, h: 0 };
+    }
+    if (!out.length || dSq(m, out[out.length - 1]) > 0.25) out.push(m);
+  });
+  return out.length > 3 ? openHeadings(minSpacing(out, 2)) : out;
+}
 // Zwei Referenzlinien: Seite zur anderen Linie hin und Abstand dazwischen (Median im Feld)
 function twoGeo(RA, RB, XF) {
   const inA = XF ? RA.filter(p => XF.inside(p)) : RA, pts = inA.length ? inA : RA;

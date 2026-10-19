@@ -76,7 +76,7 @@ const PARAMS = {
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
   radius: { label: 'fRadiusS', num: [0.5, 0], range: [0, 30], hint: () => t('radius0') },
   hdKind: { label: 'fKind', seg: true, opts: () => [['curve', t('segCurve')], ['line', t('segLine')], ['track', t('segTrack')]] },
-  fillLines: { label: 'fFillLines', seg: true, opts: () => [[1, t('segOneLine')], [2, t('segTwoLines')]] },
+  fillLines: { label: 'fFillLines', seg: true, opts: () => [[1, t('segOneLine')], [2, t('segTwoLines')], [3, t('segMidTwo')]] },
   tramTrack: { label: 'fRefLine', opts: trackOpts },
   tramTrack2: { label: 'fRefLine2', opts: trackOpts },
   side: { label: 'fSide', seg: true, opts: () => [[0, t('segAuto')], [1, t('segRight')], [-1, t('segLeft')]] },

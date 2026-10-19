@@ -3,6 +3,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    segMidTwo: 'Mitte von 2',
     dirN: 'N', dirS: 'S', dirE: 'O', dirW: 'W',
     btnMaps: 'Luftbilder und Karten', btnMapsShort: 'Weitere …', bmOrtho: 'Orthofoto', mapsWorld: 'Weltweit', mapsOrtho: 'Amtliche Luftbilder (Orthofotos)', mapsCustom: 'Eigene Karten', mapsOnTop: '(darüber)', cAT: 'Österreich', cCH: 'Schweiz', cDE: 'Deutschland', cNL: 'Niederlande', cFR: 'Frankreich', cCZ: 'Tschechien', cPL: 'Polen', cMore: 'Weitere Länder', mapsAdd: 'Eigene Karte hinzufügen', mapsName: 'Name', mapsXyz: 'Kacheln (XYZ)', mapsXyzUrl: 'https://…/{z}/{x}/{y}.png', mapsWmsUrl: 'WMS-Adresse (https://…)', mapsWmsLayers: 'Layer-Name(n), mit Komma getrennt', mapsAsBase: 'Als Hintergrund', mapsAsOver: 'Als Ebene darüber', mapsAddBtn: 'Hinzufügen', mapsAdded: 'Karte „{0}“ hinzugefügt.', mapsHint: 'Amtliche Luftbilder sind meist schärfer als das weltweite Satellitenbild – gut zum Nachzeichnen von Grenzen. Das gewählte Land liegt dann auf dem Knopf „Orthofoto“.<br>Fehlt dein Land: eigene Karte mit Kachel-Adresse ({z}/{x}/{y}) oder WMS-Dienst hinzufügen. Wird im Browser gemerkt. Bitte die Nutzungsbedingungen des Dienstes beachten.',
     ovAreas: '{0} Flächen', ovCompareWith: 'Verglichen mit „{0}“ (die Fläche über dem offenen Feld).',
@@ -131,6 +132,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    segMidTwo: 'Middle of 2',
     dirN: 'N', dirS: 'S', dirE: 'E', dirW: 'W',
     btnMaps: 'Aerial images and maps', btnMapsShort: 'More …', bmOrtho: 'Aerial', mapsWorld: 'Worldwide', mapsOrtho: 'Official aerial images (orthophotos)', mapsCustom: 'Your own maps', mapsOnTop: '(on top)', cAT: 'Austria', cCH: 'Switzerland', cDE: 'Germany', cNL: 'Netherlands', cFR: 'France', cCZ: 'Czech Republic', cPL: 'Poland', cMore: 'More countries', mapsAdd: 'Add your own map', mapsName: 'Name', mapsXyz: 'Tiles (XYZ)', mapsXyzUrl: 'https://…/{z}/{x}/{y}.png', mapsWmsUrl: 'WMS address (https://…)', mapsWmsLayers: 'Layer name(s), comma separated', mapsAsBase: 'As background', mapsAsOver: 'As layer on top', mapsAddBtn: 'Add', mapsAdded: 'Map “{0}” added.', mapsHint: 'Official aerial images are usually sharper than the worldwide satellite image – good for tracing boundaries. The chosen country then sits on the “Aerial” button.<br>Your country is missing: add your own map with a tile address ({z}/{x}/{y}) or a WMS service. Kept in the browser. Please respect the terms of use of the service.',
     ovAreas: '{0} areas', ovCompareWith: 'Compared with “{0}” (the area over the open field).',
