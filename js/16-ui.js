@@ -84,6 +84,7 @@ function updateInfo() {
   document.getElementById('btnUndo').disabled = !undo.length;
   ['btnNewOuter', 'btnNewAB'].forEach(id => { document.getElementById(id).disabled = !plane; });
   document.getElementById('btnBndCurve').disabled = !bnds[0];
+  document.getElementById('btnAutoSides').disabled = !bnds[0];
   document.getElementById('btnNewInner').disabled = !bnds[0];
   document.getElementById('btnExport').disabled = !plane;
   document.getElementById('btnDelField').disabled = !(rootHandle && dirHandle && currentField);
@@ -160,6 +161,15 @@ function selectFlag(i) {
   if (f && !map.getBounds().pad(-0.1).contains([f.lat, f.lon])) map.panTo([f.lat, f.lon]);
   drawFlags(); drawMarkers(); updateInfo();
 }
+// Fahne eine Stelle nach oben/unten; die Nummern (IDs) werden der Reihenfolge nach neu vergeben
+function moveFlag(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= flags.length) return;
+  [flags[i], flags[j]] = [flags[j], flags[i]];
+  flags.forEach((f, k) => { f.id = k + 1; });
+  if (selFlag === i) selFlag = j; else if (selFlag === j) selFlag = i;
+  flagsDirty = unsaved = true; drawFlags(); renderFlagList(true); updateTitle();
+}
 function renderFlagList(force) {
   const box = $('flagList'), act = document.activeElement;
   if (!force && act && box.contains(act) && act.tagName === 'INPUT') return;      // beim Tippen der Notiz nicht neu aufbauen
@@ -176,6 +186,7 @@ function renderFlagList(force) {
     nm.append(t('flagTip', i + 1));
     if (f.notes) { const n = document.createElement('i'); n.textContent = ' · ' + f.notes; nm.append(n); }
     row.append(ic, nm,
+      iconBtn('up', t('moveUp'), () => moveFlag(i, -1)), iconBtn('down', t('moveDown'), () => moveFlag(i, 1)),
       iconBtn('target', t('flagZoom'), () => { map.setView([f.lat, f.lon], Math.max(map.getZoom(), 18)); if (selFlag !== i) selectFlag(i); }),
       iconBtn('trash', t('delTitle'), () => deleteFlag(i)));
     wrap.append(row);

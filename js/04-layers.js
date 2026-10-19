@@ -294,6 +294,22 @@ function markTrackRows() {
   b.title = b.disabled ? t('smoothNeedSel') : '';
 }
 $('btnSmooth').onclick = () => { const i = hiTrack; if (smoothable(i)) startSmooth(i); };
+// Eintrag eine Stelle nach oben/unten schieben (gelöschte/ausgeblendete überspringen). So wird auch gespeichert –
+// AOG listet Spuren und Vorgewende-Linien in dieser Reihenfolge.
+function moveEntry(kind, i, dir) {
+  if (tool) { setStatus(t('moveCloseTool'), 'err'); return; }
+  const list = ex[kind], ok = k => list[k] && !list[k].deleted && (kind !== 'headlines' || list[k].show);
+  let j = i + dir; while (j >= 0 && j < list.length && !ok(j)) j += dir;
+  if (j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  if (kind === 'tracks') {                                   // Verweise auf Spur-Nummern mitziehen
+    const sw = k => k === i ? j : k === j ? i : k;
+    cfg.tramTrack = sw(cfg.tramTrack); cfg.tramTrack2 = sw(cfg.tramTrack2); saveCfg();
+    hiTrack = sw(hiTrack); if (typeof hiTrack2 !== 'undefined') hiTrack2 = sw(hiTrack2);
+  }
+  listDirty[kind] = true; unsaved = true;
+  drawLayer(kind); renderNames(); updateTitle();
+}
 function renderNames() {
   const boxes = { tracks: $('nameList'), headlines: $('headList') };
   for (const k in boxes) { boxes[k].innerHTML = ''; boxes[k].className = ''; }
@@ -320,6 +336,7 @@ function renderNames() {
       row.onclick = () => select(hiTrack !== i);
     }
     row.append(tag, inp,
+      iconBtn('up', t('moveUp'), () => moveEntry(kind, i, -1)), iconBtn('down', t('moveDown'), () => moveEntry(kind, i, 1)),
       iconBtn(tr.hidden ? 'eyeoff' : 'eye', t('visTitle'), () => { tr.hidden = !tr.hidden; drawLayer(kind); renderNames(); }, tr.hidden ? 'off' : ''),
       iconBtn('trash', t('delTitle'), () => askPanel('delTitle', t('confirmDelTrack', tr.name || t('noName')), () => {
         tr.deleted = true; listDirty[kind] = true; unsaved = true;

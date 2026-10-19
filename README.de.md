@@ -31,6 +31,8 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 **Spuren**
 - **AB / Kurve an Grenze**, wie „AB zeichnen“ in AgOpenGPS: zwei Punkte anklicken, die auf der Grenze einrasten, dann eine AB-Linie oder eine Kurve entlang der Grenze dazwischen anlegen.
 - **Grenze als Spur** („Boundary Curve“): macht aus einer Grenze eine Spur. Bei mehreren Grenzen klickst du die gewünschte an.
+- **Ränder automatisch**: erkennt die Ecken der Außengrenze und legt an jeder Feldseite eine Kurve oder AB-Linie an. Seiten, die man nicht braucht, auf der Karte abwählen.
+- **Reihenfolge**: Spuren, Vorgewende-Linien und Fahnen lassen sich in ihren Listen mit ▲▼ umsortieren – so werden sie gespeichert und in AgOpenGPS aufgelistet. Fahnen werden dabei der Reihe nach neu nummeriert.
 - **Glätten** einer Kurve oder Grenz-Spur (auf der Karte oder rechts in der Liste anklicken, dann „Glätten“; Stärke mit Regler oder als Zahl): ganz, oder nur zwischen zwei Punkten. Dann wird der Abschnitt durch einen glatten Bogen ersetzt, der ohne Knick anschließt, mit zusätzlichen Punkten in engen Bögen. Liegt die Spur auf einer Grenze, rasten die Klicks auf den Grenzpunkten ein, und **„Grenze mitziehen“** passt die Grenzpunkte gleich mit an, damit Grenze, Spur und Vorgewende zusammenpassen.
 - AB-Linien, Kurven und Vorgewende-Linien umbenennen, ein-/ausblenden und löschen. Beim Umbenennen ändert sich in der Datei nur die Namenszeile.
 

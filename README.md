@@ -31,6 +31,8 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 **Tracks**
 - **AB line / curve on the boundary**, like "Draw AB" in AgOpenGPS: click two points that snap to the boundary, then create an AB line or a curve that follows the boundary between them.
 - **Boundary as track** ("Boundary Curve"): turns a boundary into a track. If there is more than one boundary, you click the one you want.
+- **Sides automatically**: finds the corners of the outer boundary and creates a curve or AB line on every field side. Deselect sides you don't need on the map.
+- **Order**: tracks, headland lines and flags can be re-sorted in their lists with ▲▼ – they are saved and listed in AgOpenGPS in that order. Flags are renumbered in order.
 - **Smooth** a curve or boundary track (click it on the map or in the list on the right, then "Smooth"; strength with a slider or as a number): either the whole track, or only between two points. In that case the section is replaced by a smooth arc that joins the track without a kink, with extra points in tight bends. If the track lies on a boundary, clicks snap to the boundary points, and **"Move boundary too"** moves the matching boundary points along, so boundary, track and headland stay consistent.
 - Rename, show/hide and delete AB lines, curves and headland lines. When renaming, only the name line in the file changes.
 

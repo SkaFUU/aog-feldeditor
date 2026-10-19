@@ -45,6 +45,9 @@
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.5 7-10 7c-2 0-3.7-.7-5.1-1.6"/><path d="M3 3l18 18"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-autosides" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z" stroke-dasharray="2 2"/><path d="M6.5 15.5l1.4-8 6.4-2.2 4.2 5.8-4.3 6.4z"/></symbol>
   <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
   <symbol id="i-hdaround" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M7.5 16l1-8.5 8.5-1 .6 9z" stroke-dasharray="2.2 1.8"/></symbol>
   <symbol id="i-hdslice" viewBox="0 0 24 24"><path d="M3 20l2-15 15-2 1 16z"/><path d="M4 9l17-2" stroke-dasharray="2.2 1.8"/><circle cx="4.4" cy="9" r="1.5" fill="currentColor"/><circle cx="20.6" cy="7" r="1.5" fill="currentColor"/></symbol>
@@ -131,6 +134,7 @@
         <div class="grp"><div class="gbody">
           <button class="big c-trk" id="btnNewAB" disabled><svg class="ic"><use href="#i-ab"/></svg><span data-i18n="btnNewAB">AB / Kurve an Grenze</span></button>
           <button class="big c-trk" id="btnBndCurve" disabled><svg class="ic"><use href="#i-bndtrack"/></svg><span data-i18n="btnBndCurve">Grenze als Spur</span></button>
+          <button class="big c-trk" id="btnAutoSides" disabled><svg class="ic"><use href="#i-autosides"/></svg><span data-i18n="btnAutoSides">Ränder automatisch</span></button>
         </div><div class="gcap" data-i18n="gNew">Neu</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-trk" id="btnSmooth" disabled><svg class="ic"><use href="#i-smooth"/></svg><span data-i18n="btnSmooth">Glätten</span></button>
@@ -267,22 +271,22 @@
   <footer id="statusbar"><span id="status"></span><span id="sbCoord"></span></footer>
 </div>
 
-<script src="js/01-i18n.js?v=682a2a96"></script>
-<script src="js/02-map.js?v=d829f526"></script>
+<script src="js/01-i18n.js?v=f0dc18b2"></script>
+<script src="js/02-map.js?v=994b5722"></script>
 <script src="js/03-files.js?v=92589be2"></script>
-<script src="js/04-layers.js?v=2292a2b0"></script>
+<script src="js/04-layers.js?v=36dd48b2"></script>
 <script src="js/05-boundary-tools.js?v=039099c5"></script>
 <script src="js/06-export.js?v=f0901926"></script>
 <script src="js/07-import.js?v=681f1846"></script>
 <script src="js/08-split-combine.js?v=8ed6a464"></script>
 <script src="js/09-overlay.js?v=1d3f1e87"></script>
 <script src="js/10-tracks.js?v=03613323"></script>
-<script src="js/11-new-field.js?v=d4cc15a5"></script>
+<script src="js/11-new-field.js?v=146de53e"></script>
 <script src="js/12-geometry.js?v=03b8b13c"></script>
-<script src="js/13-settings.js?v=1c5c79d0"></script>
+<script src="js/13-settings.js?v=0a0c5569"></script>
 <script src="js/14-headland-tram-tools.js?v=62795b85"></script>
 <script src="js/15-measure.js?v=e8bf4533"></script>
-<script src="js/16-ui.js?v=ad947fdd"></script>
+<script src="js/16-ui.js?v=dc49c515"></script>
 <script src="js/17-maps.js?v=e42405ec"></script>
 </body>
 </html>

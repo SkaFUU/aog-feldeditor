@@ -2,7 +2,7 @@
 
 // --- Einstellungen (Fahrzeug, Gerät, Fahrgassen), gemerkt im Browser; Profile aus dem AgOpenGPS-Ordner ---
 const cfg = { vehicle: '', tool: '', sprayer: '', trackWidth: 1.5, toolWidth: 0, overlap: 0, tramWidth: 14, passes: 0, hdDist: 12, hdWidths: 0, radius: 0,
-  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, splitMode: 0, ovShow: 0, ovCompare: 1, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
+  side: 0, fillSide: 0, simpTol: 0.01, covPrec: 70, covEdge: 20, expFmt: 0, impTarget: 0, impPolyAs: 0, splitMode: 0, ovShow: 0, ovCompare: 1, autoKind: 0, smoothW: 10, smoothRound: 40, withRing: 0, ringCount: 1, trim: 0, fillLines: 1, nA: 1, nB: 1, nR: 1, nL: 1, hdKind: 'curve', tramTrack: -1, tramTrack2: -1, tramSet: false };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('aogCfg') || '{}')); } catch (e) { }
 let profiles = { vehicles: [], tools: [], env: null };
 const saveCfg = () => { try { localStorage.setItem('aogCfg', JSON.stringify(cfg)); } catch (e) { } };
@@ -76,6 +76,7 @@ const PARAMS = {
   hdWidths: { label: 'fWidths', num: [1, 0], hint: () => cfg.tool ? t('toolInfo', fmtNum(cfg.toolWidth - cfg.overlap, 2), fmtNum(cfg.toolWidth, 2), fmtNum(cfg.overlap, 2)) : t('needTool') },
   radius: { label: 'fRadiusS', num: [0.5, 0], range: [0, 30], hint: () => t('radius0') },
   hdKind: { label: 'fKind', seg: true, opts: () => [['curve', t('segCurve')], ['line', t('segLine')], ['track', t('segTrack')]] },
+  autoKind: { label: 'fAutoKind', seg: true, opts: () => [[0, t('segCurves')], [1, t('segABs')]] },
   fillLines: { label: 'fFillLines', seg: true, opts: () => [[1, t('segOneLine')], [2, t('segTwoLines')], [3, t('segMidTwo')]] },
   tramTrack: { label: 'fRefLine', opts: trackOpts },
   tramTrack2: { label: 'fRefLine2', opts: trackOpts },
@@ -157,7 +158,7 @@ function renderCfg() {
   $('btnTramDel').disabled = !nT;
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
-const INT_KEYS = new Set(['nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
+const INT_KEYS = new Set(['autoKind', 'nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);
 const RERENDER = new Set(['fillLines', 'withRing', 'hdKind', 'impTarget', 'splitMode']);        // diese Umschalter ändern, welche Einstellungen gezeigt werden
 function onCfg(el) {
   const k = el.dataset.cfg, v = el.value;

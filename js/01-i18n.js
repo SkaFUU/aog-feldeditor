@@ -3,6 +3,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    moveUp: 'Nach oben', moveDown: 'Nach unten', moveCloseTool: 'Zuerst das offene Werkzeug schließen.', btnAutoSides: 'Ränder automatisch', fAutoKind: 'Als', segCurves: 'Kurven', segABs: 'AB-Linien', autoSidesMsg: '<b>{0}</b> von {1} Feldseiten gewählt – auf der Karte anklicken zum An- und Abwählen.', autoSidesNone: 'An der Grenze wurden keine Ecken erkannt.', autoSidesDone: '{0} Spuren angelegt.',
     tramMidCount: 'Mitte + {0} rechts + {1} links.',
     segMidTwo: 'Mitte von 2',
     dirN: 'N', dirS: 'S', dirE: 'O', dirW: 'W',
@@ -133,6 +134,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    moveUp: 'Move up', moveDown: 'Move down', moveCloseTool: 'Close the open tool first.', btnAutoSides: 'Sides automatically', fAutoKind: 'As', segCurves: 'Curves', segABs: 'AB lines', autoSidesMsg: '<b>{0}</b> of {1} field sides selected – click on the map to select or deselect.', autoSidesNone: 'No corners found on the boundary.', autoSidesDone: '{0} tracks created.',
     tramMidCount: 'Middle + {0} right + {1} left.',
     segMidTwo: 'Middle of 2',
     dirN: 'N', dirS: 'S', dirE: 'E', dirW: 'W',

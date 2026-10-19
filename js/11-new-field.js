@@ -116,16 +116,18 @@ function headingsOf(P) {             // wie CABCurve.CalculateHeadings
   const n = P.length;
   return P.map((p, i) => { const a = P[i === 0 ? 0 : i - 1], c = P[i === n - 1 ? n - 1 : i + 1]; return normH(Math.atan2(c.e - a.e, c.n - a.n)); });
 }
-function alongBoundary(tl) {          // Grenzpunkte zwischen den beiden gewählten Punkten, auf dem kürzeren Weg
+// Grenzpunkte zwischen den beiden gewählten Punkten auf dem kürzeren Weg – beide Endpunkte gehören dazu
+// (bei einer ausgedünnten Grenze mit Punkten nur an den Ecken fehlte sonst die ganze letzte Strecke)
+function alongBoundary(tl) {
   const fence = bnds[tl.bi].pts, n = fence.length, out = [];
   let [s, e] = tl.idx;
   if (Math.abs(s - e) > n * 0.5) {
     if (s < e) [s, e] = [e, s];
     for (let i = s; i < n; i++) out.push(fence[i]);
-    for (let i = 0; i < e; i++) out.push(fence[i]);
+    for (let i = 0; i <= e; i++) out.push(fence[i]);
   } else {
     if (s > e) [s, e] = [e, s];
-    for (let i = s; i < e; i++) out.push(fence[i]);
+    for (let i = s; i <= e; i++) out.push(fence[i]);
   }
   return out;
 }
@@ -144,7 +146,7 @@ function makeABFromTool(tl) {
 }
 function makeCurveFromTool(tl) {
   const P = alongBoundary(tl);
-  if (P.length < 4) { setStatus(t('abTooShort'), 'err'); return; }
+  if (P.length < 2 || pathLen(P) < 2) { setStatus(t('abTooShort'), 'err'); return; }   // Länge zählt, nicht die Punktzahl (ausgedünnte Grenze)
   addTrack(curveTrack(P));
 }
 function curveTrack(P, name) {
@@ -254,6 +256,43 @@ function boundaryTrack(q) {
   if (F.length < 4) { setStatus(t('abTooShort'), 'err'); return; }
   addTrack({ name: q ? 'Inner Boundary Curve ' + q : 'Boundary Curve', mode: 32, heading: 0, pts: F.map(p => plane.inv(p.e, p.n)) });
 }
+// Spuren an allen Feldseiten: Ecken der Außengrenze erkennen, je Seite eine Kurve (wie „Kurve entlang Grenze“) oder AB-Linie.
+// Seiten auf der Karte an-/abwählen (Hand-Cursor), dann übernehmen.
+function startAutoSides() {
+  if (!tracksEditable() || !bnds[0]) return;
+  const F = aogFence(0), n = F.length, sides = detectSides(F).map(sd => {
+    const P = []; for (let i = sd.a; ; i = (i + 1) % n) { P.push(F[i]); if (i === sd.b || P.length > n) break; }
+    return { ...sd, P, on: pathLen(P) >= 10 };
+  });
+  if (!sides.length) { setStatus(t('autoSidesNone'), 'err'); return; }
+  startTool({
+    title: 'btnAutoSides', params: ['autoKind'], okLabel: 'apply', msgHtml: true,
+    msg: () => t('autoSidesMsg', sides.filter(x => x.on).length, sides.length),
+    recalc() { redrawTool(); },
+    draw: g => sides.forEach((sd, k) => {
+      const pl = L.polyline(sd.P.map(ll), { color: sd.on ? '#ffd400' : '#9aa0a6', weight: sd.on ? 5 : 3, dashArray: sd.on ? null : '6 6', bubblingMouseEvents: false }).addTo(g);
+      pl.on('mouseover', () => pl.setStyle({ weight: 8 })).on('mouseout', () => pl.setStyle({ weight: sd.on ? 5 : 3 }));
+      pl.on('click', () => { sd.on = !sd.on; redrawTool(); });
+      numBadge(g, ll(sd.P[sd.P.length >> 1]), k + 1);
+      if (cfg.autoKind === 1 && sd.on) L.polyline([ll(sd.P[0]), ll(sd.P[sd.P.length - 1])], { color: '#ff4fd8', weight: 2, dashArray: '4 4', interactive: false }).addTo(g);
+    }),
+    okEnabled: () => sides.some(x => x.on),
+    ok() {
+      let made = 0;
+      sides.filter(x => x.on).forEach(sd => {
+        if (cfg.autoKind === 1) {
+          const a = toDisk(sd.P[0]), b = toDisk(sd.P[sd.P.length - 1]);
+          if (Math.hypot(b.e - a.e, b.n - a.n) < 2) return;
+          const heading = normH(Math.atan2(b.e - a.e, b.n - a.n));
+          addTrack({ name: 'AB ' + degName(heading), mode: 2, heading, a: [a.e, a.n], b: [b.e, b.n], pts: [] });
+        } else addTrack(curveTrack(sd.P));
+        made++;
+      });
+      setStatus(t('autoSidesDone', made), 'ok');
+    }
+  });
+}
+$('btnAutoSides').onclick = startAutoSides;
 // Nur eine Grenze: sofort anlegen. Mehrere: die gewünschte Grenze auf der Karte anklicken.
 function makeBoundaryTracks() {
   if (!tracksEditable() || !bnds.length) return;
