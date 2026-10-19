@@ -117,6 +117,15 @@ function snapToRing(latlng, R) {
   const s2 = nearestOn(q, R.concat([R[0]]));
   return Math.sqrt(dSq(q, s2)) <= snapPx(15) ? s2 : q;
 }
+// Gesetzten Punkt verschiebbar machen: beim Ziehen rastet er über snap() ein, onMove zeigt die Vorschau, beim Loslassen onEnd
+function dragPin(g, q, color, label, snap, onMove, onEnd) {
+  const m = L.marker(ll(q), { draggable: true, zIndexOffset: 3000, title: t('dragPin'),
+    icon: L.divIcon({ className: '', html: `<div class="pin" style="background:${color}">${label || ''}</div>`, iconSize: [18, 18] }) }).addTo(g);
+  m.on('click', e => L.DomEvent.stopPropagation(e));
+  m.on('drag', e => { const s = snap(e.latlng); m.setLatLng(ll(s)); onMove(s); });
+  m.on('dragend', () => onEnd());
+  return m;
+}
 // Grenzpunkte sichtbar machen, damit man sie anklicken kann (Canvas, damit auch viele Punkte flüssig bleiben)
 let vertexCanvas = null;
 function vertexDots(g, R, color) {
@@ -142,7 +151,7 @@ function startSplit() {
       if (busy) return esc(t('splitBusy'));
       if (pts.length < 2) return esc(t(pts.length ? 'splitPick2' : 'splitPick1'));
       if (!parts) return '<span class="warn">' + esc(t('splitNoCut')) + '</span>';
-      const h = [t('splitParts', ha(parts[0]), ha(parts[1]))];
+      const h = [t('splitParts', ha(parts[0]), ha(parts[1])), esc(t('pinHint'))];
       if (cfg.splitMode === 0) h.push(esc(t('splitKeepInfo', keep + 1, orig)));
       else h.push(esc(t(cfg.splitMode === 2 ? 'splitDelInfo' : 'splitOrigInfo', orig)));
       h.push(esc(t('splitData')));
@@ -173,8 +182,10 @@ function startSplit() {
         numBadge(g, ll(centroid(P)), i + 1);
       });
       vertexDots(g, R, '#fff');
-      if (pts.length === 2) L.polyline(pts.map(ll), { color: '#ff5a5a', weight: 3, interactive: false }).addTo(g);
-      pts.forEach((q, i) => dot(ll(q), '#ff5a5a').addTo(g));
+      const line = pts.length === 2 ? L.polyline(pts.map(ll), { color: '#ff5a5a', weight: 3, interactive: false }).addTo(g) : null;
+      pts.forEach((q, i) => dragPin(g, q, '#ff5a5a', '', p => snapToRing(p, R),
+        s => { pts[i] = s; if (line) line.setLatLngs(pts.map(ll)); },
+        () => { parts = pts.length === 2 ? cutRing(R, pts[0], pts[1]) : null; if (parts && area(parts[1]) > area(parts[0])) parts.reverse(); keep = 0; list(); redrawTool(); }));
     },
     recalc() { list(); redrawTool(); },
     okEnabled: () => !busy && !!parts && (cfg.splitMode === 0 ? nameOk(names[0]) : nameOk(names[1], names[0]) && nameOk(names[0], names[1])),
@@ -277,7 +288,7 @@ function startCombine() {
       if (!other) return esc(t('combPickField'));
       if (!O) return '<span class="warn">' + esc(t('combNoBnd', other.name)) + '</span>';
       if (pts.length < 4) return esc(t(['combPick1', 'combPick2', 'combPick3', 'combPick4'][pts.length]));
-      const h = [t('combResult', fmtNum(area(merged) / 10000, 2), fmtNum(area(A) / 10000, 2), fmtNum((area(O)) / 10000, 2)), esc(t('combInfo', orig, other.name))];
+      const h = [t('combResult', fmtNum(area(merged) / 10000, 2), fmtNum(area(A) / 10000, 2), fmtNum((area(O)) / 10000, 2)), esc(t('pinHint')), esc(t('combInfo', orig, other.name))];
       if (!nameOk()) h.push('<span class="warn">' + esc(t('splitBadName')) + '</span>');
       return h.join('<br>');
     },
@@ -297,8 +308,14 @@ function startCombine() {
       if (O) L.polygon(O.map(ll), { color: '#00e5ff', weight: 2, fillOpacity: .08, interactive: false }).addTo(g);
       vertexDots(g, A, '#ff5a5a'); if (O) vertexDots(g, O, '#00e5ff');
       if (merged) L.polygon(merged.map(ll), { color: '#ffd400', weight: 3, fillColor: '#ffd400', fillOpacity: .2, interactive: false }).addTo(g);
-      for (let k = 0; k + 1 < pts.length; k += 2) L.polyline([ll(pts[k].q), ll(pts[k + 1].q)], { color: '#fff', weight: 3, dashArray: '6 5', interactive: false }).addTo(g);
-      pts.forEach((x, i) => numBadge(g, ll(x.q), (i >> 1) + 1));
+      const lines = [];
+      for (let k = 0; k + 1 < pts.length; k += 2) lines[k >> 1] = L.polyline([ll(pts[k].q), ll(pts[k + 1].q)], { color: '#fff', weight: 3, dashArray: '6 5', interactive: false }).addTo(g);
+      pts.forEach((x, i) => {                                   // Punkt ziehen: bleibt an seinem Feld
+        const Rf = x.f === 'A' ? A : O;
+        dragPin(g, x.q, x.f === 'A' ? '#ff5a5a' : '#00e5ff', (i >> 1) + 1, p => { const q = plane.fwd(p.lat, p.lng); return nearVertex(q, Rf) || nearestOn(q, Rf.concat([Rf[0]])); },
+          s => { x.q = s; const ln = lines[i >> 1]; if (ln) ln.setLatLngs([ll(pts[i & ~1].q), ll(pts[i | 1].q)]); },
+          () => { const g2 = (k, fl) => (pts[k].f === fl ? pts[k] : pts[k + 1]).q; merged = pts.length === 4 ? mergeRings(A, O, g2(0, 'A'), g2(0, 'O'), g2(2, 'A'), g2(2, 'O')) : null; redrawTool(); });
+      });
     },
     okEnabled: () => !busy && !!merged && nameOk(),
     ok() {

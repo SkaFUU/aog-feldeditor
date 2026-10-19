@@ -115,6 +115,7 @@ button.mini.off .ic { opacity:.6; }
 
 .pt { background:#fff; border:2px solid var(--acc); border-radius:50%; }
 .pt.sel { background:var(--warn); border-color:#000; }
+.pin { width:18px; height:18px; box-sizing:border-box; border:2px solid #000; border-radius:50%; cursor:move; color:#000; font:700 11px/14px system-ui, sans-serif; text-align:center; box-shadow:0 0 0 2px rgba(255,255,255,.7); }
 .flag { position:relative; width:18px; height:24px; }
 .flag::before { content:''; position:absolute; left:1px; top:0; width:2px; height:24px; background:#111; }
 .flag::after { content:''; position:absolute; left:3px; top:0; width:13px; height:10px; background:var(--c); border:1px solid #000; }
