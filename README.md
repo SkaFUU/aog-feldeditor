@@ -18,7 +18,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 
 **Edit the field boundary**
 - Every point is shown on the satellite image. You can drag points, insert them (click the line) or delete them (right-click or Del). Ctrl+Z undoes the last step.
-- While you drag a point, a dashed ghost of the old point and the old boundary stays visible until your next action.
+- While you drag a point, a dashed ghost of the old point and the old boundary stays visible until your next action. The offset is shown as well: direct distance plus east/west and north/south in metres (also when moving flags) – handy if you noted corrections out in the field.
 - Draw a new outer or inner boundary by clicking points on the map.
 - All boundaries are listed: click a name to edit it (click again to stop editing), the eye shows or hides it, the bin deletes it. Inner boundaries can be marked as **drive-through** (e.g. a ditch or path), and AgOpenGPS builds no U-turn line there.
 - **Split**: click two points (they snap to the boundary when close) – the field is split along that line. Choose: one part stays in the field and the other becomes a new field, or both become new fields (the old one stays or is deleted). AB lines and curves are shortened at the cut line and extended there by 99 m like when they are made, flags go by position, tramlines and boundary tram are cut at the line; rebuild the headland afterwards. Saved right away, with backup.

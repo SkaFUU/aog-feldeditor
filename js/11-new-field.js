@@ -11,9 +11,30 @@ map.on('click', clearGhost);
 document.addEventListener('keydown', clearGhost, true);
 document.addEventListener('click', e => { if (e.target.closest('header, #nav, #props, #toolbox')) clearGhost(); }, true);
 function showGhost(p, ring) {
-  ghostLayer.clearLayers();
+  ghostLayer.clearLayers(); moveLayer = null;
   if (ring) L.polyline(ring, { color: '#fff', weight: 1.5, opacity: .85, dashArray: '6 6', interactive: false }).addTo(ghostLayer);
   L.circleMarker(p, { radius: 7, color: '#fff', weight: 2, dashArray: '3 3', fill: false, interactive: false }).addTo(ghostLayer);
+}
+// Versatz beim Ziehen: direkte Strecke, dazu Ost/West (waagrecht) und Nord/Süd (senkrecht) – bleibt wie der Schatten stehen
+let moveLayer = null;
+function showMove(a, b) {
+  if (moveLayer) ghostLayer.removeLayer(moveLayer);
+  moveLayer = L.layerGroup().addTo(ghostLayer);
+  const pl = plane || Plane(a.lat, a.lng), A = pl.fwd(a.lat, a.lng), B = pl.fwd(b.lat, b.lng), C = { e: B.e, n: A.n };
+  const de = B.e - A.e, dn = B.n - A.n, d = Math.hypot(de, dn), LL = p => L.latLng(...pl.inv(p.e, p.n)), mid = (p, q) => LL({ e: (p.e + q.e) / 2, n: (p.n + q.n) / 2 });
+  if (d < 0.005) return;
+  const st = { color: '#ffd400', weight: 2, interactive: false };
+  L.polyline([LL(A), LL(B)], st).addTo(moveLayer);
+  L.polyline([LL(A), LL(C), LL(B)], { ...st, weight: 1.5, dashArray: '4 4' }).addTo(moveLayer);
+  const lab = (p, txt, cls) => L.marker(p, { interactive: false, icon: L.divIcon({ className: '', html: `<span class="mvlabel${cls || ''}">${txt}</span>`, iconSize: [0, 0] }) }).addTo(moveLayer);
+  const ew = Math.abs(de) >= 0.005 ? t(de > 0 ? 'dirE' : 'dirW') + ' ' + fmtNum(Math.abs(de), 2) + ' m' : '';
+  const ns = Math.abs(dn) >= 0.005 ? t(dn > 0 ? 'dirN' : 'dirS') + ' ' + fmtNum(Math.abs(dn), 2) + ' m' : '';
+  const px = map.latLngToContainerPoint(LL(A)).distanceTo(map.latLngToContainerPoint(LL(B)));
+  if (px >= 120) {                                              // groß genug: an den Seiten beschriften
+    lab(mid(A, B), '<b>' + fmtNum(d, 2) + ' m</b>');
+    if (ew) lab(mid(A, C), ew);
+    if (ns) lab(mid(C, B), ns);
+  } else lab(LL(B), '<b>' + fmtNum(d, 2) + ' m</b><br>' + [ew, ns].filter(Boolean).join(' · '), ' box');   // klein: ein Kästchen neben dem Punkt
 }
 
 // --- Neues Feld (wie „Neues Feld“ in AgOpenGPS: Ordner mit Field.txt und leeren Dateien) ---

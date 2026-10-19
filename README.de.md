@@ -18,7 +18,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 
 **Schlaggrenze bearbeiten**
 - Jeder Punkt ist auf dem Satellitenbild sichtbar und lässt sich verschieben, einfügen (Klick auf die Linie) oder löschen (Rechtsklick oder Entf). Strg+Z macht den letzten Schritt rückgängig.
-- Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion.
+- Beim Verschieben bleibt ein gestrichelter Schatten des alten Punkts und der alten Grenze sichtbar, bis zur nächsten Aktion. Dazu steht der Versatz da: direkter Abstand sowie Ost/West und Nord/Süd in Metern (auch beim Verschieben von Fahnen) – praktisch, wenn man Korrekturen draußen am Feld notiert hat.
 - Neue Außen- oder Innengrenze zeichnen: Punkte auf die Karte klicken.
 - Alle Grenzen stehen in einer Liste: Namen anklicken zum Bearbeiten (nochmal klicken beendet das), das Auge blendet ein oder aus, der Papierkorb löscht. Innengrenzen lassen sich als **befahrbar** markieren (z. B. Graben oder Weg), dann legt AgOpenGPS dort keine Wendelinie an.
 - „Aus Fahrspur“ legt eine Außengrenze um die bearbeitete Fläche, praktisch für Felder, die ohne Grenze gefahren wurden. Der Regler „Genauigkeit“ bestimmt, ab welcher Richtungsänderung ein Punkt gesetzt wird: links grob mit wenigen Punkten, rechts genau nachgezeichnet. Mit „Seiten ab (m)“ wird jede Feldseite ab dieser Länge als eigene Kurve nachgezogen, so wie sie abgefahren wurde; wo sich die verlängerten Seiten treffen, ist die Ecke, und die zackigen Wendebereiche fallen weg – ein rechteckiges Feld hat dann nur noch 4 Punkte. Die Genauigkeit bestimmt, wie eng die Kurven der Kontur folgen. Ausgegraut, wenn das Feld keine bearbeitete Fläche hat.

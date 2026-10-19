@@ -140,6 +140,8 @@ button.mini.off .ic { opacity:.6; }
 .mtab td { padding:2px 4px; border-bottom:1px solid #2b2f35; }
 .ovlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#d0a8ff; font:600 12px system-ui,sans-serif; padding:2px 6px; border-radius:3px; white-space:nowrap; }
 .lg { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+.mvlabel { display:inline-block; transform:translate(-50%,-50%); background:rgba(0,0,0,.8); color:#ffd400; font:500 12px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+.mvlabel.box { transform:translate(14px,-110%); text-align:left; line-height:1.35; }
 .mlabel { display:inline-block; transform:translate(-50%,-140%); background:rgba(0,0,0,.8); color:var(--warn); font:600 11px system-ui,sans-serif; padding:1px 5px; border-radius:3px; white-space:nowrap; }
 .tag { flex:0 0 44px; font-size:12px; color:var(--muted); }
 .bndrow { display:flex; align-items:center; gap:6px; padding:4px 6px; margin:2px 0; border-radius:6px; cursor:pointer; font-size:13px; }

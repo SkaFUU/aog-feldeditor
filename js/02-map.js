@@ -107,7 +107,7 @@ function drawMarkers() {
   for (const [i, q] of vis) {
     const m = L.marker(q, { icon: i === sel ? iconSel : icon, draggable: true, autoPan: true });
     m.on('dragstart', () => { pushUndo(); sel = i; const old = b.pts.map(ll); old.push(old[0]); showGhost(q, old); });
-    m.on('drag', e => { b.pts[i] = plane.fwd(e.latlng.lat, e.latlng.lng); drawActive(); });
+    m.on('drag', e => { b.pts[i] = plane.fwd(e.latlng.lat, e.latlng.lng); drawActive(); showMove(q, e.latlng); });
     m.on('dragend', () => { changed(b); drawMarkers(); });
     m.on('click', () => { clearGhost(); sel = i; selFlag = -1; drawMarkers(); drawFlags(); updateInfo(); });
     m.on('contextmenu', e => { L.DomEvent.preventDefault(e.originalEvent); deletePoint(i); });
@@ -124,6 +124,7 @@ function drawFlags() {
     const m = L.marker([f.lat, f.lon], { icon: ic, draggable: edit, interactive: edit, zIndexOffset: 1000 });
     m.bindTooltip(t('flagTip', i + 1) + (f.notes ? ': ' + f.notes : ''), { direction: 'top', offset: [6, -24] });
     m.on('dragstart', () => showGhost(L.latLng(f.lat, f.lon)));
+    m.on('drag', e => showMove(L.latLng(f.lat, f.lon), e.latlng));
     m.on('dragend', e => { const p = e.target.getLatLng(); f.lat = p.lat; f.lon = p.lng; flagsDirty = unsaved = true; selFlag = i; drawFlags(); updateInfo(); });
     m.on('click', () => { clearGhost(); selFlag = i; sel = -1; drawFlags(); drawMarkers(); updateInfo(); });
     m.addTo(flagLayer);
