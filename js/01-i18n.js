@@ -3,6 +3,7 @@
 // ---------- Sprache (Deutsch / Englisch) ----------
 const I18N = {
   de: {
+    discardOpen: '„{0}“ hat ungespeicherte Änderungen. Was soll damit passieren, bevor „{1}“ geöffnet wird?', discardNew: '„{0}“ hat ungespeicherte Änderungen. Was soll damit passieren, bevor das neue Feld angelegt wird?', saveAndGo: 'Speichern und weiter', discardAndGo: 'Verwerfen und weiter',
     moveUp: 'Nach oben', moveDown: 'Nach unten', moveCloseTool: 'Zuerst das offene Werkzeug schließen.', btnAutoSides: 'Ränder automatisch', fAutoKind: 'Als', segCurves: 'Kurven', segABs: 'AB-Linien', autoSidesMsg: '<b>{0}</b> von {1} Feldseiten gewählt – auf der Karte anklicken zum An- und Abwählen.', autoSidesNone: 'An der Grenze wurden keine Ecken erkannt.', autoSidesDone: '{0} Spuren angelegt.',
     tramMidCount: 'Mitte + {0} rechts + {1} links.',
     segMidTwo: 'Mitte von 2',
@@ -134,6 +135,7 @@ const I18N = {
     twolNo: 'Diese Spurdatei hat ein altes Format – neue oder geänderte Spuren gehen hier nicht.'
   },
   en: {
+    discardOpen: '“{0}” has unsaved changes. What should happen to them before “{1}” is opened?', discardNew: '“{0}” has unsaved changes. What should happen to them before the new field is created?', saveAndGo: 'Save and continue', discardAndGo: 'Discard and continue',
     moveUp: 'Move up', moveDown: 'Move down', moveCloseTool: 'Close the open tool first.', btnAutoSides: 'Sides automatically', fAutoKind: 'As', segCurves: 'Curves', segABs: 'AB lines', autoSidesMsg: '<b>{0}</b> of {1} field sides selected – click on the map to select or deselect.', autoSidesNone: 'No corners found on the boundary.', autoSidesDone: '{0} tracks created.',
     tramMidCount: 'Middle + {0} right + {1} left.',
     segMidTwo: 'Middle of 2',

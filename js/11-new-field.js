@@ -53,7 +53,7 @@ function newFieldTemplates() {
 }
 function newField() {
   if (window.showDirectoryPicker && !rootHandle) { setStatus(t('needRoot'), 'err'); return; }
-  if (unsaved) { askPanel('btnNewField', t('discard'), askFieldName, 'discardYes'); return; }
+  if (unsaved) { askDiscard('btnNewField', 'discardNew', '', askFieldName); return; }
   askFieldName();
 }
 // Name des neuen Feldes in der Seitenleiste eingeben (Enter = Übernehmen)

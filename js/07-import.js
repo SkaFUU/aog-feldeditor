@@ -396,7 +396,7 @@ function importNewField(sel, name) {
     map.fitBounds(L.latLngBounds(o.rings[0]), { animate: false });   // vorläufiger Ursprung = Feldmitte
     createField(name, () => { const sk = importBoundaries(sel, false); importRest(sel); importDone(sk); fitField(); });
   };
-  if (unsaved) askPanel('btnImport', t('discard'), go, 'discardYes'); else go();
+  if (unsaved) askDiscard('btnImport', 'discardNew', '', go); else go();
 }
 async function importFiles(list) {
   if (!list || !list.length) return;

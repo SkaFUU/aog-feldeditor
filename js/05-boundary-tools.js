@@ -10,6 +10,16 @@ const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function askPanel(title, text, onYes, yesLabel) {
   startTool({ title, params: [], msgHtml: true, msg: () => esc(text).replace(/\n/g, '<br>'), okLabel: yesLabel || 'confirmYes', ok() { onYes(); } });
 }
+// Das offene Feld hat ungespeicherte Änderungen: sagen, welches Feld, und speichern oder verwerfen lassen, bevor es weitergeht
+function askDiscard(title, textKey, target, go) {
+  const cur = newFieldName || currentField || t('noField');
+  startTool({
+    title, params: [], msgHtml: true, okLabel: 'discardAndGo',
+    msg: () => esc(t(textKey, cur, target || '')),
+    actions: () => [{ label: 'saveAndGo', run: async () => { if (await saveField()) go(); } }],
+    ok() { go(); }
+  });
+}
 function startTool(def) {
   closeTool();
   if (mode) setMode(mode);                       // laufenden Modus (Fahne/Ursprung) beenden

@@ -351,14 +351,14 @@ async function openField(name) {
     const d = await rootHandle.getDirectoryHandle(name);
     load(await readDir(d));
     dirHandle = d; currentField = name;
-    renderFieldList(); updateInfo();
+    renderFieldList(); updateInfo(); updateTitle();
     setStatus(t('fieldLoaded', name), 'ok');
   } catch (err) { setStatus(t('error', err.message), 'err'); }
 }
 $('fieldList').onchange = e => {
   const name = e.target.value;
   if (!name || name === currentField) return;
-  if (unsaved) { e.target.value = currentField; askPanel('hFields', t('discard') + '\n„' + name + '“', () => openField(name), 'discardYes'); return; }
+  if (unsaved) { e.target.value = currentField; askDiscard('hFields', 'discardOpen', name, () => openField(name)); return; }
   openField(name);
 };
 
