@@ -14,6 +14,7 @@ The layout works like Office: tabs at the top for **Field, Boundary, Tracks, Hea
 
 **New field**
 - Create a new field like in AgOpenGPS: enter a name, click the outer boundary on the map, save. The editor writes the same files AgOpenGPS creates for a new field and puts the origin in the field center.
+- "Rename" renames the open field (its folder). All files and backups are kept, unsaved changes stay open.
 - "Delete field" deletes the open field completely – the whole field folder with all files and backups. You are asked first; it cannot be undone.
 
 **Edit the field boundary**

@@ -14,6 +14,7 @@ Die Bedienung ist aufgebaut wie in Office: Oben gibt es Register für **Feld, Gr
 
 **Neues Feld**
 - Ein neues Feld anlegen wie in AgOpenGPS: Namen eingeben, Außengrenze auf die Karte klicken, speichern. Der Editor legt dieselben Dateien an wie AgOpenGPS bei einem neuen Feld und setzt den Ursprung in die Feldmitte.
+- „Umbenennen“ gibt dem offenen Feld (dem Feldordner) einen neuen Namen. Alle Dateien und Sicherungen bleiben, ungespeicherte Änderungen bleiben offen.
 - „Feld löschen“ löscht das offene Feld komplett – den ganzen Feldordner mit allen Dateien und Sicherungen. Vorher kommt eine Rückfrage, rückgängig machen lässt es sich nicht.
 
 **Schlaggrenze bearbeiten**

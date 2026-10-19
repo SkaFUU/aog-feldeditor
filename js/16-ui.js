@@ -88,6 +88,7 @@ function updateInfo() {
   document.getElementById('btnNewInner').disabled = !bnds[0];
   document.getElementById('btnExport').disabled = !plane;
   document.getElementById('btnDelField').disabled = !(rootHandle && dirHandle && currentField);
+  document.getElementById('btnRenField').disabled = !(rootHandle && (dirHandle && currentField || newFieldName));
   ['btnSplit', 'btnCombine'].forEach(id => { document.getElementById(id).disabled = !(rootHandle && dirHandle && currentField && bnds[0]); });
   document.getElementById('btnBndCov').disabled = !(plane && ex.sections && ex.sections.patches.length);
   document.getElementById('btnBndCov').title = plane && !(ex.sections && ex.sections.patches.length) ? t('needCoverage') : '';

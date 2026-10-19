@@ -344,6 +344,80 @@ $('btnDelField').onclick = () => {
     } catch (err) { setStatus(t('error', err.message), 'err'); }
   }, 'btnDelField');
 };
+// Feld umbenennen: Feldordner umbenennen (oder kopieren und alten löschen), das offene Feld samt ungespeicherten Änderungen bleibt offen
+$('btnRenField').onclick = () => {
+  const old = dirHandle ? currentField : newFieldName;
+  if (!rootHandle || !old) return;
+  closeTool(); showTab('feld');
+  const clean = v => String(v || '').replace(/[\\/:*?"<>|]/g, '').trim();
+  const taken = v => fieldNames.some(n => n !== old && n.toLowerCase() === v.toLowerCase());
+  startTool({
+    title: 'btnRenField', params: [], okLabel: 'btnRenField', msgHtml: true,
+    msg: () => { const v = clean(tool.nameVal); return esc(t('renFieldMsg', old)).replace(/\n/g, '<br>') +(v && taken(v) ? '<br><b>' + esc(t('fieldExists', v)) + '</b>' : ''); },
+    okEnabled: () => { const v = clean(tool.nameVal); return !!v && v !== old && !taken(v); },
+    ok() { renameField(old, clean(this.nameVal)); }
+  });
+  const inp = document.createElement('input');
+  inp.value = tool.nameVal = old;
+  inp.oninput = () => { tool.nameVal = inp.value; updateToolbox(); };
+  inp.onkeydown = e => { if (e.key === 'Enter' && !$('toolOk').disabled) finishTool(); };
+  $('toolList').append(inp);
+  inp.focus(); inp.select();
+};
+async function copyDir(src, dst) {
+  for await (const [n, h] of src.entries()) {
+    if (h.kind === 'directory') await copyDir(h, await dst.getDirectoryHandle(n, { create: true }));
+    else { const f = await h.getFile(), w = await (await dst.getFileHandle(n, { create: true })).createWritable(); await w.write(f); await w.close(); }
+  }
+}
+async function dirSig(d) {                                  // Dateien mit Größe, zum Prüfen der Kopie
+  const s = [];
+  for await (const [n, h] of d.entries()) {
+    if (h.kind === 'directory') for (const x of await dirSig(h)) s.push(n + '/' + x);
+    else s.push(n + ':' + (await h.getFile()).size);
+  }
+  return s.sort();
+}
+async function renameField(old, name) {
+  if (!dirHandle) {                                         // neues, noch nie gespeichertes Feld: nur den Namen ändern
+    newFieldName = name; renderFieldList(); updateInfo(); updateTitle();
+    setStatus(t('fieldRenamed', old, name), 'ok'); return;
+  }
+  const exists = async n => { try { await rootHandle.getDirectoryHandle(n); return true; } catch (e) { return false; } };
+  const moveDir = async (src, from, to) => {               // Ordner „from“ → „to“; liefert den neuen Ordner
+    if (await exists(to)) throw new Error(t('fieldExists', to));
+    if (src.move) { try { await src.move(to); if (!(await exists(from))) return await rootHandle.getDirectoryHandle(to); } catch (e) { /* geht nicht – dann kopieren */ } }
+    const d = await rootHandle.getDirectoryHandle(to, { create: true });
+    await copyDir(src, d);
+    if ((await dirSig(src)).join('|') !== (await dirSig(d)).join('|')) { try { await rootHandle.removeEntry(to, { recursive: true }); } catch (e) { } throw new Error(t('renCopyBad')); }
+    await rootHandle.removeEntry(from, { recursive: true });
+    return d;
+  };
+  const done = d => {
+    fieldNames = fieldNames.filter(n => n !== old); fieldNames.push(name); fieldNames.sort((a, b) => a.localeCompare(b, 'de'));
+    dirHandle = d; currentField = name;
+    renderFieldList(); updateInfo(); updateTitle();
+  };
+  try {
+    let d;
+    if (old.toLowerCase() === name.toLowerCase()) {          // nur Groß/Klein geändert: unter Windows über einen Zwischennamen
+      const tmp = name + ' ~' + Date.now().toString(36);
+      d = await moveDir(await moveDir(dirHandle, old, tmp), tmp, name);
+    } else d = await moveDir(dirHandle, old, name);
+    done(d);
+    setStatus(t('fieldRenamed', old, name), 'ok');
+  } catch (err) {
+    const hasNew = await exists(name), hasOld = await exists(old);
+    if (hasNew && !hasOld) { done(await rootHandle.getDirectoryHandle(name)); setStatus(t('fieldRenamed', old, name), 'ok'); return; }
+    if (hasNew && hasOld && old.toLowerCase() !== name.toLowerCase() && !fieldNames.includes(name)) {      // Kopie ist fertig, nur der alte Ordner ließ sich nicht löschen (z. B. in AOG offen)
+      fieldNames.push(name); fieldNames.sort((a, b) => a.localeCompare(b, 'de'));
+      dirHandle = await rootHandle.getDirectoryHandle(name); currentField = name;
+      renderFieldList(); updateInfo(); updateTitle();
+      setStatus(t('renOldLeft', old, name, err.message), 'err'); return;
+    }
+    setStatus(t('error', err.message), 'err');
+  }
+}
 try { const m = sessionStorage.getItem('aogMsg'); if (m) { sessionStorage.removeItem('aogMsg'); setTimeout(() => setStatus(m, 'ok'), 300); } } catch (e) { }
 
 async function openField(name) {
