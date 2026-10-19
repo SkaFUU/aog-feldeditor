@@ -409,7 +409,7 @@ function splitAt(P, cuts) {
 // Fahrgasse kreuzt, die linke nur an der linken. Bleibt von zwei Fahrgassen je ein Stück stehen, gehen die Spuren so ohne Versatz
 // ineinander über. Gibt die Stücke zurück: lines (Spurstücke), pieces [{ tracks: [Stück rechts, Stück links] | [Stück] }],
 // src[k] = Nummer der ursprünglichen Spur, idx[k] = Nummer des Stücks auf ihr.
-function tramPieces(TL, pairs) {
+function tramPieces(TL, pairs, extra) {                    // extra[k]: weitere Schnitte für Spur k (z. B. von einer Schnittlinie)
   const dir = P => { const a = P[0], b = P[P.length - 1]; const l = Math.hypot(b.e - a.e, b.n - a.n) || 1; return { e: (b.e - a.e) / l, n: (b.n - a.n) / l }; };
   const info = pairs.map(p => {
     if (p.tracks.length < 2 || p.center.length < 2) return null;
@@ -431,6 +431,7 @@ function tramPieces(TL, pairs) {
     const put = (k1, k2) => c => { if (c.inP) cuts[k1].push(c); if (c.inQ) cuts[k2].push({ i: c.j, t: c.u, pt: c.pt }); };
     xr.forEach(put(A.R, CR)); xl.forEach(put(A.L, CL));
   }
+  if (extra) extra.forEach((cs, k) => { if (cs) cuts[k].push(...cs); });
   const lines = [], src = [], idx = [], first = [];
   TL.forEach((P, k) => { first[k] = lines.length; splitAt(P, cuts[k]).forEach((S, m) => { lines.push(S); src.push(k); idx.push(m); }); });
   const count = k => (k + 1 < TL.length ? first[k + 1] : lines.length) - first[k];

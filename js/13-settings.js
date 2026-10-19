@@ -156,6 +156,7 @@ function renderCfg() {
   const T = ex.tram, nT = T ? T.lines.length + (T.outer.length > 1 ? 1 : 0) : 0;
   $('btnTramMid').disabled = !(T && T.lines.length >= 2);
   $('btnTramDel').disabled = !nT;
+  $('btnTramCut').disabled = !(ex.tram && ex.tram.lines.length);
   $('tramInfo').innerHTML = !plane ? '–' : t('tramHave', T ? T.lines.length : 0, T && T.outer.length > 1 ? t('yes') : t('no'));
 }
 const INT_KEYS = new Set(['autoKind', 'nR', 'nL', 'smoothW', 'smoothRound', 'passes', 'side', 'fillSide', 'hdWidths', 'nA', 'nB', 'withRing', 'ringCount', 'trim', 'fillLines', 'tramTrack', 'tramTrack2']);

@@ -400,8 +400,73 @@ function startTramDel() {
     }
   });
 }
+// Schneiden: Schnittlinie mit zwei Klicks (Punkte danach noch verschiebbar) – jede Fahrgasse, die sie kreuzt, wird dort geteilt.
+// Stücke anklicken nimmt sie weg (nochmal = zurück), „Seite A/B weg“ schneidet alle auf einer Seite ab. Übernehmen speichert
+// auch reines Teilen: die Stücke bleiben dann einzelne Fahrgassen, die man später z. B. mit „Löschen“ entfernen kann.
+function startTramCut() {
+  if (!ex.tram || !ex.tram.lines.length) return;
+  const { T, TL, pairs } = tramPlane(), hist = [];
+  let pts = [], gone = new Set(), P = null, cutPts = [];
+  const sideOf = q => { const [a, b] = pts; return Math.sign((b.e - a.e) * (q.n - a.n) - (b.n - a.n) * (q.e - a.e)); };
+  const calc = () => {
+    cutPts = [];
+    if (pts.length < 2) { P = null; return; }
+    const S = [pts[0], pts[1]];
+    const extra = TL.map(L => { const x = allCrosses(L, S).filter(c => c.inP); cutPts.push(...x.map(c => c.pt)); return x; });
+    P = cutPts.length ? tramPieces(TL, pairs, extra) : null;
+  };
+  const atCut = q => P.lines[q].length > 1 && cutPts.some(c => dSq(c, P.lines[q][0]) < 1e-6 || dSq(c, P.lines[q][P.lines[q].length - 1]) < 1e-6);
+  const mid = S => S[S.length >> 1];
+  // Seite A/B: alle Stücke, die an der Schnittlinie enden und auf dieser Seite liegen
+  const sidePieces = s => P ? P.pieces.map((p, k) => k).filter(k => P.pieces[k].tracks.some(atCut) && sideOf(mid(P.lines[P.pieces[k].tracks[0]])) === s) : [];
+  const toggle = keys => { hist.push(new Set(gone)); const all = keys.every(k => gone.has(k)); keys.forEach(k => all ? gone.delete(k) : gone.add(k)); redrawTool(); };
+  startTool({
+    title: 'btnTramCut', params: [], okLabel: 'apply',
+    msg: () => pts.length < 2 ? t(pts.length ? 'cutPick2' : 'cutPick1') : !P ? t('cutNone') : t('cutMsg', cutPts.length, gone.size),
+    onClick: p => {
+      if (pts.length === 2) { pts = []; gone = new Set(); }
+      pts.push(plane.fwd(p.lat, p.lng)); calc(); redrawTool();
+    },
+    onUndo: () => { if (hist.length) gone = hist.pop(); else { pts.pop(); calc(); } redrawTool(); },
+    draw: g => {
+      if (P) {
+        tramHits(g, P.lines, P.pieces, null, k => toggle([k]));
+        P.pieces.forEach((pc, k) => { if (gone.has(k)) pc.tracks.forEach(q => L.polyline(P.lines[q].map(ll), { color: '#ff5a5a', weight: 3, dashArray: '4 5', interactive: false }).addTo(g)); });
+        cutPts.forEach(c => dot(ll(c), '#fff').setRadius(3).addTo(g));
+      }
+      if (pts.length === 2) {
+        const [a, b] = pts, line = L.polyline([ll(a), ll(b)], { color: '#ff5a5a', weight: 2, dashArray: '8 5', interactive: false }).addTo(g);
+        const l = Math.sqrt(dSq(a, b)) || 1, m = { e: (a.e + b.e) / 2, n: (a.n + b.n) / 2 }, nx = -(b.n - a.n) / l * 12, ny = (b.e - a.e) / l * 12;
+        if (P) { numBadge(g, ll({ e: m.e + nx, n: m.n + ny }), 'A'); numBadge(g, ll({ e: m.e - nx, n: m.n - ny }), 'B'); }
+        pts.forEach((q, i) => dragPin(g, q, '#ff5a5a', '', p => plane.fwd(p.lat, p.lng), s => { pts[i] = s; line.setLatLngs(pts.map(ll)); }, () => { gone = new Set(); hist.length = 0; calc(); redrawTool(); }));
+      } else pts.forEach(q => dot(ll(q), '#ff5a5a').addTo(g));
+    },
+    actions: () => P ? [{ label: 'cutSideA', keep: true, run: () => toggle(sidePieces(1)) }, { label: 'cutSideB', keep: true, run: () => toggle(sidePieces(-1)) }] : [],
+    okEnabled: () => !!P,
+    ok() {
+      const del = new Set(); gone.forEach(k => P.pieces[k].tracks.forEach(q => del.add(q)));
+      const isCut = p => cutPts.some(c => dSq(c, p) < 1e-6), lines = [];
+      // je Spur: übrige Stücke wieder verbinden – außer an der Schnittlinie (dort bleibt sie geteilt); Unberührtes bleibt wie es war
+      TL.forEach((L0, k) => {
+        const mine = P.lines.map((_, q) => q).filter(q => P.src[q] === k);
+        if (mine.length === 1 && !del.has(mine[0])) { lines.push(T.lines[k]); return; }
+        let cur = null;
+        const flush = () => { if (cur && cur.length > 1 && pathLen(cur) > 0.5) lines.push(cur.map(p => plane.inv(p.e, p.n))); cur = null; };
+        mine.forEach(q => {
+          if (del.has(q)) { flush(); return; }
+          const S = P.lines[q];
+          if (cur && !isCut(S[0])) cur = cur.concat(S.slice(1)); else { flush(); cur = S.slice(); }
+        });
+        flush();
+      });
+      setTramData({ outer: T.outer, inner: T.inner, lines });
+      setStatus(t('cutDone', cutPts.length, gone.size), 'ok');
+    }
+  });
+}
 renderCfg();
 $('btnHdAround').onclick = startHdAround;
+$('btnTramCut').onclick = startTramCut;
 $('btnHdSlice').onclick = startHdSlice;
 $('btnTram').onclick = startTramTool;
 $('btnTramRing').onclick = startTramRing;

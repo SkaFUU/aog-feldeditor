@@ -45,7 +45,8 @@
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.5 7-10 7c-2 0-3.7-.7-5.1-1.6"/><path d="M3 3l18 18"/></symbol>
   <symbol id="i-rename" viewBox="0 0 24 24"><path d="M3 7h10M3 12h7M3 17h5M13 20l1-4 6-6 3 3-6 6-4 1z"/></symbol>
-  <symbol id="i-trash"viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 7.5 20 18M8.5 16.5 20 6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-autosides" viewBox="0 0 24 24"><path d="M4 17L6 6l9-3 6 8-6 9z" stroke-dasharray="2 2"/><path d="M6.5 15.5l1.4-8 6.4-2.2 4.2 5.8-4.3 6.4z"/></symbol>
@@ -164,6 +165,7 @@
         </div><div class="gcap" data-i18n="gTramBuild">Fahrgassen erzeugen</div></div>
         <div class="grp"><div class="gbody">
           <button class="big c-tram" id="btnTramMid" disabled><svg class="ic"><use href="#i-trammid"/></svg><span data-i18n="btnTramMid">Gasse dazwischen</span></button>
+          <button class="big c-tram" id="btnTramCut" disabled><svg class="ic"><use href="#i-cut"/></svg><span data-i18n="btnTramCut">Schneiden</span></button>
           <button class="big c-tram" id="btnTramDel" disabled><svg class="ic"><use href="#i-trash"/></svg><span data-i18n="btnTramDel">Löschen</span></button>
         </div><div class="gcap" data-i18n="gEdit">Bearbeiten</div></div>
         <div class="grp"><div class="gbody"><div class="rf">
@@ -276,7 +278,7 @@
   <footer id="statusbar"><span id="status"></span><span id="sbCoord"></span></footer>
 </div>
 
-<script src="js/01-i18n.js?v=fcfff137"></script>
+<script src="js/01-i18n.js?v=5cb478c9"></script>
 <script src="js/02-map.js?v=994b5722"></script>
 <script src="js/03-files.js?v=567a72f7"></script>
 <script src="js/04-layers.js?v=ec8a2c62"></script>
@@ -287,9 +289,9 @@
 <script src="js/09-overlay.js?v=1d3f1e87"></script>
 <script src="js/10-tracks.js?v=03613323"></script>
 <script src="js/11-new-field.js?v=285df3d1"></script>
-<script src="js/12-geometry.js?v=03891f19"></script>
-<script src="js/13-settings.js?v=0a0c5569"></script>
-<script src="js/14-headland-tram-tools.js?v=90ba60fb"></script>
+<script src="js/12-geometry.js?v=e8b0ea0e"></script>
+<script src="js/13-settings.js?v=56921bc2"></script>
+<script src="js/14-headland-tram-tools.js?v=233753d4"></script>
 <script src="js/15-measure.js?v=e8bf4533"></script>
 <script src="js/16-ui.js?v=11bd1eeb"></script>
 <script src="js/17-maps.js?v=e42405ec"></script>
